@@ -4,8 +4,10 @@ const { addCredits, budgetOk, saveForensics, getDeployerPriorRugs } = require('.
 
 const DAILY_BUDGET = parseInt(process.env.HELIUS_DAILY_BUDGET || '28000', 10);
 const HELIUS_KEY = process.env.HELIUS_KEY || '';
-const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
-const ENHANCED_URL = `https://api.helius.xyz/v0`;
+// Use Helius if key provided, otherwise fall back to Ankr's free public endpoint
+const RPC_URL = HELIUS_KEY
+  ? `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`
+  : (process.env.RPC_URL || 'https://rpc.ankr.com/solana');
 
 // Pump.fun total supply constant
 const TOTAL_SUPPLY = 1_000_000_000;
@@ -13,7 +15,7 @@ const TOTAL_SUPPLY = 1_000_000_000;
 // ── rate limiter: max 8 req/s ─────────────────────────────────────────
 const _queue = [];
 let _inflight = 0;
-const MAX_RPS = 8;
+const MAX_RPS = HELIUS_KEY ? 8 : 3;
 const SLOT_MS = 1000 / MAX_RPS;
 
 function rateLimit(fn) {
@@ -287,18 +289,7 @@ async function checkSocials(uri) {
 async function runForensics(launch) {
   const { mint, deployer, uri, created_at, graduated_at } = launch;
 
-  if (!HELIUS_KEY) {
-    console.warn('[forensics] HELIUS_KEY not set, skipping forensics for', mint);
-    saveForensics(mint, {
-      bundle_pct: null, dev_age_days: null, dev_prior_rugs: 0,
-      top10_pct: null, dev_sold_early: 0, has_socials: 0,
-      organic_buyers: 0, insider_cluster_pct: 0,
-      deployer_id: _deployerId(deployer || '', 0), same_block_snipes: 0,
-    });
-    return;
-  }
-
-  console.log(`[forensics] processing ${mint}`);
+  console.log(`[forensics] processing ${mint} via ${HELIUS_KEY ? 'Helius' : 'Ankr public RPC'}`);
 
   try {
     const [
