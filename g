@@ -1,3 +1,6 @@
+---
+layout: null
+---
 #!/bin/sh
 cd /root
 rm -rf lab
