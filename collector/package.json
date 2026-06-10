@@ -1,0 +1,21 @@
+{
+  "name": "survivor-lab-collector",
+  "version": "1.0.0",
+  "description": "PumpPortal → Helius → Dexscreener data pipeline for Survivor Lab",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "calibrate": "node calibrate.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0",
+    "ws": "^8.17.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
