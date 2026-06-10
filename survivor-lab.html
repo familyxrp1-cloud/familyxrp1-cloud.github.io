@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#08080C">
+<title>SURVIVOR LAB — Solana Launch Forensics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#08080C;
+  --srf:#0E0E16;
+  --srf2:#12121D;
+  --line:rgba(180,180,215,.11);
+  --line2:rgba(180,180,215,.24);
+  --txt:#ECECF4;
+  --mut:#8B8BA3;
+  --win:#14F195;
+  --win-soft:rgba(20,241,149,.1);
+  --rug:#FF4757;
+  --rug-soft:rgba(255,71,87,.1);
+  --sol:#9945FF;
+  --sol-soft:rgba(153,69,255,.12);
+  --amb:#FFB13D;
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Oxanium',sans-serif;
+  --body:'Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--txt);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--sol);color:#fff}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.mono{font-family:var(--mono)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:rgba(8,8,12,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:800;font-size:16px;letter-spacing:.05em}
+.logo i{width:26px;height:26px;display:grid;place-items:center;font-style:normal;font-size:13px;background:linear-gradient(135deg,var(--sol),var(--win));color:#06060A;font-weight:800;border-radius:4px}
+.logo small{color:var(--mut);font-weight:600;font-size:10px;letter-spacing:.22em;display:block;line-height:1}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{font-family:var(--disp);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:8px 14px;border-radius:4px;transition:.15s}
+.nav-tab:hover{color:var(--txt)}
+.nav-tab.act{color:var(--win);background:var(--win-soft)}
+.net-pill{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amb);border:1px solid rgba(255,177,61,.35);padding:5px 10px;border-radius:3px;transition:.3s}
+.net-pill.live{color:var(--win);border-color:rgba(20,241,149,.35)}
+.net-pill.offline{color:var(--rug);border-color:rgba(255,71,87,.35)}
+
+/* views */
+html.routed [data-view]{display:none}
+html.routed [data-view].on{display:block}
+section[data-view]{padding:46px 0 90px}
+
+/* shared */
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--sol);margin-bottom:14px}
+h1{font-family:var(--disp);font-weight:800;font-size:clamp(30px,5vw,52px);line-height:1.05;margin-bottom:16px}
+h2{font-family:var(--disp);font-weight:700;font-size:clamp(22px,3vw,32px);line-height:1.1}
+.sub{color:var(--mut);max-width:560px;font-size:15px}
+.panel{background:var(--srf);border:1px solid var(--line);border-radius:8px}
+.k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+
+/* loading */
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:300px;color:var(--mut)}
+.loading-state .spinner{width:32px;height:32px;border:3px solid var(--line2);border-top-color:var(--sol);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:60px 20px;color:var(--mut)}
+.empty-state h3{font-family:var(--disp);font-size:20px;margin-bottom:8px;color:var(--txt)}
+
+/* overview */
+.ov-head{margin-bottom:36px}
+.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:40px}
+.stat{background:var(--srf);border:1px solid var(--line);border-radius:8px;padding:20px;position:relative;overflow:hidden}
+.stat .v{font-family:var(--disp);font-weight:800;font-size:34px;line-height:1.1}
+.stat .v.win{color:var(--win)} .stat .v.rug{color:var(--rug)} .stat .v.sol{color:var(--sol)} .stat .v.amb{color:var(--amb)}
+.stat .k{margin-top:6px;display:block}
+.split-wrap{margin-bottom:40px}
+.split-bar{display:flex;height:34px;border-radius:6px;overflow:hidden;border:1px solid var(--line2)}
+.split-bar div{display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:700;color:#06060A;min-width:0;white-space:nowrap;overflow:hidden}
+.split-leg{display:flex;gap:20px;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--mut);flex-wrap:wrap}
+.split-leg b{color:var(--txt);font-weight:500}
+.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:7px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mini-dna{padding:22px}
+.mini-dna h3{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.mini-dna p{font-size:13px;color:var(--mut);margin-bottom:18px}
+.lift-row{display:grid;grid-template-columns:1fr 90px;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.lift-row:last-child{border-bottom:none}
+.lift-row .nm{font-size:13px}
+.lift-row .nm small{display:block;font-family:var(--mono);font-size:10px;color:var(--mut);margin-top:2px}
+.lift-val{font-family:var(--disp);font-weight:800;font-size:17px;text-align:right}
+.lift-val.w{color:var(--win)} .lift-val.r{color:var(--rug)}
+
+/* launches */
+.feed-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filter{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);border:1px solid var(--line2);padding:7px 13px;border-radius:4px;transition:.15s}
+.filter.act{color:#06060A;font-weight:700}
+.filter.act.f-all{background:var(--sol);border-color:var(--sol)}
+.filter.act.f-win{background:var(--win);border-color:var(--win)}
+.filter.act.f-rug{background:var(--rug);border-color:var(--rug)}
+.filter.act.f-fade{background:var(--amb);border-color:var(--amb)}
+.specimens{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.spec{background:var(--srf);border:1px solid var(--line);border-radius:8px;padding:18px;transition:.15s}
+.spec:hover{border-color:var(--line2)}
+.spec-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.spec-img{width:42px;height:42px;border-radius:6px;display:grid;place-items:center;font-family:var(--disp);font-weight:800;font-size:13px;color:#06060A;flex-shrink:0}
+.spec-nm{font-family:var(--disp);font-weight:700;font-size:15px;line-height:1.2}
+.spec-nm small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;color:var(--mut);letter-spacing:.06em;margin-top:2px}
+.verdict{margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:3px}
+.v-win{color:var(--win);background:var(--win-soft);border:1px solid rgba(20,241,149,.35)}
+.v-rug{color:var(--rug);background:var(--rug-soft);border:1px solid rgba(255,71,87,.35)}
+.v-fade{color:var(--amb);background:rgba(255,177,61,.08);border:1px solid rgba(255,177,61,.3)}
+.spec-flags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.flag{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:4px 8px;border-radius:3px;border:1px solid var(--line2);color:var(--mut)}
+.flag.bad{color:var(--rug);border-color:rgba(255,71,87,.4);background:var(--rug-soft)}
+.flag.good{color:var(--win);border-color:rgba(20,241,149,.4);background:var(--win-soft)}
+.spec-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.spec-meta div{background:var(--srf2);padding:10px 12px}
+.spec-meta .k{font-size:9px;display:block;margin-bottom:4px}
+.spec-meta .vv{font-family:var(--mono);font-size:13px;font-weight:500}
+.spec-meta .vv.w{color:var(--win)} .spec-meta .vv.r{color:var(--rug)}
+
+/* dna */
+.dna-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:34px}
+.dna-panel{padding:24px}
+.dna-panel h3{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.dna-panel h3 i{width:10px;height:10px;border-radius:2px;font-style:normal}
+.dna-panel>p{font-size:13px;color:var(--mut);margin-bottom:22px}
+.dna-row{margin-bottom:18px}
+.dna-row:last-child{margin-bottom:0}
+.dna-lbl{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;gap-row:4px;flex-wrap:wrap}
+.dna-lbl .nm{font-size:13px;font-weight:500}
+.dna-lbl .ct{font-family:var(--mono);font-size:10px;color:var(--mut)}
+.dna-track{height:22px;background:rgba(180,180,215,.07);border-radius:4px;position:relative;overflow:hidden}
+.dna-track i{position:absolute;inset:0 auto 0 0;width:0;border-radius:4px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.dna-track .pc{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:10px;font-weight:700;color:var(--txt)}
+.dna-foot{margin-top:30px;border-top:1px dashed var(--line2);padding-top:16px;font-family:var(--mono);font-size:11px;color:var(--mut);line-height:1.7}
+
+/* rules */
+.rules{display:flex;flex-direction:column;gap:12px;margin-top:34px}
+.rule{display:grid;grid-template-columns:74px 1fr auto;gap:18px;align-items:center;padding:18px 20px}
+.rule .x{font-family:var(--disp);font-weight:800;font-size:24px;color:var(--win)}
+.rule .x.neg{color:var(--rug)}
+.rule .x small{display:block;font-size:9px;font-family:var(--mono);font-weight:400;color:var(--mut);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.rule .tx{font-size:14px}
+.rule .tx small{display:block;font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:4px}
+.rule .n{font-family:var(--mono);font-size:11px;color:var(--mut);text-align:right;white-space:nowrap}
+.method{margin-top:36px;padding:22px;border:1px dashed var(--line2);border-radius:8px;font-size:13px;color:var(--mut);line-height:1.7}
+.method b{color:var(--txt);font-weight:600}
+
+/* wire */
+.wire-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:34px}
+.wire-card{padding:24px}
+.wire-card h3{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px}
+.wire-card p{font-size:13px;color:var(--mut);margin-bottom:14px}
+.code{background:#06060A;border:1px solid var(--line);border-radius:6px;padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.7;color:#B9B9D0;overflow-x:auto;white-space:pre}
+.code .c{color:#5A5A75}.code .g{color:var(--win)}.code .p{color:var(--sol)}
+.wire-note{margin-top:14px;border-left:2px solid var(--amb);padding:10px 14px;background:rgba(255,177,61,.05);font-size:12.5px;color:var(--mut)}
+
+/* trends */
+.tr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:34px}
+.tr-card{padding:24px}
+.tr-card.full{grid-column:1/-1}
+.tr-card h3{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.tr-card>p{font-size:13px;color:var(--mut);margin-bottom:18px}
+.curve{width:100%;height:auto;display:block}
+.curve text{font-family:var(--mono);font-size:9px;fill:var(--mut)}
+.curve .axis{stroke:var(--line2);stroke-width:1}
+.curve .grid{stroke:var(--line);stroke-width:1;stroke-dasharray:2 4}
+.curve-leg{display:flex;gap:18px;margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--mut);flex-wrap:wrap}
+.meta-row{display:grid;grid-template-columns:130px 1fr 64px;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.meta-row:last-child{border-bottom:none}
+.meta-row .nm{font-size:13px}
+.meta-row .nm small{display:block;font-family:var(--mono);font-size:9px;color:var(--mut);margin-top:1px}
+.meta-row .bar{height:18px;background:rgba(180,180,215,.07);border-radius:3px;position:relative;overflow:hidden}
+.meta-row .bar i{position:absolute;inset:0 auto 0 0;border-radius:3px;background:linear-gradient(90deg,#5B2E99,var(--sol))}
+.meta-row .vv{font-family:var(--disp);font-weight:800;font-size:15px;text-align:right;color:var(--sol)}
+.lineage{width:100%;border-collapse:collapse;font-size:13px}
+.lineage th{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);text-align:left;padding:9px 12px;border-bottom:1px solid var(--line2);font-weight:500}
+.lineage td{padding:11px 12px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px}
+.lineage td:first-child{font-family:var(--body);font-weight:500;font-size:13px}
+.lineage .w{color:var(--win)} .lineage .r{color:var(--rug)}
+.lineage .tagv{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:3px}
+.smart{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:6px}
+.smart div{background:var(--srf2);padding:16px}
+.smart .big{font-family:var(--disp);font-weight:800;font-size:30px}
+@media (max-width:920px){
+  .tr-grid{grid-template-columns:1fr}
+  .meta-row{grid-template-columns:104px 1fr 54px}
+}
+
+.t-basket{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tier{border:1px solid var(--line);border-radius:6px;padding:18px;background:var(--srf2)}
+.tier h4{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.tier .sub2{font-family:var(--mono);font-size:10px;color:var(--mut);margin-bottom:14px;display:block}
+.tier .row2{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--mut)}
+.tier .row2:last-child{border-bottom:none}
+.tier .row2 b{font-family:var(--mono);font-weight:600;color:var(--txt)}
+.tier .row2 b.hot{color:var(--win)}
+.tier.best{border-color:rgba(20,241,149,.4);background:linear-gradient(180deg,rgba(20,241,149,.05),var(--srf2))}
+@media (max-width:920px){.t-basket{grid-template-columns:1fr}}
+
+/* tabbar */
+.tabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(8,8,12,.95);backdrop-filter:blur(14px);border-top:1px solid var(--line2)}
+.tabbar button{flex:1;padding:10px 4px 13px;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.tabbar button .ic{font-family:var(--disp);font-weight:800;font-size:14px;line-height:1}
+.tabbar button.act{color:var(--win)}
+
+/* reveal */
+html.js .rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+html.js .rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html.js .rv{opacity:1;transform:none}
+}
+@media (max-width:920px){
+  .nav-tabs{display:none}
+  html.routed .tabbar{display:flex}
+  html.routed body{padding-bottom:62px}
+  .ov-grid{grid-template-columns:1fr 1fr}
+  .two-col,.specimens,.dna-cols,.wire-grid{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .rule{grid-template-columns:64px 1fr}
+  .rule .n{display:none}
+  .spec-meta{grid-template-columns:1fr 1fr 1fr}
+  section[data-view]{padding:34px 0 80px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="#/overview" data-route="overview"><i>SL</i><span>SURVIVOR LAB<small>SOLANA LAUNCH FORENSICS</small></span></a>
+    <div class="nav-tabs">
+      <button class="nav-tab" data-route="overview">Overview</button>
+      <button class="nav-tab" data-route="launches">Launches</button>
+      <button class="nav-tab" data-route="dna">Winner DNA</button>
+      <button class="nav-tab" data-route="trends">Trends</button>
+      <button class="nav-tab" data-route="rules">Rules</button>
+      <button class="nav-tab" data-route="wire">Wire live data</button>
+    </div>
+    <span class="net-pill" id="statusPill">Connecting…</span>
+  </div>
+</nav>
+
+<!-- OVERVIEW -->
+<section data-view="overview">
+  <div class="wrap">
+    <div class="ov-head rv">
+      <div class="eyebrow">Specimen population · pump.fun-style launches</div>
+      <h1>Most launches die.<br><span style="color:var(--win)">These didn't.</span></h1>
+      <p class="sub">Every launch in the lab is dissected into measurable traits — bundling, deployer history, holder spread, socials — then tracked to its outcome. The engine recomputes everything from the loaded dataset, so conclusions update the moment live data is wired in.</p>
+    </div>
+    <div class="ov-grid">
+      <div class="stat rv"><div class="v" id="sTotal">—</div><span class="k">Launches analyzed</span></div>
+      <div class="stat rv"><div class="v win" id="sWinRate">—</div><span class="k">Survived &amp; held</span></div>
+      <div class="stat rv"><div class="v rug" id="sBundled">—</div><span class="k">Bundled at launch</span></div>
+      <div class="stat rv"><div class="v amb" id="sMedX">—</div><span class="k">Median winner peak</span></div>
+    </div>
+    <div class="split-wrap rv">
+      <span class="k" style="display:block;margin-bottom:10px">Outcome distribution</span>
+      <div class="split-bar" id="splitBar"></div>
+      <div class="split-leg" id="splitLeg"></div>
+    </div>
+    <div class="two-col">
+      <div class="panel mini-dna rv">
+        <h3 style="color:var(--win)">Top winner signals</h3>
+        <p>Traits most over-represented in survivors vs the base rate.</p>
+        <div id="miniWin"></div>
+      </div>
+      <div class="panel mini-dna rv">
+        <h3 style="color:var(--rug)">Top rug signals</h3>
+        <p>Traits most over-represented in rugs vs the base rate.</p>
+        <div id="miniRug"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAUNCHES -->
+<section data-view="launches">
+  <div class="wrap">
+    <div class="feed-head rv">
+      <div>
+        <div class="eyebrow">Specimen feed</div>
+        <h2>Every launch, flagged and scored.</h2>
+      </div>
+      <div class="filters">
+        <button class="filter f-all act" data-f="all">All</button>
+        <button class="filter f-win" data-f="win">Winners</button>
+        <button class="filter f-rug" data-f="rug">Rugs</button>
+        <button class="filter f-fade" data-f="fade">Faded</button>
+      </div>
+    </div>
+    <div class="specimens" id="feed"></div>
+  </div>
+</section>
+
+<!-- DNA -->
+<section data-view="dna">
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">Comparative trait analysis</div>
+      <h2>Winner DNA vs rug DNA.</h2>
+      <p class="sub" style="margin-top:10px">For each trait: how often it appears in survivors vs rugs. The gap is the signal.</p>
+    </div>
+    <div class="dna-cols">
+      <div class="panel dna-panel rv">
+        <h3><i style="background:var(--win)"></i>Survivors</h3>
+        <p>Trait prevalence among launches that graduated and held.</p>
+        <div id="dnaWin"></div>
+      </div>
+      <div class="panel dna-panel rv">
+        <h3><i style="background:var(--rug)"></i>Rugs</h3>
+        <p>Trait prevalence among launches that pulled liquidity or dev-dumped to zero.</p>
+        <div id="dnaRug"></div>
+      </div>
+    </div>
+    <div class="dna-foot rv" id="dnaFoot"></div>
+  </div>
+</section>
+
+<!-- TRENDS -->
+<section data-view="trends">
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">Behavior over time</div>
+      <h2>What runners do that rugs can't fake.</h2>
+      <p class="sub" style="margin-top:10px">Snapshot traits get you in the door. The separation happens in the first 48 hours — holder accumulation shape, deployer track record, and timing inside a meta.</p>
+    </div>
+    <div class="tr-grid">
+      <div class="panel tr-card full rv">
+        <h3>Median holder trajectory · first 48h</h3>
+        <p>Winners compound: steady organic accumulation that keeps climbing after graduation. Rugs spike in the deploy block (the bundle), flatline, then collapse when the dev exits. The shape is the tell — by hour 6 the curves have already diverged.</p>
+        <svg class="curve" id="curveSvg" viewBox="0 0 720 240" role="img" aria-label="Median holder count over 48 hours for winners, fades and rugs"></svg>
+        <div class="curve-leg">
+          <span><i class="dot" style="background:var(--win)"></i>Survivors</span>
+          <span><i class="dot" style="background:var(--amb)"></i>Faded</span>
+          <span><i class="dot" style="background:var(--rug)"></i>Rugs</span>
+        </div>
+      </div>
+      <div class="panel tr-card rv">
+        <h3>Win rate by meta position</h3>
+        <p>Riding a narrative early matters. First movers in a fresh meta survive far more often than the 4th+ copycat of the same joke.</p>
+        <div id="metaPos"></div>
+      </div>
+      <div class="panel tr-card rv">
+        <h3>Win rate by narrative</h3>
+        <p>Metas rotate weekly. The engine groups launches by narrative cluster and scores each one — wire real data to see the current rotation.</p>
+        <div id="metaCluster"></div>
+      </div>
+      <div class="panel tr-card full rv">
+        <h3>Deployer lineage</h3>
+        <p>Wallets linked by funding source, treated as one deployer. History is the strongest prior there is: serial ruggers repeat, proven shippers repeat too.</p>
+        <div style="overflow-x:auto">
+          <table class="lineage">
+            <thead><tr><th>Deployer cluster</th><th>Launches</th><th>Survived</th><th>Rugged</th><th>Hit rate</th><th>Read</th></tr></thead>
+            <tbody id="lineageBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel tr-card full rv">
+        <h3>Smart-money overlap</h3>
+        <p>Share of launches where 2+ wallets with a profitable launch-trading history bought in the first 30 minutes. Smart money isn't always right — but it's rarely in rugs.</p>
+        <div class="smart">
+          <div><span class="k">Among survivors</span><div class="big" style="color:var(--win)" id="smWin">—</div></div>
+          <div><span class="k">Among rugs</span><div class="big" style="color:var(--rug)" id="smRug">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section data-view="rules">
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">Extracted heuristics</div>
+      <h2>The common denominators, as rules.</h2>
+      <p class="sub" style="margin-top:10px">Each rule shows the win-rate multiplier when the condition holds, with the sample size behind it. Computed live from the dataset.</p>
+    </div>
+    <div class="rules" id="rules"></div>
+    <div class="panel tr-card full rv" style="margin-top:14px">
+      <h3>Basket math · buy 5, need 1</h3>
+      <p>Your strategy, quantified against this dataset. Each filter level changes the hit rate — and the hit rate changes the odds that a 5-token basket contains at least one survivor.</p>
+      <div class="t-basket" id="basket"></div>
+      <div class="method" style="margin-top:18px" id="basketNote"></div>
+    </div>
+    <div class="method rv">
+      <b>How to read this:</b> a 3.4× lift means launches matching the condition survived 3.4 times more often than the population average. Lift is correlation, not causation — a deployer with aged wallets and real socials is also the kind of deployer who doesn't rug. Sample sizes below ~10 are noise; treat them as hypotheses, not signals. None of this is financial advice — it's a microscope, not a crystal ball.
+    </div>
+  </div>
+</section>
+
+<!-- WIRE -->
+<section data-view="wire">
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">Live data pipeline</div>
+      <h2>How the data flows in.</h2>
+      <p class="sub" style="margin-top:10px">The collector runs 24h unattended and exposes <code style="font-family:var(--mono);font-size:13px;background:var(--srf2);padding:2px 6px;border-radius:3px">/launches.json</code>. This page fetches it on load and auto-refreshes every 5 minutes.</p>
+    </div>
+    <div class="wire-grid">
+      <div class="panel wire-card rv">
+        <h3>The data contract</h3>
+        <p>One object per launch. Booleans and numbers only — the engine buckets them itself.</p>
+        <div class="code">{
+  name, ticker, mint,
+  bundlePct,        <span class="c">// % supply bought in deploy block</span>
+  devAgeDays,       <span class="c">// deployer wallet age</span>
+  devPriorRugs,     <span class="c">// rugs from linked deployer wallets</span>
+  top10Pct,         <span class="c">// holder concentration at grad</span>
+  devSoldEarly,     <span class="c">// dev sold &gt;50% pre-grad</span>
+  hasSocials,       <span class="c">// X + site live before launch</span>
+  organicBuyers,    <span class="c">// unique funded-elsewhere buyers, 30m</span>
+  liqAtGrad,        <span class="c">// SOL in pool at graduation</span>
+  outcome,          <span class="c">// 'win' | 'rug' | 'fade'</span>
+  peakX, hoursAlive,
+  series,           <span class="c">// holders at 0,4,8…48h (13 pts)</span>
+  meta, metaRank,   <span class="c">// narrative cluster + nth in it</span>
+  deployerId,       <span class="c">// funding-linked wallet cluster</span>
+  smartMoneyBuyers, <span class="c">// profitable wallets in first 30m</span>
+  saleDurationMin,  <span class="c">// bonding-curve fill time</span>
+  sameBlockSnipes,  <span class="c">// deployer-funded deploy-block buys</span>
+  insiderClusterPct <span class="c">// supply held by funding-linked ring</span>
+}</div>
+      </div>
+      <div class="panel wire-card rv">
+        <h3>Pipeline stages</h3>
+        <p>Three-stage funnel keeps API usage well within free tiers.</p>
+        <div class="code"><span class="p">Stage 1</span>  PumpPortal WSS → every create + migrate
+         stores mint/name/deployer in SQLite
+         FREE — no cost per token
+
+<span class="p">Stage 2</span>  Helius RPC (free key) → graduated only
+         deploy-block txs → <span class="g">bundlePct</span>
+         wallet first-tx date → <span class="g">devAgeDays</span>
+         funding-parent graph → <span class="g">insiderClusterPct,
+           organicBuyers, deployerId</span>
+         DAS getLargestAccounts → <span class="g">top10Pct</span>
+         ~200-300 tokens/day, budget-guarded
+
+<span class="p">Stage 3</span>  Dexscreener (free, no key)
+         polled at 12h / 24h / 48h post-grad
+         price + liq → <span class="g">outcome, peakX</span>
+         Helius snapshots every 4h → <span class="g">series</span></div>
+        <div class="wire-note">Set <b style="color:var(--txt)">window.COLLECTOR_URL</b> before this script loads if the collector runs on a different origin. The server must have CORS enabled (it does by default).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- mobile tab bar -->
+<div class="tabbar" role="navigation" aria-label="Pages">
+  <button data-route="overview"><span class="ic">SL</span>Lab</button>
+  <button data-route="launches"><span class="ic">◉</span>Feed</button>
+  <button data-route="dna"><span class="ic">⌬</span>DNA</button>
+  <button data-route="trends"><span class="ic">∿</span>Trends</button>
+  <button data-route="rules"><span class="ic">×N</span>Rules</button>
+  <button data-route="wire"><span class="ic">⇄</span>Wire</button>
+</div>
+
+<script>
+document.documentElement.classList.add('js');
+
+// Set window.COLLECTOR_URL = 'https://your-server.com' if the collector
+// runs on a different origin (e.g. when hosting this page on GitHub Pages).
+const COLLECTOR_URL = (typeof window !== 'undefined' && window.COLLECTOR_URL) || '';
+
+let LAUNCHES = [];
+
+// ── router (defined before data loads so nav works immediately) ─────────
+const VIEWS = ['overview','launches','dna','trends','rules','wire'];
+
+function armBars() {
+  document.querySelectorAll('.dna-track i').forEach(i => {
+    requestAnimationFrame(() => { i.style.width = i.dataset.w; });
+  });
+}
+
+function route(v) {
+  if (!VIEWS.includes(v)) v = 'overview';
+  document.querySelectorAll('[data-view]').forEach(el =>
+    el.classList.toggle('on', el.dataset.view === v));
+  document.querySelectorAll('[data-route]').forEach(el =>
+    el.classList.toggle('act', el.dataset.route === v));
+  try { if (location.hash !== '#/' + v) history.replaceState(null, '', '#/' + v); } catch(e) {}
+  try { window.scrollTo(0, 0); } catch(e) {}
+  armBars();
+}
+
+document.querySelectorAll('[data-route]').forEach(el =>
+  el.addEventListener('click', e => { e.preventDefault(); route(el.dataset.route); })
+);
+window.addEventListener('hashchange', () =>
+  route(location.hash.replace('#/', ''))
+);
+
+// ── analysis engine ────────────────────────────────────────────────────
+const TRAITS = [
+  { id:'lowBundle',  nm:'Bundle < 15% at launch',             test: l => l.bundlePct != null && l.bundlePct < 15 },
+  { id:'agedDev',    nm:'Deployer wallet > 30d old',          test: l => l.devAgeDays != null && l.devAgeDays > 30 },
+  { id:'cleanDev',   nm:'Zero prior rugs from deployer',      test: l => (l.devPriorRugs ?? 0) === 0 },
+  { id:'spread',     nm:'Top-10 holders < 35%',               test: l => l.top10Pct != null && l.top10Pct < 35 },
+  { id:'devHeld',    nm:'Dev held through graduation',        test: l => !l.devSoldEarly },
+  { id:'socials',    nm:'Real socials before launch',         test: l => !!l.hasSocials },
+  { id:'organic',    nm:'80+ organic buyers in 30m',          test: l => (l.organicBuyers ?? 0) >= 80 },
+  { id:'deepLiq',    nm:'60+ SOL liquidity at grad',          test: l => l.liqAtGrad != null && l.liqAtGrad >= 60 },
+  { id:'pace',       nm:'Sale filled at organic pace (>30m)', test: l => (l.saleDurationMin ?? 60) > 30 },
+  { id:'noSnipe',    nm:'No deployer-funded same-block snipes', test: l => (l.sameBlockSnipes ?? 0) === 0 },
+  { id:'noCluster',  nm:'Insider cluster holds < 20% supply', test: l => (l.insiderClusterPct ?? 0) < 20 },
+];
+
+function pct(part, whole) { return whole ? Math.round(part / whole * 100) : 0; }
+function median(a) {
+  const s = [...a].sort((x, y) => x - y);
+  return s.length ? s[Math.floor(s.length / 2)] : 0;
+}
+
+function traitStats(t, LAUNCHES) {
+  const wins = LAUNCHES.filter(l => l.outcome === 'win');
+  const rugs  = LAUNCHES.filter(l => l.outcome === 'rug');
+  const baseWin = LAUNCHES.length ? wins.length / LAUNCHES.length : 0;
+  const has = LAUNCHES.filter(t.test);
+  const hasWins = has.filter(l => l.outcome === 'win');
+  return {
+    nm: t.nm,
+    inWinPct: pct(wins.filter(t.test).length, wins.length),
+    inRugPct: pct(rugs.filter(t.test).length, rugs.length),
+    lift: has.length ? (hasWins.length / has.length) / baseWin : 0,
+    n: has.length,
+    nWin: hasWins.length,
+  };
+}
+
+const HUES = ['#9945FF','#14F195','#FFB13D','#FF4757','#38BDF8','#F472B6','#A3E635','#FB923C'];
+
+function flagList(l) {
+  const f = [];
+  if (l.bundlePct != null) f.push(l.bundlePct >= 15 ? { t:`bundled ${l.bundlePct}%`, c:'bad' } : { t:`bundle ${l.bundlePct}%`, c:'good' });
+  if (l.devAgeDays != null) f.push(l.devAgeDays > 30 ? { t:`dev ${l.devAgeDays}d old`, c:'good' } : { t:`dev ${l.devAgeDays}d old`, c:'bad' });
+  if (l.devPriorRugs > 0) f.push({ t:`${l.devPriorRugs} prior rugs`, c:'bad' });
+  else f.push({ t:'clean deployer', c:'good' });
+  f.push(l.devSoldEarly ? { t:'dev sold early', c:'bad' } : { t:'dev held', c:'good' });
+  f.push(l.hasSocials ? { t:'socials live', c:'good' } : { t:'no socials', c:'bad' });
+  return f;
+}
+
+const V = { win:['v-win','Survived'], rug:['v-rug','Rugged'], fade:['v-fade','Faded'] };
+
+function renderFeed(filter) {
+  const list = LAUNCHES.filter(l => filter === 'all' || l.outcome === filter);
+  if (!list.length) {
+    document.getElementById('feed').innerHTML =
+      '<div class="empty-state"><h3>No launches yet</h3><p>The collector is building up data. Check back in a few hours.</p></div>';
+    return;
+  }
+  document.getElementById('feed').innerHTML = list.map((l, i) => {
+    const [vc, vt] = V[l.outcome] || ['v-fade', 'Pending'];
+    return `<div class="spec rv in">
+      <div class="spec-top">
+        <div class="spec-img" style="background:${HUES[i % HUES.length]}">${(l.ticker || '??').slice(0, 2)}</div>
+        <div class="spec-nm">${l.name || 'Unknown'}<small>$${l.ticker} · ${l.mint ? l.mint.slice(0,8) + '…' : '—'}</small></div>
+        <span class="verdict ${vc}">${vt}</span>
+      </div>
+      <div class="spec-flags">${flagList(l).map(f => `<span class="flag ${f.c}">${f.t}</span>`).join('')}</div>
+      <div class="spec-meta">
+        <div><span class="k">Top 10</span><span class="vv ${l.top10Pct != null && l.top10Pct < 35 ? 'w' : 'r'}">${l.top10Pct != null ? l.top10Pct + '%' : '—'}</span></div>
+        <div><span class="k">Organic 30m</span><span class="vv ${(l.organicBuyers ?? 0) >= 80 ? 'w' : ''}">${l.organicBuyers ?? '—'}</span></div>
+        <div><span class="k">Peak</span><span class="vv">${l.peakX != null ? l.peakX + '×' : '—'}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function dnaRows(elId, key, color, STATS, wins, rugs) {
+  const order = [...STATS].sort((a, b) => b[key] - a[key]);
+  document.getElementById(elId).innerHTML = order.map(s =>
+    `<div class="dna-row">
+      <div class="dna-lbl"><span class="nm">${s.nm}</span><span class="ct">${key === 'inWinPct' ? wins.length : rugs.length} specimens</span></div>
+      <div class="dna-track"><i data-w="${s[key]}%" style="background:${color}"></i><span class="pc">${s[key]}%</span></div>
+    </div>`
+  ).join('');
+}
+
+function metaBars(elId, rows) {
+  const maxV = Math.max(...rows.map(r => r.v), 1);
+  document.getElementById(elId).innerHTML = rows.map(r =>
+    `<div class="meta-row"><div class="nm">${r.nm}<small>${r.sub}</small></div><div class="bar"><i style="width:${Math.round(r.v / maxV * 100)}%"></i></div><div class="vv">${r.v}%</div></div>`
+  ).join('');
+}
+
+function drawCurves(wins, fades, rugs) {
+  function medianSeries(list) {
+    if (!list.length) return [];
+    const out = [];
+    for (let t = 0; t <= 12; t++) {
+      const vals = list.filter(l => l.series && l.series[t] != null).map(l => l.series[t]);
+      out.push(vals.length ? median(vals) : null);
+    }
+    return out;
+  }
+
+  const groups = [[wins, '#14F195'], [fades, '#FFB13D'], [rugs, '#FF4757']];
+  const W=720, H=240, PL=44, PR=12, PT=14, PB=26;
+  const allVals = groups.flatMap(([g]) => medianSeries(g)).filter(v => v != null);
+  if (!allVals.length) { document.getElementById('curveSvg').innerHTML = '<text x="360" y="120" text-anchor="middle" fill="#8B8BA3">Waiting for 48h series data</text>'; return; }
+  const maxY = Math.max(...allVals, 1);
+  const X = t => PL + (W - PL - PR) * t / 12;
+  const Y = v => PT + (H - PT - PB) * (1 - v / maxY);
+  let s = '';
+  for (let g = 0; g <= 4; g++) {
+    const v = maxY * g / 4;
+    s += `<line class="grid" x1="${PL}" y1="${Y(v)}" x2="${W - PR}" y2="${Y(v)}"/><text x="${PL - 6}" y="${Y(v) + 3}" text-anchor="end">${Math.round(v)}</text>`;
+  }
+  [0, 6, 12].forEach(t => { s += `<text x="${X(t)}" y="${H - 8}" text-anchor="middle">${t * 4}h</text>`; });
+  s += `<line class="axis" x1="${PL}" y1="${PT}" x2="${PL}" y2="${H - PB}"/><line class="axis" x1="${PL}" y1="${H - PB}" x2="${W - PR}" y2="${H - PB}"/>`;
+  groups.forEach(([g, c]) => {
+    const ms = medianSeries(g);
+    if (!ms.some(v => v != null)) return;
+    const pts = ms.map((v, t) => ({ t, v })).filter(p => p.v != null);
+    if (pts.length < 2) return;
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.t).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
+    s += `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>`;
+    const last = pts[pts.length - 1];
+    s += `<circle cx="${X(last.t)}" cy="${Y(last.v)}" r="3.5" fill="${c}"/>`;
+  });
+  document.getElementById('curveSvg').innerHTML = s;
+}
+
+// ── build all panels from current LAUNCHES ─────────────────────────────
+function buildEngine() {
+  const wins  = LAUNCHES.filter(l => l.outcome === 'win');
+  const rugs  = LAUNCHES.filter(l => l.outcome === 'rug');
+  const fades = LAUNCHES.filter(l => l.outcome === 'fade');
+  const baseWin = LAUNCHES.length ? wins.length / LAUNCHES.length : 0;
+  const STATS = TRAITS.map(t => traitStats(t, LAUNCHES));
+
+  // ── overview ──────────────────────────────────────────────────────
+  document.getElementById('sTotal').textContent = LAUNCHES.length;
+  document.getElementById('sWinRate').textContent = pct(wins.length, LAUNCHES.length) + '%';
+  document.getElementById('sBundled').textContent = pct(LAUNCHES.filter(l => (l.bundlePct ?? 0) >= 15).length, LAUNCHES.length) + '%';
+  document.getElementById('sMedX').textContent = (median(wins.filter(w => w.peakX != null).map(w => w.peakX)) || '—') + '×';
+
+  const segs = [['Survived', wins.length, 'var(--win)'], ['Rugged', rugs.length, 'var(--rug)'], ['Faded', fades.length, 'var(--amb)']];
+  document.getElementById('splitBar').innerHTML = segs.map(([nm, n, c]) =>
+    `<div style="background:${c};width:${pct(n, LAUNCHES.length)}%">${pct(n, LAUNCHES.length)}%</div>`
+  ).join('');
+  document.getElementById('splitLeg').innerHTML = segs.map(([nm, n, c]) =>
+    `<span><i class="dot" style="background:${c}"></i>${nm} <b>${n}</b></span>`
+  ).join('');
+
+  const byLift = [...STATS].sort((a, b) => b.lift - a.lift);
+  document.getElementById('miniWin').innerHTML = byLift.slice(0, 4).map(s =>
+    `<div class="lift-row"><div class="nm">${s.nm}<small>${s.nWin}/${s.n} matching launches survived</small></div><div class="lift-val w">${s.lift.toFixed(1)}×</div></div>`
+  ).join('');
+  document.getElementById('miniRug').innerHTML = [...STATS]
+    .sort((a, b) => (b.inRugPct - b.inWinPct) - (a.inRugPct - a.inWinPct))
+    .slice(0, 4).map(s =>
+      `<div class="lift-row"><div class="nm">NOT: ${s.nm}<small>absent in ${100 - s.inRugPct}% of rugs vs ${100 - s.inWinPct}% of winners</small></div><div class="lift-val r">${s.inWinPct - s.inRugPct > 0 ? '-' : ''}${Math.abs(s.inWinPct - s.inRugPct)}pt</div></div>`
+    ).join('');
+
+  // ── feed ──────────────────────────────────────────────────────────
+  renderFeed('all');
+  document.querySelectorAll('.filter').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.filter').forEach(x => x.classList.remove('act'));
+    b.classList.add('act');
+    renderFeed(b.dataset.f);
+  }));
+
+  // ── DNA ───────────────────────────────────────────────────────────
+  dnaRows('dnaWin', 'inWinPct', 'linear-gradient(90deg,#0B8F5A,var(--win))', STATS, wins, rugs);
+  dnaRows('dnaRug', 'inRugPct', 'linear-gradient(90deg,#8F1F2B,var(--rug))', STATS, wins, rugs);
+  const biggest = [...STATS].sort((a, b) => (b.inWinPct - b.inRugPct) - (a.inWinPct - a.inRugPct))[0];
+  if (biggest) {
+    document.getElementById('dnaFoot').textContent =
+      `Widest gap in this dataset: "${biggest.nm}" — present in ${biggest.inWinPct}% of survivors vs ${biggest.inRugPct}% of rugs. The common denominator isn't one trait; winners stack most of them, rugs stack almost none.`;
+  }
+
+  // ── rules ─────────────────────────────────────────────────────────
+  const RULES = [...STATS].sort((a, b) => b.lift - a.lift).map(s => ({
+    x: s.lift, nm: s.nm,
+    sub: `${s.nWin} of ${s.n} matching launches survived · base rate ${Math.round(baseWin * 100)}%`,
+    n: s.n,
+  }));
+  document.getElementById('rules').innerHTML = RULES.map(r =>
+    `<div class="panel rule rv">
+      <div class="x ${r.x < 1 ? 'neg' : ''}">${r.x.toFixed(1)}×<small>win lift</small></div>
+      <div class="tx">${r.nm}<small>${r.sub}</small></div>
+      <div class="n">n=${r.n}</div>
+    </div>`
+  ).join('');
+
+  // ── trends ────────────────────────────────────────────────────────
+  drawCurves(wins, fades, rugs);
+
+  const posBuckets = [
+    { nm:'First mover',    sub:'metaRank 1',    test: l => l.metaRank === 1 },
+    { nm:'Early follower', sub:'metaRank 2–3',  test: l => l.metaRank >= 2 && l.metaRank <= 3 },
+    { nm:'Copycat wave',   sub:'metaRank 4+',   test: l => l.metaRank >= 4 },
+  ];
+  const withMeta = LAUNCHES.filter(l => l.metaRank != null);
+  if (withMeta.length >= 5) {
+    metaBars('metaPos', posBuckets.map(b => {
+      const g = withMeta.filter(b.test);
+      return { nm: b.nm, sub: b.sub + ` · n=${g.length}`, v: pct(g.filter(l => l.outcome === 'win').length, g.length) };
+    }));
+  } else {
+    document.getElementById('metaPos').innerHTML = '<div style="padding:16px;font-size:13px;color:var(--mut)">Requires meta-rank data from the pipeline.</div>';
+  }
+
+  const metas = [...new Set(LAUNCHES.filter(l => l.meta).map(l => l.meta))];
+  if (metas.length >= 2) {
+    metaBars('metaCluster', metas.map(m => {
+      const g = LAUNCHES.filter(l => l.meta === m);
+      return { nm: m, sub: `n=${g.length}`, v: pct(g.filter(l => l.outcome === 'win').length, g.length) };
+    }).sort((a, b) => b.v - a.v));
+  } else {
+    document.getElementById('metaCluster').innerHTML = '<div style="padding:16px;font-size:13px;color:var(--mut)">Requires narrative cluster data from the pipeline.</div>';
+  }
+
+  // deployer lineage
+  const depMap = {};
+  LAUNCHES.forEach(l => {
+    const id = l.deployerId || 'unknown';
+    (depMap[id] = depMap[id] || []).push(l);
+  });
+  const lineageRows = Object.entries(depMap)
+    .map(([id, ls]) => ({
+      id, n: ls.length,
+      w: ls.filter(l => l.outcome === 'win').length,
+      r: ls.filter(l => l.outcome === 'rug').length,
+    }))
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 8);
+  document.getElementById('lineageBody').innerHTML = lineageRows.map(d => {
+    const hit = pct(d.w, d.n);
+    const read = d.r >= 2 ? ['Serial rugger','v-rug'] : d.w >= 2 ? ['Proven shipper','v-win'] : ['Unproven','v-fade'];
+    return `<tr><td>${d.id}</td><td>${d.n}</td><td class="w">${d.w}</td><td class="r">${d.r}</td><td>${hit}%</td><td><span class="tagv ${read[1]}">${read[0]}</span></td></tr>`;
+  }).join('');
+
+  const withSM = LAUNCHES.filter(l => l.smartMoneyBuyers != null);
+  if (withSM.length >= 5) {
+    const smWins = wins.filter(l => l.smartMoneyBuyers != null);
+    const smRugs = rugs.filter(l => l.smartMoneyBuyers != null);
+    document.getElementById('smWin').textContent = pct(smWins.filter(l => l.smartMoneyBuyers >= 2).length, smWins.length) + '%';
+    document.getElementById('smRug').textContent = pct(smRugs.filter(l => l.smartMoneyBuyers >= 2).length, smRugs.length) + '%';
+  } else {
+    document.getElementById('smWin').textContent = 'n/a';
+    document.getElementById('smRug').textContent = 'n/a';
+  }
+
+  // ── basket simulator ──────────────────────────────────────────────
+  const tiers = [
+    { nm:'No filter',      sub:'every launch',                         test: () => true },
+    { nm:'Kill the obvious', sub:'no same-block snipes · clean deployer', test: l => (l.sameBlockSnipes ?? 0) === 0 && (l.devPriorRugs ?? 0) === 0 },
+    { nm:'Full stack',     sub:'+ organic pace · cluster <20% · socials', test: l => (l.sameBlockSnipes ?? 0) === 0 && (l.devPriorRugs ?? 0) === 0 && (l.saleDurationMin ?? 60) > 30 && (l.insiderClusterPct ?? 0) < 20 && l.hasSocials },
+  ];
+  document.getElementById('basket').innerHTML = tiers.map((t, i) => {
+    const g = LAUNCHES.filter(t.test);
+    const w = g.filter(l => l.outcome === 'win');
+    const p2 = g.length ? w.length / g.length : 0;
+    const atLeast1 = 1 - Math.pow(1 - p2, 5);
+    const medPeak = median(w.filter(x => x.peakX != null).map(x => x.peakX)) || 0;
+    const captured = Math.round(medPeak * 0.35 * 10) / 10;
+    return `<div class="tier ${i === 2 ? 'best' : ''}">
+      <h4>${t.nm}</h4><span class="sub2">${t.sub} · n=${g.length}</span>
+      <div class="row2"><span>Hit rate</span><b class="${p2 >= .3 ? 'hot' : ''}">${Math.round(p2 * 100)}%</b></div>
+      <div class="row2"><span>P(≥1 winner in 5)</span><b class="${atLeast1 >= .7 ? 'hot' : ''}">${Math.round(atLeast1 * 100)}%</b></div>
+      <div class="row2"><span>Median winner peak</span><b>${medPeak}×</b></div>
+      <div class="row2"><span>At ~35% peak capture</span><b>${captured}× on the win</b></div>
+    </div>`;
+  }).join('');
+  document.getElementById('basketNote').innerHTML =
+    '<b>Why capture matters more than picking:</b> a 5-token basket needs one winner returning >5× your per-token stake just to break even (assuming the other four go to zero). Median winner peaks clear that bar easily — but nobody sells the exact top. At a realistic ~35% of peak captured, the filters do two jobs: raise the odds the basket contains a winner, and skew it toward the fat-tail winners.';
+
+  // ── reveal animation ──────────────────────────────────────────────
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { threshold: .1 });
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+}
+
+// ── data loader ────────────────────────────────────────────────────────
+async function loadData() {
+  const pill = document.getElementById('statusPill');
+  try {
+    const res = await fetch(COLLECTOR_URL + '/launches.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(String(res.status));
+    const data = await res.json();
+    // Accept both {launches:[...]} and plain array
+    const arr = Array.isArray(data) ? data : (data.launches || []);
+    const ts = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString() : new Date().toLocaleTimeString();
+    pill.textContent = `● ${arr.length} launches · ${ts}`;
+    pill.classList.add('live');
+    pill.classList.remove('offline');
+    return arr;
+  } catch (err) {
+    pill.textContent = '○ collector offline';
+    pill.classList.add('offline');
+    pill.classList.remove('live');
+    console.warn('[survivor-lab] could not fetch /launches.json:', err.message);
+    return null;
+  }
+}
+
+// ── bootstrap ──────────────────────────────────────────────────────────
+(async () => {
+  document.documentElement.classList.add('routed');
+
+  const data = await loadData();
+  if (data && data.length > 0) {
+    LAUNCHES = data;
+    buildEngine();
+  } else if (data && data.length === 0) {
+    document.getElementById('statusPill').textContent = '○ no data yet';
+  }
+
+  route(location.hash.replace('#/', '') || 'overview');
+
+  // Auto-refresh every 5 minutes
+  setInterval(async () => {
+    const fresh = await loadData();
+    if (fresh && fresh.length > 0) {
+      LAUNCHES = fresh;
+      buildEngine();
+      armBars();
+    }
+  }, 5 * 60 * 1000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+collector/memetrans/
+collector/launches.db
+collector/.env
+collector/node_modules/
