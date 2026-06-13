@@ -1,0 +1,19 @@
+{
+  "name": "ledgerpad-x-bot",
+  "version": "1.0.0",
+  "description": "Auto-tweets XRP price, $PAD token updates, and XRP news ~10x/day",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test-tweet.js"
+  },
+  "dependencies": {
+    "twitter-api-v2": "^1.17.2",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
