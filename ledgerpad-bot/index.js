@@ -2,6 +2,7 @@ require('dotenv').config();
 const cron = require('node-cron');
 const { TwitterApi } = require('twitter-api-v2');
 const { TWEET_SCHEDULE } = require('./tweets');
+const { startXrplMonitor } = require('./launcher');
 
 const DRY_RUN = process.env.DRY_RUN === 'true';
 
@@ -65,8 +66,26 @@ for (const { cron: expr, idx, label } of SCHEDULE) {
   console.log(`[bot] Scheduled "${label}" at ${expr} UTC`);
 }
 
+// ── Launch & graduation monitor ───────────────────────────────────────────────
+// Fires immediately on XRPL events (not on a schedule)
+startXrplMonitor(async (text, label) => {
+  if (!text) return;
+  if (text.length > 280) text = text.slice(0, 277) + '...';
+  if (DRY_RUN) {
+    console.log(`\n[DRY RUN] Would post "${label}":\n${'─'.repeat(60)}\n${text}\n${'─'.repeat(60)}\n`);
+    return;
+  }
+  try {
+    const { data } = await rwClient.v2.tweet(text);
+    console.log(`[bot] Posted "${label}" → tweet id ${data.id}`);
+  } catch (err) {
+    console.error(`[bot] Failed to post "${label}":`, err.message);
+  }
+});
+
 console.log(`\n🚀 LedgerPad X Bot started — ${DRY_RUN ? 'DRY RUN mode' : 'LIVE mode'}`);
-console.log('📅 10 tweets/day, 06:00–22:00 UTC\n');
+console.log('📅 10 scheduled tweets/day, 06:00–22:00 UTC');
+console.log('⚡ Launch & graduation alerts: real-time via XRPL WebSocket\n');
 
 // Keep alive
 process.on('SIGINT', () => {
