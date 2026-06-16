@@ -120,7 +120,8 @@ def detect_buy(tx: dict, meta: dict):
 
 
 # ── LP deposit detection ──────────────────────────────────────────────────────
-# AMMDeposit is its own transaction type — no ambiguity with buys.
+# AMMDeposit is its own transaction type — completely separate from buys.
+# Can be single-sided (XRP only or CFH only) or two-sided (both assets).
 
 def detect_lp(tx: dict, meta: dict):
     if tx.get("TransactionType") != "AMMDeposit":
@@ -128,15 +129,19 @@ def detect_lp(tx: dict, meta: dict):
     if meta.get("TransactionResult") != "tesSUCCESS":
         return None
 
-    depositor = tx.get("Account", "")
+    depositor  = tx.get("Account", "")
     xrp_amount = 0.0
+    cfh_amount = 0.0
+
     for field in ("Amount", "Amount2"):
         val = tx.get(field)
-        if isinstance(val, str):  # XRP in drops
+        if isinstance(val, str):  # XRP is always a drops string
             xrp_amount = int(val) / 1_000_000
-            break
+        elif isinstance(val, dict):
+            if val.get("currency") == CURRENCY and val.get("issuer") == ISSUER:
+                cfh_amount = float(val.get("value", 0))
 
-    return xrp_amount, depositor
+    return xrp_amount, cfh_amount, depositor
 
 
 # ── Whale balance check ───────────────────────────────────────────────────────
@@ -199,14 +204,15 @@ async def post_buy(ch, xrp_spent, cfh_received, buyer, whale_bal, txn_hash):
     await ch.send(body)
 
 
-async def post_lp(ch, xrp_amount, depositor, txn_hash):
-    await ch.send(
-        f"💧 {CURRENCY} LP Deposit!\n"
-        f"🪙 **{xrp_amount:.2f} XRP** added to pool\n"
-        f"👤 {short_addr(depositor)}\n\n"
-        f"[🔗 Txn](https://xrpscan.com/tx/{txn_hash})\n"
-        f"{CURRENCY} • XRPL"
-    )
+async def post_lp(ch, xrp_amount, cfh_amount, depositor, txn_hash):
+    lines = [f"💧 {CURRENCY} LP Deposit!"]
+    if xrp_amount > 0:
+        lines.append(f"🪙 **{xrp_amount:.2f} XRP** added to pool")
+    if cfh_amount > 0:
+        lines.append(f"🪙 **{fmt_amount(cfh_amount)} {CURRENCY}** added to pool")
+    lines.append(f"👤 {short_addr(depositor)}")
+    lines.append(f"\n[🔗 Txn](https://xrpscan.com/tx/{txn_hash})\n{CURRENCY} • XRPL")
+    await ch.send("\n".join(lines))
 
 
 # ── XRPL listener ────────────────────────────────────────────────────────────
@@ -231,7 +237,8 @@ async def xrpl_listener(channel):
 
                     lp = detect_lp(tx, meta)
                     if lp:
-                        await post_lp(channel, *lp, txn_hash)
+                        xrp_amt, cfh_amt, depositor = lp
+                        await post_lp(channel, xrp_amt, cfh_amt, depositor, txn_hash)
                         continue
 
                     buy = detect_buy(tx, meta)
