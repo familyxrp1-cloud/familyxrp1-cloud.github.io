@@ -3,12 +3,14 @@ import json
 import os
 
 import aiohttp
+import discord
 import websockets
 from dotenv import load_dotenv
 
 load_dotenv()
 
-WEBHOOK_URL     = os.getenv("DISCORD_WEBHOOK_URL")
+DISCORD_TOKEN   = os.getenv("DISCORD_TOKEN")
+CHANNEL_NAME    = os.getenv("DISCORD_CHANNEL_NAME", "cfh-alerts")
 ISSUER          = os.getenv("TOKEN_ISSUER", "rDTHkzTq3Acxu6QrSLVfHrR3KadFknMkfS")
 CURRENCY        = os.getenv("TOKEN_CURRENCY", "CFH")
 XRPL_WS         = os.getenv("XRPL_WS", "wss://xrplcluster.com")
@@ -19,6 +21,9 @@ WHALE_THRESHOLD = float(os.getenv("WHALE_THRESHOLD", "1000000"))
 TIER_STRONG = float(os.getenv("TIER_STRONG", "50"))
 TIER_MEGA   = float(os.getenv("TIER_MEGA",   "200"))
 TIER_WHALE  = float(os.getenv("TIER_WHALE",  "500"))
+
+intents = discord.Intents.default()
+bot = discord.Client(intents=intents)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -36,16 +41,9 @@ def short_addr(addr: str) -> str:
     return f"{addr[:6]}...{addr[-4:]}"
 
 
-# ── Discord webhook ───────────────────────────────────────────────────────────
-
-async def send_webhook(content: str):
-    async with aiohttp.ClientSession() as session:
-        await session.post(WEBHOOK_URL, json={"content": content})
-
-
 # ── Buy detection ─────────────────────────────────────────────────────────────
 # Payment where Amount=CFH token + buyer's XRP balance decreased = BUY
-# Excludes sells (Amount would be XRP string) and CFH transfers
+# Excludes sells (Amount is XRP string) and plain CFH transfers
 
 def detect_buy(tx: dict, meta: dict):
     if tx.get("TransactionType") != "Payment":
@@ -131,7 +129,7 @@ async def get_token_balance(account: str) -> float:
 
 # ── Alert messages ────────────────────────────────────────────────────────────
 
-async def post_buy(xrp_spent, cfh_received, buyer, whale_bal, txn_hash):
+async def post_buy(channel, xrp_spent, cfh_received, buyer, whale_bal, txn_hash):
     tier = get_tier_label(xrp_spent)
     is_whale = whale_bal >= WHALE_THRESHOLD
     lines = [f"**{CURRENCY} {tier}**"]
@@ -145,11 +143,11 @@ async def post_buy(xrp_spent, cfh_received, buyer, whale_bal, txn_hash):
         lines.append(f"🐋 Bag: **{whale_bal:,.0f} {CURRENCY}**")
     lines.append(f"👤 `{short_addr(buyer)}`")
     lines.append(f"[🔗 Txn](https://xrpscan.com/tx/{txn_hash})")
-    await send_webhook("\n".join(lines))
+    await channel.send("\n".join(lines))
 
 
-async def post_lp(xrp_amount, depositor, txn_hash):
-    await send_webhook(
+async def post_lp(channel, xrp_amount, depositor, txn_hash):
+    await channel.send(
         f"**💧 {CURRENCY} LP Deposit!**\n"
         f"💰 **{xrp_amount:.2f} XRP** added to pool\n"
         f"👤 `{short_addr(depositor)}`\n"
@@ -159,8 +157,7 @@ async def post_lp(xrp_amount, depositor, txn_hash):
 
 # ── XRPL listener ────────────────────────────────────────────────────────────
 
-async def main():
-    await send_webhook(f"✅ **${CURRENCY} Alerts online!** Watching buys & LP deposits...")
+async def xrpl_listener(channel):
     while True:
         try:
             async with websockets.connect(XRPL_WS, ping_interval=30) as ws:
@@ -180,18 +177,31 @@ async def main():
 
                     lp = detect_lp_deposit(tx, meta)
                     if lp:
-                        await post_lp(*lp, txn_hash)
+                        await post_lp(channel, *lp, txn_hash)
                         continue
 
                     buy = detect_buy(tx, meta)
                     if buy:
                         xrp_spent, cfh_received, buyer = buy
                         whale_bal = await get_token_balance(buyer)
-                        await post_buy(xrp_spent, cfh_received, buyer, whale_bal, txn_hash)
+                        await post_buy(channel, xrp_spent, cfh_received, buyer, whale_bal, txn_hash)
 
         except Exception as e:
             print(f"[XRPL] Error: {e} — retrying in 5s")
             await asyncio.sleep(5)
 
 
-asyncio.run(main())
+# ── Discord startup ───────────────────────────────────────────────────────────
+
+@bot.event
+async def on_ready():
+    print(f"[Discord] Logged in as {bot.user}")
+    channel = discord.utils.get(bot.get_all_channels(), name=CHANNEL_NAME)
+    if not channel:
+        print(f"[Discord] ERROR: No channel named #{CHANNEL_NAME}")
+        return
+    await channel.send(f"✅ **${CURRENCY} Alerts online!** Watching buys & LP deposits...")
+    asyncio.create_task(xrpl_listener(channel))
+
+
+bot.run(DISCORD_TOKEN)
