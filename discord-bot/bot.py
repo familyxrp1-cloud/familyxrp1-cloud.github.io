@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 
+import aiohttp
 import discord
 import websockets
 from dotenv import load_dotenv
@@ -13,6 +14,8 @@ CHANNEL_ID      = int(os.getenv("DISCORD_CHANNEL_ID", "0"))
 ISSUER          = os.getenv("TOKEN_ISSUER", "rDTHkzTq3Acxu6QrSLVfHrR3KadFknMkfS")
 CURRENCY        = os.getenv("TOKEN_CURRENCY", "CFH")
 XRPL_WS         = os.getenv("XRPL_WS", "wss://xrplcluster.com")
+XRPLTO_API_KEY  = os.getenv("XRPLTO_API_KEY", "")
+XRPLTO_BASE     = "https://api.xrpl.to/api"
 WHALE_THRESHOLD = float(os.getenv("WHALE_THRESHOLD", "1000000"))
 
 # Buy tier thresholds in XRP
@@ -107,9 +110,25 @@ def detect_lp_deposit(tx: dict, meta: dict):
     return xrp_amount, depositor
 
 
-# ── XRPL whale balance check ──────────────────────────────────────────────────
+# ── Balance check (xrpl.to API preferred, falls back to raw XRPL) ────────────
 
 async def get_token_balance(account: str) -> float:
+    # Try xrpl.to REST API first — faster than opening a new WS connection
+    if XRPLTO_API_KEY:
+        try:
+            url = f"{XRPLTO_BASE}/account/{account}/lines"
+            headers = {"X-Api-Key": XRPLTO_API_KEY}
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=8)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        for line in data.get("lines", []):
+                            if line.get("currency") == CURRENCY and line.get("account") == ISSUER:
+                                return float(line.get("balance", 0))
+        except Exception:
+            pass  # fall through to XRPL websocket
+
+    # Fallback: raw XRPL websocket
     try:
         async with websockets.connect(XRPL_WS, open_timeout=10) as ws:
             await ws.send(json.dumps({
