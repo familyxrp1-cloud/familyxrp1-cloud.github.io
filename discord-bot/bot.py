@@ -215,17 +215,47 @@ async def post_lp(ch, xrp_amount, cfh_amount, depositor, txn_hash):
     await ch.send("\n".join(lines))
 
 
+# ── AMM pool discovery ────────────────────────────────────────────────────────
+# Subscribing to the issuer alone misses OfferCreate fills — those don't have
+# the issuer as Account/Destination. Subscribing to the AMM pool account catches
+# every trade (buy, sell, LP deposit) because every swap modifies the pool's balances.
+
+async def get_amm_account() -> str:
+    try:
+        async with websockets.connect(XRPL_WS, open_timeout=10) as ws:
+            await ws.send(json.dumps({
+                "id": "amm",
+                "command": "amm_info",
+                "asset":  {"currency": CURRENCY, "issuer": ISSUER},
+                "asset2": {"currency": "XRP"},
+                "ledger_index": "validated",
+            }))
+            resp = json.loads(await asyncio.wait_for(ws.recv(), timeout=10))
+            amm = resp.get("result", {}).get("amm", {})
+            acct = amm.get("account", "")
+            if acct:
+                print(f"[XRPL] AMM pool: {acct}")
+            return acct
+    except Exception as e:
+        print(f"[XRPL] Could not fetch AMM account: {e}")
+        return ""
+
+
 # ── XRPL listener ────────────────────────────────────────────────────────────
 
 async def xrpl_listener(channel):
+    amm_account = await get_amm_account()
+    accounts = [ISSUER] + ([amm_account] if amm_account else [])
+
     while True:
         try:
             async with websockets.connect(XRPL_WS, ping_interval=30) as ws:
                 await ws.send(json.dumps({
-                    "id": "sub", "command": "subscribe", "accounts": [ISSUER],
+                    "id": "sub", "command": "subscribe", "accounts": accounts,
                 }))
-                print(f"[XRPL] Subscribed to {ISSUER}")
+                print(f"[XRPL] Subscribed to {accounts}")
 
+                seen = set()
                 async for raw in ws:
                     data = json.loads(raw)
                     if data.get("type") != "transaction":
@@ -234,6 +264,12 @@ async def xrpl_listener(channel):
                     tx       = data.get("transaction", {})
                     meta     = data.get("meta", {})
                     txn_hash = tx.get("hash", "")
+
+                    if txn_hash in seen:
+                        continue
+                    seen.add(txn_hash)
+                    if len(seen) > 500:
+                        seen = set(list(seen)[-250:])
 
                     lp = detect_lp(tx, meta)
                     if lp:
