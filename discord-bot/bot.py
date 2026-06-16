@@ -215,45 +215,41 @@ async def post_lp(ch, xrp_amount, cfh_amount, depositor, txn_hash):
     await ch.send("\n".join(lines))
 
 
-# ── AMM pool discovery ────────────────────────────────────────────────────────
-# Subscribing to the issuer alone misses OfferCreate fills — those don't have
-# the issuer as Account/Destination. Subscribing to the AMM pool account catches
-# every trade (buy, sell, LP deposit) because every swap modifies the pool's balances.
-
-async def get_amm_account() -> str:
-    try:
-        async with websockets.connect(XRPL_WS, open_timeout=10) as ws:
-            await ws.send(json.dumps({
-                "id": "amm",
-                "command": "amm_info",
-                "asset":  {"currency": CURRENCY, "issuer": ISSUER},
-                "asset2": {"currency": "XRP"},
-                "ledger_index": "validated",
-            }))
-            resp = json.loads(await asyncio.wait_for(ws.recv(), timeout=10))
-            amm = resp.get("result", {}).get("amm", {})
-            acct = amm.get("account", "")
-            if acct:
-                print(f"[XRPL] AMM pool: {acct}")
-            return acct
-    except Exception as e:
-        print(f"[XRPL] Could not fetch AMM account: {e}")
-        return ""
-
-
 # ── XRPL listener ────────────────────────────────────────────────────────────
+# AMM pool discovery runs on the SAME connection as the subscription so we
+# don't waste a separate socket and avoid race-condition timeouts.
 
 async def xrpl_listener(channel):
-    amm_account = await get_amm_account()
-    accounts = [ISSUER] + ([amm_account] if amm_account else [])
-
     while True:
         try:
             async with websockets.connect(XRPL_WS, ping_interval=30) as ws:
+                # Step 1: query AMM pool address on this connection
+                await ws.send(json.dumps({
+                    "id": "amm_query",
+                    "command": "amm_info",
+                    "asset":  {"currency": CURRENCY, "issuer": ISSUER},
+                    "asset2": {"currency": "XRP"},
+                    "ledger_index": "validated",
+                }))
+                amm_resp = json.loads(await asyncio.wait_for(ws.recv(), timeout=15))
+                print(f"[XRPL] amm_info raw: {json.dumps(amm_resp)[:300]}")
+                amm_account = amm_resp.get("result", {}).get("amm", {}).get("account", "")
+                if amm_account:
+                    print(f"[XRPL] AMM pool: {amm_account}")
+                else:
+                    print(f"[XRPL] WARNING: AMM account not found — subscribing to issuer only")
+
+                accounts = [ISSUER] + ([amm_account] if amm_account else [])
+
+                # Step 2: subscribe to accounts on this same connection
                 await ws.send(json.dumps({
                     "id": "sub", "command": "subscribe", "accounts": accounts,
                 }))
                 print(f"[XRPL] Subscribed to {accounts}")
+
+                # Step 3: consume subscribe confirmation (not a "transaction" type)
+                sub_resp = json.loads(await asyncio.wait_for(ws.recv(), timeout=15))
+                print(f"[XRPL] subscribe ack: {json.dumps(sub_resp)[:200]}")
 
                 seen = set()
                 async for raw in ws:
