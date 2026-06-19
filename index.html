@@ -336,6 +336,11 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   .hero-ctas{flex-direction:column}
   .btn-ice,.btn-ghost{text-align:center}
 }
+.ca-wrap{display:flex;align-items:center;gap:10px;margin-top:22px;background:rgba(91,184,255,0.05);border:1px solid rgba(91,184,255,0.15);border-radius:8px;padding:10px 16px;flex-wrap:wrap}
+.ca-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.ca-addr{font-family:monospace;font-size:0.8rem;color:var(--ice);word-break:break-all;flex:1}
+.ca-copy{background:rgba(91,184,255,0.12);border:1px solid rgba(91,184,255,0.25);color:var(--ice);padding:5px 14px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
+.ca-copy:hover{background:rgba(91,184,255,0.22)}
 </style>
 </head>
 <body>
@@ -348,7 +353,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#community">Community</a></li>
   </ul>
-  <a href="#community" class="nav-btn">Join The Family</a>
+  <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" class="nav-btn" target="_blank" rel="noopener">Buy $FAMILY</a>
   <button class="ham" id="ham" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
 </nav>
 
@@ -362,7 +367,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <div class="hero-serif">One Ledger. One Family.</div>
     <p>The XRP community survived the cold years together. Bear markets. Years of waiting. Being underestimated.<br><strong>People stayed.</strong></p>
     <div class="hero-ctas">
-      <a href="#community" class="btn-ice">Buy $FAMILY</a>
+      <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" class="btn-ice" target="_blank" rel="noopener">Buy $FAMILY</a>
       <a href="#story" class="btn-ghost">Our Story</a>
     </div>
   </div>
@@ -410,6 +415,11 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
         <div class="t-node fire"><div class="t-pct">25%</div><div class="t-desc">Unlocks 24h after launch on First Ledger</div><div class="t-tag">🔥 Burned forever</div></div>
         <div class="t-node hi"><div class="t-pct">75%</div><div class="t-desc">Remains locked in escrow</div><div class="t-tag">1 year minimum lock</div></div>
       </div>
+    </div>
+    <div class="ca-wrap">
+      <span class="ca-label">Issuer</span>
+      <span class="ca-addr" id="caAddr">rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi</span>
+      <button class="ca-copy" onclick="navigator.clipboard.writeText('rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})">Copy</button>
     </div>
   </div>
 </section>
