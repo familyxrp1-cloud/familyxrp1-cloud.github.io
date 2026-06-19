@@ -336,6 +336,13 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   .hero-ctas{flex-direction:column}
   .btn-ice,.btn-ghost{text-align:center}
 }
+.burn-cd{background:rgba(255,106,56,0.07);border:1px solid rgba(255,106,56,0.3);border-radius:12px;padding:18px 22px;margin-bottom:22px}
+.burn-cd-label{font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#ff6a38;margin-bottom:12px}
+.burn-cd-timer{display:flex;align-items:center;gap:8px}
+.burn-unit{text-align:center}
+.burn-unit span{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:0.04em;color:var(--white);line-height:1;display:block}
+.burn-unit small{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:#ff6a38;font-weight:600}
+.burn-sep{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#ff6a38;opacity:0.6;margin-bottom:12px}
 .ca-wrap{display:flex;align-items:center;gap:10px;margin-top:22px;background:rgba(91,184,255,0.05);border:1px solid rgba(91,184,255,0.15);border-radius:8px;padding:10px 16px;flex-wrap:wrap}
 .ca-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
 .ca-addr{font-family:monospace;font-size:0.8rem;color:var(--ice);word-break:break-all;flex:1}
@@ -408,6 +415,16 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <div class="t-label">Tokenomics</div>
     <h2>NO QUICK<br>FLIP.<br>NO FAKE<br>HYPE.</h2>
     <p class="token-desc">Built for the long term. Escrow locks, a scheduled burn, and a minimum year of locked commitment. We're not going anywhere. No dumps. No rugs.</p>
+    <div class="burn-cd">
+      <div class="burn-cd-label">🔥 Burn countdown</div>
+      <div class="burn-cd-timer">
+        <div class="burn-unit"><span id="burnH">21</span><small>hours</small></div>
+        <div class="burn-sep">:</div>
+        <div class="burn-unit"><span id="burnM">00</span><small>min</small></div>
+        <div class="burn-sep">:</div>
+        <div class="burn-unit"><span id="burnS">00</span><small>sec</small></div>
+      </div>
+    </div>
     <div class="t-flow">
       <div class="t-node hi"><div class="t-pct">50%</div><div class="t-desc">Dev allocation locked in escrow at launch</div><div class="t-tag">Locked at launch</div></div>
       <div class="t-arrow"></div>
@@ -494,6 +511,24 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
 </footer>
 
 <script>
+// Burn countdown — target is 21h from launch
+const BURN_END = new Date('2026-06-20T08:00:00Z').getTime();
+function tickBurn() {
+  const diff = BURN_END - Date.now();
+  if (diff <= 0) {
+    document.querySelector('.burn-cd').innerHTML = '<div class="burn-cd-label">🔥 Burn complete</div>';
+    return;
+  }
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('burnH').textContent = String(h).padStart(2,'0');
+  document.getElementById('burnM').textContent = String(m).padStart(2,'0');
+  document.getElementById('burnS').textContent = String(s).padStart(2,'0');
+}
+tickBurn();
+setInterval(tickBurn, 1000);
+
 const cv=document.getElementById('snow'),cx=cv.getContext('2d');
 let W,H,fl=[];
 function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight}
