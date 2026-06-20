@@ -336,9 +336,6 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   .hero-ctas{flex-direction:column}
   .btn-ice,.btn-ghost{text-align:center}
 }
-.burn-mini{margin:10px 0 8px;border-top:1px solid rgba(255,106,56,0.2);padding-top:10px}
-.burn-mini-label{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#ff6a38;margin-bottom:5px}
-.burn-mini-timer{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;color:var(--white);line-height:1}
 .ca-wrap{display:flex;align-items:center;gap:10px;margin-top:22px;background:rgba(91,184,255,0.05);border:1px solid rgba(91,184,255,0.15);border-radius:8px;padding:10px 16px;flex-wrap:wrap}
 .ca-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
 .ca-addr{font-family:monospace;font-size:0.8rem;color:var(--ice);word-break:break-all;flex:1}
@@ -415,15 +412,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       <div class="t-node hi"><div class="t-pct">50%</div><div class="t-desc">Dev allocation locked in escrow at launch</div><div class="t-tag">Locked at launch</div></div>
       <div class="t-arrow"></div>
       <div class="t-split">
-        <div class="t-node fire">
-          <div class="t-pct">25%</div>
-          <div class="t-desc">Unlocks 24h after launch on First Ledger</div>
-          <div class="burn-mini">
-            <div class="burn-mini-label">🔥 Burns in</div>
-            <div class="burn-mini-timer"><span id="burnH">21</span>h <span id="burnM">00</span>m <span id="burnS">00</span>s</div>
-          </div>
-          <div class="t-tag">Burned forever</div>
-        </div>
+        <div class="t-node fire"><div class="t-pct">25%</div><div class="t-desc">Unlocks 24h after launch on First Ledger</div><div class="t-tag">🔥 Burned forever</div></div>
         <div class="t-node hi"><div class="t-pct">75%</div><div class="t-desc">Remains locked in escrow</div><div class="t-tag">1 year minimum lock</div></div>
       </div>
     </div>
@@ -505,25 +494,6 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
 </footer>
 
 <script>
-// Burn countdown — target is 21h from launch
-const BURN_END = new Date('2026-06-20T18:30:00Z').getTime();
-function tickBurn() {
-  const diff = BURN_END - Date.now();
-  if (diff <= 0) {
-    document.querySelector('.burn-cd').innerHTML = '<div class="burn-cd-label">🔥 Burn complete</div>';
-    return;
-  }
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  const s = Math.floor((diff % 60000) / 1000);
-  document.getElementById('burnH').textContent = String(h).padStart(2,'0');
-  document.getElementById('burnM').textContent = String(m).padStart(2,'0');
-  document.getElementById('burnS').textContent = String(s).padStart(2,'0');
-
-}
-tickBurn();
-setInterval(tickBurn, 1000);
-
 const cv=document.getElementById('snow'),cx=cv.getContext('2d');
 let W,H,fl=[];
 function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight}
