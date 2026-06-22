@@ -337,6 +337,49 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   .hero-ctas{flex-direction:column}
   .btn-ice,.btn-ghost{text-align:center}
 }
+/* ══ NFT SECTION ══ */
+.nft-section{background:var(--deep);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:100px 0}
+.nft-inner{max-width:860px;margin:0 auto;padding:0 24px}
+.nft-head{text-align:center;margin-bottom:52px}
+.nft-head h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5rem);line-height:0.9;color:var(--white);margin:10px 0 16px}
+.nft-sub{font-size:1rem;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.7}
+.nft-split{display:flex;align-items:stretch;gap:0;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:36px}
+.nft-half{flex:1;padding:36px 28px;text-align:center}
+.nft-half.holders{background:rgba(91,184,255,0.05)}
+.nft-half.lp{background:rgba(91,184,255,0.02)}
+.nft-half-pct{font-family:'Bebas Neue',sans-serif;font-size:4rem;line-height:1;color:var(--ice);margin-bottom:6px}
+.nft-half-label{font-size:0.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--white);margin-bottom:8px}
+.nft-half-desc{font-size:0.82rem;color:var(--muted);line-height:1.5}
+.nft-divider{width:1px;background:var(--border);flex-shrink:0}
+.nft-examples{margin-bottom:36px}
+.nft-ex-label{font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.nft-ex-grid{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.nft-ex-head{display:grid;grid-template-columns:1fr 1fr;padding:10px 18px;background:rgba(91,184,255,0.06);font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.nft-ex-row{display:grid;grid-template-columns:1fr 1fr;padding:14px 18px;border-top:1px solid var(--border);font-size:0.9rem;color:var(--text);transition:background .15s}
+.nft-ex-row:hover{background:rgba(91,184,255,0.04)}
+.nft-ex-row.hot{background:rgba(91,184,255,0.06)}
+.nft-ex-row.hot:hover{background:rgba(91,184,255,0.1)}
+.xrp-val{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:0.04em;color:var(--ice)}
+.nft-wallet{border:1px solid var(--border);border-radius:14px;padding:26px;margin-bottom:30px;background:rgba(91,184,255,0.03)}
+.nft-wallet-label{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.nft-wallet-addr{font-family:monospace;font-size:0.82rem;color:var(--ice);margin-bottom:20px;word-break:break-all}
+.nft-balance-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.nft-bal-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.nft-bal-title{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.nft-bal-val{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.04em;color:var(--white)}
+.nft-bal-val.highlight{color:var(--ice)}
+.nft-snap{display:flex;flex-direction:column;gap:12px}
+.nft-snap-item{display:flex;align-items:flex-start;gap:12px;font-size:0.9rem;color:var(--muted);line-height:1.5}
+.nft-snap-item b{color:var(--text)}
+@media(max-width:900px){
+  .nft-balance-row{grid-template-columns:1fr 1fr}
+  .nft-section{padding:72px 0}
+}
+@media(max-width:560px){
+  .nft-split{flex-direction:column}
+  .nft-divider{width:100%;height:1px}
+  .nft-balance-row{grid-template-columns:1fr 1fr}
+}
 .ca-wrap{display:flex;align-items:center;gap:10px;margin-top:22px;background:rgba(91,184,255,0.05);border:1px solid rgba(91,184,255,0.15);border-radius:8px;padding:10px 16px;flex-wrap:wrap}
 .ca-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
 .ca-addr{font-family:monospace;font-size:0.8rem;color:var(--ice);word-break:break-all;flex:1}
@@ -352,6 +395,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <li><a href="#story">About</a></li>
     <li><a href="#token">Token</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#nft">NFT</a></li>
     <li><a href="#community">Community</a></li>
   </ul>
   <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" class="nav-btn" target="_blank" rel="noopener">Buy $FAMILY</a>
@@ -437,6 +481,70 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <div class="phase"><div class="phase-bg-n">03</div><div class="phase-lbl">Phase 03</div><div class="phase-title">Long Term</div><ul class="phase-items"><li>Deliver on roadmap</li><li>Continue building</li><li>Show other chains what community looks like</li></ul></div>
   </div>
   <div class="sledding-strip rv"></div>
+</section>
+
+<section class="nft-section" id="nft">
+  <div class="nft-inner">
+    <div class="nft-head rv">
+      <div class="label">Phase 2</div>
+      <h2>$FAMILY<br>NFT UTILITY</h2>
+      <p class="nft-sub">1,000 NFTs. 10 XRP mint price. Monthly royalties split automatically — no staking, no locking. Just hold.</p>
+    </div>
+
+    <div class="nft-split rv">
+      <div class="nft-half holders">
+        <div class="nft-half-pct">70%</div>
+        <div class="nft-half-label">To NFT Holders</div>
+        <div class="nft-half-desc">Split equally across all 1,000 NFTs every month</div>
+      </div>
+      <div class="nft-divider"></div>
+      <div class="nft-half lp">
+        <div class="nft-half-pct">30%</div>
+        <div class="nft-half-label">To Liquidity Pool</div>
+        <div class="nft-half-desc">Deepens liquidity, strengthens the floor</div>
+      </div>
+    </div>
+
+    <div class="nft-examples rv">
+      <div class="nft-ex-label">Example monthly earnings per NFT</div>
+      <div class="nft-ex-grid">
+        <div class="nft-ex-head"><span>Monthly Royalties</span><span>Per NFT (70% ÷ 1,000)</span></div>
+        <div class="nft-ex-row"><span>1,000 XRP</span><span class="xrp-val">0.70 XRP</span></div>
+        <div class="nft-ex-row"><span>5,000 XRP</span><span class="xrp-val">3.50 XRP</span></div>
+        <div class="nft-ex-row"><span>10,000 XRP</span><span class="xrp-val">7.00 XRP</span></div>
+        <div class="nft-ex-row hot"><span>20,000 XRP 🔥</span><span class="xrp-val">14.00 XRP</span></div>
+      </div>
+    </div>
+
+    <div class="nft-wallet rv">
+      <div class="nft-wallet-label">Royalty Fee Wallet</div>
+      <div class="nft-wallet-addr" id="nftWalletAddr">TBC</div>
+      <div class="nft-balance-row">
+        <div class="nft-bal-box">
+          <div class="nft-bal-title">Current Balance</div>
+          <div class="nft-bal-val" id="nftBalance">—</div>
+        </div>
+        <div class="nft-bal-box">
+          <div class="nft-bal-title">Holder share (70%)</div>
+          <div class="nft-bal-val" id="nftHolderShare">—</div>
+        </div>
+        <div class="nft-bal-box">
+          <div class="nft-bal-title">Per NFT estimate</div>
+          <div class="nft-bal-val highlight" id="nftPerNft">—</div>
+        </div>
+        <div class="nft-bal-box">
+          <div class="nft-bal-title">LP share (30%)</div>
+          <div class="nft-bal-val" id="nftLpShare">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nft-snap rv">
+      <div class="nft-snap-item">📸<span>Snapshot: last day of every month at <b>7pm UTC</b></span></div>
+      <div class="nft-snap-item">⚡<span>Rewards distributed within <b>24 hours</b></span></div>
+      <div class="nft-snap-item">💎<span>No staking. No locking. <b>Just hold your NFT.</b></span></div>
+    </div>
+  </div>
 </section>
 
 <section class="community" id="community">
@@ -533,6 +641,28 @@ document.querySelectorAll('.faq-item').forEach(item=>{
   q.addEventListener('click',toggle);
   q.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
 });
+
+// NFT fee wallet balance — set address when confirmed
+const NFT_FEE_WALLET = ''; // TBC — paste wallet address here when ready
+(async function loadNftBalance(){
+  if(!NFT_FEE_WALLET){return;}
+  document.getElementById('nftWalletAddr').textContent=NFT_FEE_WALLET;
+  try{
+    const r=await fetch('https://xrplcluster.com',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({method:'account_info',params:[{account:NFT_FEE_WALLET,ledger_index:'validated'}]})});
+    const d=await r.json();
+    const drops=d?.result?.account_data?.Balance;
+    if(!drops)return;
+    const xrp=parseFloat(drops)/1e6;
+    const holder=xrp*0.7;
+    const lp=xrp*0.3;
+    const perNft=holder/1000;
+    document.getElementById('nftBalance').textContent=xrp.toFixed(2)+' XRP';
+    document.getElementById('nftHolderShare').textContent=holder.toFixed(2)+' XRP';
+    document.getElementById('nftPerNft').textContent=perNft.toFixed(4)+' XRP';
+    document.getElementById('nftLpShare').textContent=lp.toFixed(2)+' XRP';
+  }catch(e){console.warn('NFT wallet fetch failed',e)}
+})();
 </script>
 </body>
 </html>
