@@ -541,29 +541,6 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       </div>
     </div>
 
-    <div class="nft-wallet rv">
-      <div class="nft-wallet-label">Royalty Fee Wallet</div>
-      <div class="nft-wallet-addr" id="nftWalletAddr">TBC</div>
-      <div class="nft-balance-row">
-        <div class="nft-bal-box">
-          <div class="nft-bal-title">Current Balance</div>
-          <div class="nft-bal-val" id="nftBalance">—</div>
-        </div>
-        <div class="nft-bal-box">
-          <div class="nft-bal-title">Holder share (70%)</div>
-          <div class="nft-bal-val" id="nftHolderShare">—</div>
-        </div>
-        <div class="nft-bal-box">
-          <div class="nft-bal-title">Per NFT estimate</div>
-          <div class="nft-bal-val highlight" id="nftPerNft">—</div>
-        </div>
-        <div class="nft-bal-box">
-          <div class="nft-bal-title">LP share (30%)</div>
-          <div class="nft-bal-val" id="nftLpShare">—</div>
-        </div>
-      </div>
-    </div>
-
     <div class="nft-snap rv">
       <div class="nft-snap-item">📸<span>Snapshot: last day of every month at <b>7pm UTC</b></span></div>
       <div class="nft-snap-item">⚡<span>Rewards distributed within <b>24 hours</b></span></div>
@@ -689,28 +666,6 @@ document.querySelectorAll('.faq-item').forEach(item=>{
   q.addEventListener('click',toggle);
   q.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
 });
-
-// NFT fee wallet balance
-const NFT_FEE_WALLET = 'rwTqum7ZhaNU15iMjzwTpmMX9AaT655XE5';
-(async function loadNftBalance(){
-  if(!NFT_FEE_WALLET){return;}
-  document.getElementById('nftWalletAddr').textContent=NFT_FEE_WALLET;
-  try{
-    const r=await fetch('https://xrplcluster.com',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({method:'account_info',params:[{account:NFT_FEE_WALLET,ledger_index:'validated'}]})});
-    const d=await r.json();
-    const drops=d?.result?.account_data?.Balance;
-    if(!drops)return;
-    const xrp=parseFloat(drops)/1e6;
-    const holder=xrp*0.7;
-    const lp=xrp*0.3;
-    const perNft=holder/1000;
-    document.getElementById('nftBalance').textContent=xrp.toFixed(2)+' XRP';
-    document.getElementById('nftHolderShare').textContent=holder.toFixed(2)+' XRP';
-    document.getElementById('nftPerNft').textContent=perNft.toFixed(4)+' XRP';
-    document.getElementById('nftLpShare').textContent=lp.toFixed(2)+' XRP';
-  }catch(e){console.warn('NFT wallet fetch failed',e)}
-})();
 
 // NFT collection strip + stats
 function hexToUtf8(h){
