@@ -385,6 +385,24 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
 .ca-addr{font-family:monospace;font-size:0.8rem;color:var(--ice);word-break:break-all;flex:1}
 .ca-copy{background:rgba(91,184,255,0.12);border:1px solid rgba(91,184,255,0.25);color:var(--ice);padding:5px 14px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
 .ca-copy:hover{background:rgba(91,184,255,0.22)}
+.nft-coll-stats{display:flex;gap:10px;justify-content:center;margin-top:36px;padding-top:28px;border-top:1px solid var(--border);flex-wrap:wrap}
+.nft-stat-chip{background:rgba(91,184,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px 22px;text-align:center;min-width:88px}
+.nft-stat-v{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.04em;color:var(--ice)}
+.nft-stat-l{font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.nft-strip-hdr{display:flex;align-items:center;justify-content:space-between;margin-top:26px}
+.nft-strip-title{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+.nft-strip-link{font-size:0.72rem;color:var(--ice);text-decoration:none;opacity:.8}
+.nft-strip-link:hover{opacity:1;text-decoration:underline}
+.nft-strip-outer{overflow:hidden;position:relative;margin:14px -24px 0;padding:14px 0;background:rgba(91,184,255,0.02);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.nft-strip-outer::before,.nft-strip-outer::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:1;pointer-events:none}
+.nft-strip-outer::before{left:0;background:linear-gradient(to right,var(--deep),transparent)}
+.nft-strip-outer::after{right:0;background:linear-gradient(to left,var(--deep),transparent)}
+.nft-scroll-track{display:flex;gap:12px;width:max-content;animation:marquee 55s linear infinite;padding:0 40px}
+.nft-scroll-track:hover{animation-play-state:paused}
+.nft-c{flex-shrink:0;width:96px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:transform .2s,border-color .15s}
+.nft-c:hover{transform:scale(1.05);border-color:rgba(91,184,255,.4)}
+.nft-c img{width:96px;height:96px;object-fit:cover;display:block}
+.nft-c span{display:block;font-size:0.55rem;font-weight:600;letter-spacing:0.04em;color:var(--muted);padding:4px 6px 5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -544,6 +562,29 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       <div class="nft-snap-item">⚡<span>Rewards distributed within <b>24 hours</b></span></div>
       <div class="nft-snap-item">💎<span>No staking. No locking. <b>Just hold your NFT.</b></span></div>
     </div>
+
+    <div class="nft-coll-stats rv" id="nftCollStats" style="display:none">
+      <div class="nft-stat-chip">
+        <div class="nft-stat-v" id="nftMinted">—</div>
+        <div class="nft-stat-l">Minted</div>
+      </div>
+      <div class="nft-stat-chip">
+        <div class="nft-stat-v">1,000</div>
+        <div class="nft-stat-l">Max Supply</div>
+      </div>
+      <div class="nft-stat-chip" id="nftFloorWrap" style="display:none">
+        <div class="nft-stat-v" id="nftFloor">—</div>
+        <div class="nft-stat-l">Floor Price</div>
+      </div>
+    </div>
+
+    <div class="nft-strip-hdr rv" id="nftStripHdr" style="display:none">
+      <span class="nft-strip-title">MINTED NFTS</span>
+      <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener" class="nft-strip-link">View all on XRP Cafe →</a>
+    </div>
+    <div class="nft-strip-outer" id="nftStripOuter" style="display:none">
+      <div class="nft-scroll-track" id="nftScrollTrack"></div>
+    </div>
   </div>
 </section>
 
@@ -642,8 +683,8 @@ document.querySelectorAll('.faq-item').forEach(item=>{
   q.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
 });
 
-// NFT fee wallet balance — set address when confirmed
-const NFT_FEE_WALLET = ''; // TBC — paste wallet address here when ready
+// NFT fee wallet balance
+const NFT_FEE_WALLET = 'rwTqum7ZhaNU15iMjzwTpmMX9AaT655XE5';
 (async function loadNftBalance(){
   if(!NFT_FEE_WALLET){return;}
   document.getElementById('nftWalletAddr').textContent=NFT_FEE_WALLET;
@@ -662,6 +703,93 @@ const NFT_FEE_WALLET = ''; // TBC — paste wallet address here when ready
     document.getElementById('nftPerNft').textContent=perNft.toFixed(4)+' XRP';
     document.getElementById('nftLpShare').textContent=lp.toFixed(2)+' XRP';
   }catch(e){console.warn('NFT wallet fetch failed',e)}
+})();
+
+// NFT collection strip + stats
+function hexToUtf8(h){
+  try{return decodeURIComponent(h.replace(/../g,'%$&'))}
+  catch(e){let s='';for(let i=0;i<h.length;i+=2)s+=String.fromCharCode(parseInt(h.substr(i,2),16));return s}
+}
+(async function loadNftStrip(){
+  const ISSUER='rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
+  const track=document.getElementById('nftScrollTrack');
+  if(!track)return;
+  let items=[],minted=null,floor=null;
+
+  // Try XRP Cafe API (browser fetches may succeed where server-side is blocked)
+  try{
+    const cr=await fetch('https://xrp.cafe/api/v2/nfts?collection=xrp-family&limit=24',{headers:{Accept:'application/json'}});
+    if(cr.ok){
+      const cd=await cr.json();
+      const list=cd?.nfts||cd?.data||cd||[];
+      items=list.slice(0,24).map(n=>({
+        name:n.name||n.metadata?.name||'XRP Family',
+        image:n.image||n.thumbnail||n.metadata?.image||''
+      })).filter(n=>n.image);
+    }
+  }catch(e){}
+
+  // Try XRP Cafe collection stats
+  try{
+    const sr=await fetch('https://xrp.cafe/api/v2/collections/xrp-family',{headers:{Accept:'application/json'}});
+    if(sr.ok){
+      const sd=await sr.json();
+      minted=sd?.minted_count??sd?.total_minted??sd?.minted??null;
+      floor=sd?.floor_price??sd?.floor??null;
+    }
+  }catch(e){}
+
+  // Fall back to XRPL nfts_by_issuer + IPFS metadata
+  if(!items.length){
+    try{
+      const xr=await fetch('https://xrplcluster.com',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({method:'nfts_by_issuer',params:[{issuer:ISSUER,limit:20,ledger_index:'validated'}]})});
+      const xd=await xr.json();
+      const nfts=xd?.result?.nfts||[];
+      if(nfts.length&&minted===null){
+        minted=Math.max(...nfts.map(n=>n.nft_serial||0))+1;
+      }
+      const fetched=await Promise.allSettled(nfts.slice(0,14).map(async nft=>{
+        if(!nft.uri)return null;
+        const uri=hexToUtf8(nft.uri);
+        const url=uri.startsWith('ipfs://')?'https://cloudflare-ipfs.com/ipfs/'+uri.slice(7):uri;
+        try{
+          const m=await fetch(url).then(r=>r.ok?r.json():null);
+          if(!m?.image)return null;
+          let img=m.image.startsWith('ipfs://')?'https://cloudflare-ipfs.com/ipfs/'+m.image.slice(7):m.image;
+          return{name:m.name||'#'+nft.nft_serial,image:img};
+        }catch{return null}
+      }));
+      items=fetched.filter(r=>r.status==='fulfilled'&&r.value).map(r=>r.value);
+    }catch(e){}
+  }
+
+  // Show minted count
+  if(minted!==null){
+    const el=document.getElementById('nftMinted');
+    if(el)el.textContent=Number(minted).toLocaleString();
+    const wrap=document.getElementById('nftCollStats');
+    if(wrap)wrap.style.display='flex';
+  }
+
+  // Show floor price
+  if(floor!==null){
+    const fl=document.getElementById('nftFloor');
+    if(fl)fl.textContent=floor+' XRP';
+    const fw=document.getElementById('nftFloorWrap');
+    if(fw)fw.style.display='block';
+  }
+
+  if(!items.length)return;
+
+  // Build scroll strip
+  const card=n=>`<a class="nft-c" href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener"><img src="${n.image}" alt="${n.name}" loading="lazy" onerror="this.closest('.nft-c').style.display='none'"><span>${n.name}</span></a>`;
+  track.innerHTML=items.map(card).join('')+items.map(card).join('');
+
+  const outer=document.getElementById('nftStripOuter');
+  const hdr=document.getElementById('nftStripHdr');
+  if(outer)outer.style.display='';
+  if(hdr)hdr.style.display='flex';
 })();
 </script>
 </body>
