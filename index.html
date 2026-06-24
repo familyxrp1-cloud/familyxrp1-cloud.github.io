@@ -403,6 +403,12 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
 .nft-c:hover{transform:scale(1.05);border-color:rgba(91,184,255,.4)}
 .nft-c img{width:96px;height:96px;object-fit:cover;display:block}
 .nft-c span{display:block;font-size:0.55rem;font-weight:600;letter-spacing:0.04em;color:var(--muted);padding:4px 6px 5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nft-mint-btn{display:inline-flex;align-items:center;gap:8px;background:var(--ice);color:var(--ink);padding:13px 30px;border-radius:100px;font-size:0.88rem;font-weight:700;text-decoration:none;margin-top:24px;transition:all .25s}
+.nft-mint-btn:hover{background:var(--ice2);transform:translateY(-2px);box-shadow:0 12px 36px rgba(91,184,255,0.3)}
+.nft-c.sk{pointer-events:none}
+.nft-c.sk .sk-img{width:96px;height:96px;background:linear-gradient(90deg,rgba(91,184,255,0.04) 25%,rgba(91,184,255,0.1) 50%,rgba(91,184,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite}
+.nft-c.sk .sk-lbl{height:9px;margin:6px 10px 5px;border-radius:4px;background:linear-gradient(90deg,rgba(91,184,255,0.04) 25%,rgba(91,184,255,0.1) 50%,rgba(91,184,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
@@ -507,6 +513,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       <div class="label">Phase 2</div>
       <h2>$FAMILY<br>NFT UTILITY</h2>
       <p class="nft-sub">1,000 NFTs. 10 XRP mint price. Monthly royalties split automatically — no staking, no locking. Just hold.</p>
+      <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener" class="nft-mint-btn">Mint / Buy NFT →</a>
     </div>
 
     <div class="nft-split rv">
@@ -578,11 +585,11 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       </div>
     </div>
 
-    <div class="nft-strip-hdr rv" id="nftStripHdr" style="display:none">
+    <div class="nft-strip-hdr rv">
       <span class="nft-strip-title">MINTED NFTS</span>
       <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener" class="nft-strip-link">View all on XRP Cafe →</a>
     </div>
-    <div class="nft-strip-outer" id="nftStripOuter" style="display:none">
+    <div class="nft-strip-outer">
       <div class="nft-scroll-track" id="nftScrollTrack"></div>
     </div>
   </div>
@@ -716,6 +723,10 @@ function hexToUtf8(h){
   if(!track)return;
   let items=[],minted=null,floor=null;
 
+  // Show skeleton cards immediately while data loads
+  const sk='<div class="nft-c sk"><div class="sk-img"></div><div class="sk-lbl"></div></div>';
+  track.innerHTML=sk.repeat(16)+sk.repeat(16);
+
   // Try XRP Cafe API (browser fetches may succeed where server-side is blocked)
   try{
     const cr=await fetch('https://xrp.cafe/api/v2/nfts?collection=xrp-family&limit=24',{headers:{Accept:'application/json'}});
@@ -780,16 +791,10 @@ function hexToUtf8(h){
     if(fw)fw.style.display='block';
   }
 
+  // Replace skeletons with real cards (or leave skeletons if no data)
   if(!items.length)return;
-
-  // Build scroll strip
   const card=n=>`<a class="nft-c" href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener"><img src="${n.image}" alt="${n.name}" loading="lazy" onerror="this.closest('.nft-c').style.display='none'"><span>${n.name}</span></a>`;
   track.innerHTML=items.map(card).join('')+items.map(card).join('');
-
-  const outer=document.getElementById('nftStripOuter');
-  const hdr=document.getElementById('nftStripHdr');
-  if(outer)outer.style.display='';
-  if(hdr)hdr.style.display='flex';
 })();
 </script>
 </body>
