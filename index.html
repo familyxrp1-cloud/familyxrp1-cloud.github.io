@@ -409,8 +409,8 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
 .nft-c.sk .sk-img{width:96px;height:96px;background:linear-gradient(90deg,rgba(91,184,255,0.04) 25%,rgba(91,184,255,0.1) 50%,rgba(91,184,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite}
 .nft-c.sk .sk-lbl{height:9px;margin:6px 10px 5px;border-radius:4px;background:linear-gradient(90deg,rgba(91,184,255,0.04) 25%,rgba(91,184,255,0.1) 50%,rgba(91,184,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.nft-coming-soon{padding:28px;text-align:center;font-size:0.82rem;color:var(--muted)}
-.nft-coming-soon a{color:var(--ice);text-decoration:none}.nft-coming-soon a:hover{text-decoration:underline}
+.nft-soon{display:flex;align-items:center;gap:10px;justify-content:center;padding:26px;font-size:0.82rem;color:var(--muted)}
+.nft-soon a{color:var(--ice);text-decoration:none}.nft-soon a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -568,8 +568,12 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       <span class="nft-strip-title">MINTED NFTS</span>
       <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener" class="nft-strip-link">View all on XRP Cafe →</a>
     </div>
-    <div class="nft-strip-outer">
+    <div class="nft-strip-outer" id="nftStripOuter">
       <div class="nft-scroll-track" id="nftScrollTrack"></div>
+      <div class="nft-soon" id="nftSoon" style="display:none">
+        <span>🚀</span>
+        <span>NFT minting opens soon — <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener">watch on XRP Cafe</a></span>
+      </div>
     </div>
   </div>
 </section>
@@ -669,7 +673,7 @@ document.querySelectorAll('.faq-item').forEach(item=>{
   q.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
 });
 
-// NFT collection strip + stats
+// NFT collection strip — uses account_tx to find NFTokenMint txns → URIs → images
 function hexToUtf8(h){
   try{return decodeURIComponent(h.replace(/../g,'%$&'))}
   catch(e){let s='';for(let i=0;i<h.length;i+=2)s+=String.fromCharCode(parseInt(h.substr(i,2),16));return s}
@@ -677,121 +681,69 @@ function hexToUtf8(h){
 function ipfsUrl(u){
   if(!u)return '';
   if(u.startsWith('ipfs://'))return 'https://nftstorage.link/ipfs/'+u.slice(7);
-  if(u.startsWith('https://ipfs.io/ipfs/'))return u.replace('https://ipfs.io/ipfs/','https://nftstorage.link/ipfs/');
   return u;
-}
-async function xrplPost(body){
-  const nodes=['https://xrplcluster.com','https://xrpl.ws','https://s2.ripple.com:51234'];
-  for(const n of nodes){
-    try{
-      const r=await fetch(n,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      if(r.ok){const d=await r.json();if(!d?.result?.error)return d}
-    }catch(e){}
-  }
-  return null;
 }
 (async function loadNftStrip(){
   const ISSUER='rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
   const track=document.getElementById('nftScrollTrack');
-  const outer=document.getElementById('nftStripOuter')||track?.parentElement;
+  const soon=document.getElementById('nftSoon');
   if(!track)return;
-  let items=[],minted=null,floor=null;
 
-  // Show skeletons while loading
+  // Skeletons while loading
   const sk='<div class="nft-c sk"><div class="sk-img"></div><div class="sk-lbl"></div></div>';
   track.innerHTML=sk.repeat(16)+sk.repeat(16);
 
-  // 1. Try XRP Cafe by issuer (not collection slug — more reliable)
-  const cafeUrls=[
-    'https://xrp.cafe/api/v2/nfts?issuer='+ISSUER+'&limit=24&sort=minted_asc',
-    'https://xrp.cafe/api/v2/nfts?collection=xrp-family&limit=24&sort=minted_asc',
-    'https://xrp.cafe/api/v1/nfts?issuer='+ISSUER+'&limit=24',
-  ];
-  for(const url of cafeUrls){
-    if(items.length)break;
-    try{
-      const r=await fetch(url,{headers:{Accept:'application/json',Origin:location.origin}});
-      if(!r.ok)continue;
-      const d=await r.json();
-      const list=d?.nfts||d?.data||d?.items||(Array.isArray(d)?d:[]);
-      const mapped=list.slice(0,24).map(n=>({
-        name:n.name||n.metadata?.name||'XRP Family #'+(n.serial||n.nft_serial||''),
-        image:n.image||n.thumbnail||n.cdn_image||n.metadata?.image||''
-      })).filter(n=>n.image);
-      if(mapped.length)items=mapped;
-    }catch(e){}
-  }
-
-  // 2. Try XRP Cafe collection stats
+  // Fetch NFTokenMint transactions from issuer — works on standard rippled (no Clio needed)
+  let mintTxns=[];
   try{
-    const r=await fetch('https://xrp.cafe/api/v2/collections/xrp-family',{headers:{Accept:'application/json'}});
-    if(r.ok){
-      const d=await r.json();
-      minted=d?.minted_count??d?.total_minted??d?.minted??d?.supply??null;
-      floor=d?.floor_price??d?.floor??null;
-    }
+    const r=await fetch('https://xrplcluster.com',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({method:'account_tx',params:[{
+        account:ISSUER,limit:200,
+        ledger_index_min:-1,ledger_index_max:-1,forward:true
+      }]})
+    });
+    const d=await r.json();
+    const txns=d?.result?.transactions||[];
+    mintTxns=txns
+      .filter(t=>t.tx?.TransactionType==='NFTokenMint' && t.meta?.TransactionResult==='tesSUCCESS')
+      .map(t=>({uri:t.tx.URI, serial:t.tx.LastLedgerSequence}))
+      .filter(t=>t.uri);
   }catch(e){}
 
-  // 3. XRPL nfts_by_issuer → decode URI → fetch metadata
-  if(!items.length){
-    const xd=await xrplPost({method:'nfts_by_issuer',params:[{issuer:ISSUER,limit:20,ledger_index:'validated'}]});
-    const nfts=xd?.result?.nfts||[];
-    if(nfts.length&&minted===null)minted=Math.max(...nfts.map(n=>n.nft_serial||0))+1;
-    const fetched=await Promise.allSettled(nfts.slice(0,16).map(async nft=>{
-      if(!nft.uri)return null;
-      const metaUrl=ipfsUrl(hexToUtf8(nft.uri));
-      if(!metaUrl)return null;
-      try{
-        const m=await fetch(metaUrl,{signal:AbortSignal.timeout(5000)}).then(r=>r.ok?r.json():null);
-        if(!m?.image)return null;
-        return{name:m.name||'XRP Family #'+nft.nft_serial,image:ipfsUrl(m.image)};
-      }catch{return null}
-    }));
-    items=fetched.filter(r=>r.status==='fulfilled'&&r.value).map(r=>r.value);
-  }
-
-  // 4. account_nfts fallback (for NFTs held by issuer account itself)
-  if(!items.length){
-    const xd=await xrplPost({method:'account_nfts',params:[{account:ISSUER,limit:20,ledger_index:'validated'}]});
-    const nfts=xd?.result?.account_nfts||[];
-    const fetched=await Promise.allSettled(nfts.slice(0,16).map(async nft=>{
-      if(!nft.URI)return null;
-      const metaUrl=ipfsUrl(hexToUtf8(nft.URI));
-      if(!metaUrl)return null;
-      try{
-        const m=await fetch(metaUrl,{signal:AbortSignal.timeout(5000)}).then(r=>r.ok?r.json():null);
-        if(!m?.image)return null;
-        return{name:m.name||'XRP Family #'+nft.nft_serial,image:ipfsUrl(m.image)};
-      }catch{return null}
-    }));
-    items=fetched.filter(r=>r.status==='fulfilled'&&r.value).map(r=>r.value);
-  }
-
-  // Update minted count
-  if(minted!==null){
+  // Show minted count
+  if(mintTxns.length){
     const el=document.getElementById('nftMinted');
-    if(el)el.textContent=Number(minted).toLocaleString();
+    if(el)el.textContent=mintTxns.length.toLocaleString();
     const wrap=document.getElementById('nftCollStats');
     if(wrap)wrap.style.display='flex';
   }
 
-  // Update floor price
-  if(floor!==null){
-    const fl=document.getElementById('nftFloor');
-    if(fl)fl.textContent=floor+' XRP';
-    const fw=document.getElementById('nftFloorWrap');
-    if(fw)fw.style.display='block';
+  if(!mintTxns.length){
+    track.innerHTML='';
+    if(soon)soon.style.display='flex';
+    return;
   }
+
+  // Fetch metadata for first 20 NFTs concurrently
+  const sample=mintTxns.slice(0,20);
+  const fetched=await Promise.allSettled(sample.map(async t=>{
+    const metaUrl=ipfsUrl(hexToUtf8(t.uri));
+    if(!metaUrl)return null;
+    try{
+      const m=await fetch(metaUrl,{signal:AbortSignal.timeout(6000)}).then(r=>r.ok?r.json():null);
+      if(!m?.image)return null;
+      return{name:m.name||'XRP Family',image:ipfsUrl(m.image)};
+    }catch{return null}
+  }));
+  const items=fetched.filter(r=>r.status==='fulfilled'&&r.value).map(r=>r.value);
 
   if(items.length){
     const card=n=>`<a class="nft-c" href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener"><img src="${n.image}" alt="${n.name}" loading="lazy" onerror="this.closest('.nft-c').style.display='none'"><span>${n.name}</span></a>`;
     track.innerHTML=items.map(card).join('')+items.map(card).join('');
   }else{
-    // No NFTs found — show coming soon state
     track.innerHTML='';
-    if(outer){
-      outer.innerHTML='<div class="nft-coming-soon">NFTs launching soon — <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener">check on XRP Cafe</a></div>';
-    }
+    if(soon)soon.style.display='flex';
   }
 })();
 </script>
