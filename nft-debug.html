@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFT Debug</title>
+<style>
+body{font-family:monospace;background:#05080f;color:#ddeeff;padding:20px;font-size:13px}
+h2{color:#5bb8ff;margin-bottom:8px}
+.blk{background:#0d1b2e;border:1px solid rgba(91,184,255,.15);border-radius:8px;padding:14px;margin-bottom:14px}
+.ok{color:#14f195}.err{color:#ff4757}.mut{color:#5a7a99}
+pre{white-space:pre-wrap;word-break:break-all;margin-top:8px;font-size:11px;max-height:300px;overflow:auto}
+img{width:80px;height:80px;object-fit:cover;border-radius:6px;margin:4px}
+</style>
+</head>
+<body>
+<h2>NFT Data Debug — familyxrp.com</h2>
+<p class="mut">Open this page in your browser. It will test every data source and show raw results.</p>
+<div id="out"></div>
+<script>
+const ISSUER = 'rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
+const out = document.getElementById('out');
+
+function log(title, status, data, imgs) {
+  const d = document.createElement('div');
+  d.className = 'blk';
+  let html = `<b class="${status==='ok'?'ok':'err'}">[${status.toUpperCase()}]</b> <b>${title}</b>`;
+  if (imgs && imgs.length) {
+    html += `<br><br>`;
+    imgs.forEach(img => { html += `<img src="${img.image}" title="${img.name}" onerror="this.style.border='1px solid red'">`; });
+  }
+  html += `<pre>${typeof data === 'string' ? data : JSON.stringify(data, null, 2).slice(0, 2000)}</pre>`;
+  d.innerHTML = html;
+  out.appendChild(d);
+}
+
+function hexToUtf8(h) {
+  try { return decodeURIComponent(h.replace(/../g, '%$&')); }
+  catch(e) { let s=''; for(let i=0;i<h.length;i+=2) s+=String.fromCharCode(parseInt(h.substr(i,2),16)); return s; }
+}
+function ipfsUrl(u) {
+  if (!u) return '';
+  if (u.startsWith('ipfs://')) return 'https://nftstorage.link/ipfs/' + u.slice(7);
+  return u;
+}
+
+(async () => {
+
+  // Test 1: XRP Cafe by issuer
+  try {
+    const r = await fetch(`https://xrp.cafe/api/v2/nfts?issuer=${ISSUER}&limit=6`, {headers:{Accept:'application/json'}});
+    const text = await r.text();
+    log('XRP Cafe /api/v2/nfts?issuer=', r.ok ? 'ok' : 'err', `HTTP ${r.status}\n${text.slice(0,500)}`);
+  } catch(e) { log('XRP Cafe /api/v2/nfts?issuer=', 'err', e.message); }
+
+  // Test 2: XRP Cafe by collection slug
+  try {
+    const r = await fetch('https://xrp.cafe/api/v2/nfts?collection=xrp-family&limit=6', {headers:{Accept:'application/json'}});
+    const text = await r.text();
+    log('XRP Cafe /api/v2/nfts?collection=xrp-family', r.ok ? 'ok' : 'err', `HTTP ${r.status}\n${text.slice(0,500)}`);
+  } catch(e) { log('XRP Cafe collection slug', 'err', e.message); }
+
+  // Test 3: XRP Cafe collection info
+  try {
+    const r = await fetch('https://xrp.cafe/api/v2/collections/xrp-family', {headers:{Accept:'application/json'}});
+    const text = await r.text();
+    log('XRP Cafe /api/v2/collections/xrp-family', r.ok ? 'ok' : 'err', `HTTP ${r.status}\n${text.slice(0,500)}`);
+  } catch(e) { log('XRP Cafe collection info', 'err', e.message); }
+
+  // Test 4: XRPL nfts_by_issuer (xrplcluster)
+  try {
+    const r = await fetch('https://xrplcluster.com', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({method:'nfts_by_issuer', params:[{issuer:ISSUER, limit:5, ledger_index:'validated'}]})
+    });
+    const d = await r.json();
+    const nfts = d?.result?.nfts || [];
+    log(`XRPL xrplcluster nfts_by_issuer — ${nfts.length} NFTs found`, r.ok && !d?.result?.error ? 'ok' : 'err', d);
+
+    if (nfts.length) {
+      log('First NFT URI decoded', 'ok', nfts[0].uri ? hexToUtf8(nfts[0].uri) : 'NO URI');
+      // Try fetching metadata for first NFT
+      if (nfts[0].uri) {
+        const url = ipfsUrl(hexToUtf8(nfts[0].uri));
+        try {
+          const mr = await fetch(url);
+          const md = await mr.json();
+          log('First NFT metadata', 'ok', md, [{name: md.name, image: ipfsUrl(md.image)}]);
+        } catch(e) { log('First NFT metadata fetch', 'err', e.message + ' — URL: ' + url); }
+      }
+    }
+  } catch(e) { log('XRPL xrplcluster nfts_by_issuer', 'err', e.message); }
+
+  // Test 5: XRPL account_nfts (NFTs held by issuer account)
+  try {
+    const r = await fetch('https://xrplcluster.com', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({method:'account_nfts', params:[{account:ISSUER, limit:5, ledger_index:'validated'}]})
+    });
+    const d = await r.json();
+    const nfts = d?.result?.account_nfts || [];
+    log(`XRPL account_nfts for issuer — ${nfts.length} NFTs held`, r.ok ? 'ok' : 'err', d);
+  } catch(e) { log('XRPL account_nfts', 'err', e.message); }
+
+  // Test 6: xrpl.ws
+  try {
+    const r = await fetch('https://xrpl.ws', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({method:'nfts_by_issuer', params:[{issuer:ISSUER, limit:3, ledger_index:'validated'}]})
+    });
+    const d = await r.json();
+    const nfts = d?.result?.nfts || [];
+    log(`xrpl.ws nfts_by_issuer — ${nfts.length} NFTs`, r.ok ? 'ok' : 'err', d?.result?.error || `${nfts.length} nfts`);
+  } catch(e) { log('xrpl.ws', 'err', e.message); }
+
+})();
+</script>
+</body>
+</html>
