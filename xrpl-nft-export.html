@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>XRPL NFT Export Tool — $FAMILY</title>
+<meta name="description" content="Export your full XRPL NFT collection with metadata, XRP Cafe links, and more. Replaces nft.export."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#04090f;--deep:#070f1c;--panel:#0b1628;--card:#0d1b2e;
+  --ice:#5bb8ff;--ice2:#a8d8ff;--muted:#5a7a99;
+  --text:#ddeeff;--white:#f4f9ff;--border:rgba(91,184,255,0.1);
+  --green:#14f195;--orange:#ff6a38;--red:#ff4757;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(4,9,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:0.08em;color:var(--white);text-decoration:none}
+.logo span{color:var(--ice)}
+.nav-links{display:flex;gap:24px;align-items:center;list-style:none}
+.nav-links a{font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--ice)}
+.nav-btn{background:var(--ice);color:var(--ink);padding:9px 22px;border-radius:100px;font-size:0.78rem;font-weight:700;text-decoration:none;transition:all .2s}
+.nav-btn:hover{background:var(--ice2);transform:translateY(-1px)}
+
+/* HERO */
+.tool-hero{padding:130px 80px 60px;border-bottom:1px solid var(--border);background:linear-gradient(to bottom,rgba(91,184,255,0.05) 0%,transparent 100%)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(91,184,255,0.08);border:1px solid rgba(91,184,255,0.2);padding:7px 16px;border-radius:100px;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ice);margin-bottom:20px}
+.eyebrow::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--ice);animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.tool-hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5.5rem);line-height:0.9;letter-spacing:0.03em;color:var(--white);margin-bottom:16px}
+.tool-hero h1 span{color:var(--ice)}
+.hero-sub{font-size:1rem;color:var(--muted);max-width:520px;line-height:1.8;margin-bottom:32px;font-weight:300}
+.pricing-pills{display:flex;gap:12px;flex-wrap:wrap}
+.pill{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 18px}
+.pill-xrp{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--ice);letter-spacing:0.05em;line-height:1}
+.pill-label{font-size:0.72rem;color:var(--muted);line-height:1.4;font-weight:300}
+.pill-label strong{display:block;color:var(--text);font-weight:600;font-size:0.78rem}
+
+/* MAIN TOOL */
+.tool-body{max-width:900px;margin:0 auto;padding:60px 24px 100px}
+
+/* STEP CARDS */
+.step-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;margin-bottom:24px;transition:opacity .3s,transform .3s}
+.step-card.locked{opacity:0.35;pointer-events:none;user-select:none}
+.step-header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.step-num{width:36px;height:36px;border-radius:50%;background:rgba(91,184,255,0.1);border:1px solid rgba(91,184,255,0.25);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--ice);flex-shrink:0}
+.step-num.done{background:rgba(20,241,149,0.1);border-color:rgba(20,241,149,0.3);color:var(--green)}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.06em;color:var(--white)}
+.step-sub{font-size:0.78rem;color:var(--muted);margin-top:2px}
+
+/* FORM */
+.field-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.field{flex:1;min-width:220px}
+label{display:block;font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+input[type="text"],input[type="number"],select{width:100%;background:rgba(91,184,255,0.04);border:1px solid rgba(91,184,255,0.15);border-radius:10px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--white);outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:rgba(91,184,255,0.4);background:rgba(91,184,255,0.07)}
+input::placeholder{color:var(--muted)}
+select option{background:var(--card)}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;cursor:pointer}
+.toggle-row input[type="checkbox"]{width:auto;accent-color:var(--ice)}
+.toggle-label{font-size:0.82rem;color:var(--muted)}
+.toggle-label strong{color:var(--text)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;border:none;transition:all .22s;text-decoration:none}
+.btn-primary{background:var(--ice);color:var(--ink)}
+.btn-primary:hover{background:var(--ice2);transform:translateY(-1px);box-shadow:0 10px 30px rgba(91,184,255,0.25)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,0.15)}
+.btn-ghost:hover{border-color:rgba(91,184,255,0.4);color:var(--ice)}
+.btn-green{background:var(--green);color:var(--ink)}
+.btn-green:hover{background:#0fe88a;transform:translateY(-1px)}
+.btn-orange{background:var(--orange);color:var(--white)}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* PROGRESS */
+.progress-wrap{margin:20px 0}
+.progress-bar-bg{height:6px;background:rgba(91,184,255,0.1);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(to right,var(--ice),var(--ice2));border-radius:3px;transition:width .3s ease;width:0%}
+.progress-info{display:flex;justify-content:space-between;margin-top:8px}
+.progress-count{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--ice)}
+.progress-label{font-size:0.72rem;color:var(--muted)}
+.log-line{font-size:0.75rem;color:var(--muted);margin-top:6px;font-family:monospace}
+
+/* STATS ROW */
+.stats-row{display:flex;gap:2px;margin:24px 0;background:var(--border);border-radius:14px;overflow:hidden}
+.stat-box{flex:1;background:var(--panel);padding:16px;text-align:center}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--white);letter-spacing:0.05em;line-height:1}
+.stat-l{font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* NFT PREVIEW TABLE */
+.preview-wrap{overflow-x:auto;margin:20px 0;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:0.8rem}
+thead th{background:rgba(91,184,255,0.06);padding:10px 14px;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(91,184,255,0.05);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(91,184,255,0.03)}
+tbody td{padding:10px 14px;vertical-align:middle;color:var(--text)}
+.nft-thumb{width:40px;height:40px;border-radius:6px;object-fit:cover;background:rgba(91,184,255,0.08);border:1px solid var(--border);flex-shrink:0}
+.nft-thumb-placeholder{width:40px;height:40px;border-radius:6px;background:rgba(91,184,255,0.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.7rem}
+.mono{font-family:monospace;font-size:0.72rem;color:var(--muted)}
+.truncate{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cafe-link{color:var(--ice);text-decoration:none;font-size:0.7rem;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.cafe-link:hover{color:var(--ice2);text-decoration:underline}
+.badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:0.62rem;font-weight:700;letter-spacing:0.06em}
+.badge-green{background:rgba(20,241,149,0.12);color:var(--green)}
+.badge-muted{background:rgba(91,184,255,0.08);color:var(--muted)}
+
+/* PAYMENT SECTION */
+.payment-grid{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:start}
+@media(max-width:600px){.payment-grid{grid-template-columns:1fr}}
+.payment-detail-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.payment-detail-row:last-child{border-bottom:none}
+.detail-label{font-size:0.72rem;color:var(--muted);font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.detail-val{font-family:monospace;font-size:0.85rem;color:var(--white);word-break:break-all;text-align:right;max-width:280px}
+.detail-val.big{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--ice);letter-spacing:0.06em}
+.detail-val.copy-it{cursor:pointer;color:var(--ice)}
+.detail-val.copy-it:hover{color:var(--ice2)}
+.copy-hint{font-size:0.62rem;color:var(--muted);margin-left:6px}
+.qr-box{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.qr-box img{width:160px;height:160px;border-radius:8px}
+.qr-label{font-size:0.65rem;color:var(--muted);text-align:center;line-height:1.5}
+.pay-warn{background:rgba(255,106,56,0.08);border:1px solid rgba(255,106,56,0.2);border-radius:10px;padding:12px 16px;font-size:0.78rem;color:rgba(255,200,150,0.9);line-height:1.6;margin:16px 0}
+.pay-warn strong{color:var(--orange)}
+.verify-status{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:12px;margin-top:16px;font-size:0.85rem;font-weight:600}
+.verify-status.polling{background:rgba(91,184,255,0.06);border:1px solid rgba(91,184,255,0.15);color:var(--ice)}
+.verify-status.confirmed{background:rgba(20,241,149,0.08);border:1px solid rgba(20,241,149,0.2);color:var(--green)}
+.verify-status.failed{background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);color:var(--red)}
+.spinner{width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* EXPORT */
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+@media(max-width:500px){.export-grid{grid-template-columns:1fr}}
+.export-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;transition:border-color .2s}
+.export-card:hover{border-color:rgba(91,184,255,0.3)}
+.export-icon{font-size:2rem;margin-bottom:10px}
+.export-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.06em;color:var(--white);margin-bottom:6px}
+.export-desc{font-size:0.75rem;color:var(--muted);line-height:1.5;margin-bottom:16px}
+
+/* STATUS BADGE */
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-blue{background:var(--ice);animation:blink 1.5s infinite}
+.dot-green{background:var(--green)}
+.dot-red{background:var(--red)}
+
+/* ALERT */
+.alert{padding:14px 18px;border-radius:10px;font-size:0.82rem;margin:12px 0;line-height:1.6}
+.alert-warn{background:rgba(255,106,56,0.08);border:1px solid rgba(255,106,56,0.2);color:rgba(255,200,150,0.9)}
+.alert-info{background:rgba(91,184,255,0.06);border:1px solid rgba(91,184,255,0.15);color:var(--ice2)}
+.alert-success{background:rgba(20,241,149,0.07);border:1px solid rgba(20,241,149,0.18);color:#7ff7c8}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.footer-copy{font-size:0.72rem;color:var(--muted)}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:0.72rem;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--ice)}
+
+/* MOBILE */
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .tool-hero{padding:100px 24px 40px}
+  .tool-hero h1{font-size:2.4rem}
+  .step-card{padding:22px 18px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">$<span>FAMILY</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="https://xrp.cafe" target="_blank" rel="noopener">XRP Cafe</a></li>
+    <li><a href="https://twitter.com/family_xrpl" target="_blank" rel="noopener" class="nav-btn">Twitter</a></li>
+  </ul>
+</nav>
+
+<section class="tool-hero">
+  <div class="eyebrow">XRPL NFT Export Tool</div>
+  <h1>Export Your<br/><span>Full NFT</span> Collection</h1>
+  <p class="hero-sub">The community replacement for the defunct nft.export. Pull your entire XRPL collection — with on-chain metadata, IPFS images, XRP Cafe links, and clean CSV/JSON exports. No backend. No data retention. Everything runs in your browser.</p>
+  <div class="pricing-pills">
+    <div class="pill">
+      <div class="pill-xrp">5 XRP</div>
+      <div class="pill-label"><strong>Under 500 NFTs</strong>Small collection export</div>
+    </div>
+    <div class="pill">
+      <div class="pill-xrp">8 XRP</div>
+      <div class="pill-label"><strong>500+ NFTs</strong>Large collection export</div>
+    </div>
+    <div class="pill" style="border-color:rgba(20,241,149,0.2)">
+      <div class="pill-xrp" style="color:var(--green)">FREE</div>
+      <div class="pill-label"><strong>Preview always free</strong>10-NFT sample, no payment</div>
+    </div>
+  </div>
+</section>
+
+<main class="tool-body">
+
+  <!-- STEP 1: Input -->
+  <div class="step-card" id="card-1">
+    <div class="step-header">
+      <div class="step-num" id="num-1">1</div>
+      <div>
+        <div class="step-title">Enter Collection Details</div>
+        <div class="step-sub">Paste the NFT issuer address and optional taxon to scope your collection</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field" style="flex:2">
+        <label>Issuer Address (r...)</label>
+        <input type="text" id="issuer" placeholder="rXXX... — the wallet that minted the NFTs" maxlength="64"/>
+      </div>
+      <div class="field">
+        <label>Taxon (optional)</label>
+        <input type="number" id="taxon" placeholder="0" min="0"/>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <input type="checkbox" id="fetchMeta" checked/>
+      <label class="toggle-label" for="fetchMeta"><strong>Fetch on-chain metadata</strong> — name, description, attributes, image (slower for large collections)</label>
+    </div>
+
+    <div class="alert alert-info" style="margin-bottom:20px">
+      <strong>Tip:</strong> The issuer address is the wallet that originally minted the NFTs. It is <em>not</em> necessarily the current holder. You can find it on XRP Cafe by browsing your collection.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-fetch" onclick="startFetch()">
+        <span>Scan Collection</span>
+        <span>&#x2192;</span>
+      </button>
+      <button class="btn btn-ghost" onclick="fillDemo()">Try Demo Address</button>
+    </div>
+    <div id="step1-error" class="alert alert-warn" style="display:none;margin-top:14px"></div>
+  </div>
+
+  <!-- STEP 2: Scanning -->
+  <div class="step-card locked" id="card-2">
+    <div class="step-header">
+      <div class="step-num" id="num-2">2</div>
+      <div>
+        <div class="step-title">Scanning On-Chain Data</div>
+        <div class="step-sub">Paginating through the XRP Ledger…</div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-bar"></div></div>
+      <div class="progress-info">
+        <span class="progress-count" id="prog-count">0</span>
+        <span class="progress-label" id="prog-label">NFTs found</span>
+      </div>
+    </div>
+    <div class="log-line" id="scan-log">Waiting to start…</div>
+    <div class="log-line" id="meta-log" style="display:none"></div>
+  </div>
+
+  <!-- STEP 3: Results + Payment -->
+  <div class="step-card locked" id="card-3">
+    <div class="step-header">
+      <div class="step-num" id="num-3">3</div>
+      <div>
+        <div class="step-title">Collection Found — Pay to Export</div>
+        <div class="step-sub">Preview your collection, then complete a one-time XRP payment to unlock the full export</div>
+      </div>
+    </div>
+
+    <div class="stats-row" id="stats-row">
+      <div class="stat-box"><div class="stat-n" id="stat-total">—</div><div class="stat-l">Total NFTs</div></div>
+      <div class="stat-box"><div class="stat-n" id="stat-taxon">—</div><div class="stat-l">Taxon</div></div>
+      <div class="stat-box"><div class="stat-n" id="stat-fee">—</div><div class="stat-l">Export Fee</div></div>
+      <div class="stat-box"><div class="stat-n" id="stat-meta">—</div><div class="stat-l">Metadata Loaded</div></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div class="step-sub" style="margin-bottom:8px">Preview — first 10 NFTs</div>
+      <div class="preview-wrap" id="preview-table-wrap">
+        <table id="preview-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>NFToken ID</th>
+              <th>Seq</th>
+              <th>Transfer Fee</th>
+              <th>XRP Cafe</th>
+            </tr>
+          </thead>
+          <tbody id="preview-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Payment UI -->
+    <div id="payment-section">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--white);letter-spacing:0.06em;margin-bottom:16px">Complete Payment to Unlock Export</div>
+
+      <div class="payment-grid">
+        <div>
+          <div class="payment-detail-row">
+            <span class="detail-label">Amount</span>
+            <span class="detail-val big" id="pay-amount">— XRP</span>
+          </div>
+          <div class="payment-detail-row">
+            <span class="detail-label">Destination</span>
+            <span class="detail-val copy-it" id="pay-address" onclick="copyText('pay-address')" title="Click to copy">—<span class="copy-hint">[click to copy]</span></span>
+          </div>
+          <div class="payment-detail-row">
+            <span class="detail-label">Destination Tag</span>
+            <span class="detail-val copy-it" id="pay-tag" onclick="copyText('pay-tag')" title="Click to copy — REQUIRED">—<span class="copy-hint">[REQUIRED — click to copy]</span></span>
+          </div>
+          <div class="payment-detail-row">
+            <span class="detail-label">Memo (optional)</span>
+            <span class="detail-val" style="font-size:0.75rem;color:var(--muted)">XRPL NFT Export</span>
+          </div>
+
+          <div class="pay-warn">
+            <strong>Important:</strong> You MUST include the Destination Tag shown above. Without it, your payment cannot be verified and the export will not unlock. Double-check before sending.
+          </div>
+
+          <div id="verify-status" class="verify-status polling" style="display:none">
+            <div class="spinner"></div>
+            <span id="verify-msg">Monitoring ledger for your payment…</span>
+          </div>
+
+          <div class="btn-row" style="margin-top:14px">
+            <button class="btn btn-primary" id="btn-verify" onclick="startPaymentVerification()">
+              I've Sent the Payment — Verify
+            </button>
+            <a id="xumm-link" class="btn btn-ghost" href="#" target="_blank" rel="noopener">
+              Pay via Xaman &#x2197;
+            </a>
+          </div>
+        </div>
+
+        <div class="qr-box">
+          <img id="qr-img" src="" alt="Payment QR Code" loading="lazy"/>
+          <div class="qr-label">Scan with any XRPL wallet<br/>(Xaman, Exodus, Bitget…)<br/><strong style="color:var(--orange)">Set destination tag!</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Already paid / skip for free preview -->
+    <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <span style="font-size:0.75rem;color:var(--muted)">Just want the 10-NFT preview? No payment needed.</span>
+      <button class="btn btn-ghost" style="padding:9px 18px;font-size:0.78rem" onclick="unlockExport(true)">Download Preview (10 NFTs)</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Export -->
+  <div class="step-card locked" id="card-4">
+    <div class="step-header">
+      <div class="step-num" id="num-4">4</div>
+      <div>
+        <div class="step-title">Export Your Collection</div>
+        <div class="step-sub" id="export-sub">Payment confirmed — download your full NFT data below</div>
+      </div>
+    </div>
+
+    <div class="alert alert-success" id="payment-confirmed-msg" style="display:none">
+      Payment confirmed on the XRP Ledger. Your full export is ready.
+    </div>
+
+    <div class="export-grid">
+      <div class="export-card">
+        <div class="export-icon">📊</div>
+        <div class="export-name">CSV Export</div>
+        <div class="export-desc">Spreadsheet-ready. Opens in Excel, Google Sheets, or any CSV editor. Includes all fields + XRP Cafe links.</div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="exportCSV()">Download CSV</button>
+      </div>
+      <div class="export-card">
+        <div class="export-icon">&#x7B;&#x7D;</div>
+        <div class="export-name">JSON Export</div>
+        <div class="export-desc">Full structured data with nested metadata objects, attributes arrays, and raw on-chain fields.</div>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportJSON()">Download JSON</button>
+      </div>
+    </div>
+
+    <div style="margin-top:20px" id="export-fields-info">
+      <div class="step-sub" style="margin-bottom:10px">Fields included in export</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px" id="field-list"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-copy">&copy; 2025 $FAMILY — One Ledger. One Family. &nbsp;|&nbsp; XRPL NFT Export Tool — community replacement for nft.export</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="https://xrp.cafe" target="_blank" rel="noopener">XRP Cafe</a>
+    <a href="https://twitter.com/family_xrpl" target="_blank" rel="noopener">Twitter</a>
+  </div>
+</footer>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// Set PAYMENT_ADDRESS to the wallet that should receive export fees.
+// Destination tags are generated per-session to match payments.
+const PAYMENT_ADDRESS = 'rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
+
+const FEE_SMALL     = 5;    // XRP for collections < 500 NFTs
+const FEE_LARGE     = 8;    // XRP for collections >= 500 NFTs
+const FEE_THRESHOLD = 500;
+
+const XRPL_NODES    = [
+  'https://xrplcluster.com',
+  'https://s2.ripple.com',
+  'https://xrpl.ws'
+];
+const IPFS_GATEWAYS = [
+  'https://nftstorage.link/ipfs/',
+  'https://cloudflare-ipfs.com/ipfs/',
+  'https://ipfs.io/ipfs/'
+];
+const CAFE_BASE     = 'https://xrp.cafe/nft/';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let allNFTs       = [];
+let metadataMap   = {};
+let scanComplete  = false;
+let paymentVerified = false;
+let previewOnly   = false;
+let destTag       = null;
+let pollTimer     = null;
+let pollStart     = null;
+
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+function hexToUtf8(h) {
+  if (!h) return '';
+  try { return decodeURIComponent(h.replace(/../g, '%$&')); }
+  catch { let s=''; for(let i=0;i<h.length;i+=2) s+=String.fromCharCode(parseInt(h.substr(i,2),16)); return s; }
+}
+
+function ipfsToHttp(url, gatewayIndex) {
+  if (!url) return '';
+  const gw = IPFS_GATEWAYS[gatewayIndex % IPFS_GATEWAYS.length];
+  if (url.startsWith('ipfs://')) return gw + url.slice(7);
+  if (url.includes('/ipfs/')) {
+    const parts = url.split('/ipfs/');
+    return gw + parts[parts.length - 1];
+  }
+  return url;
+}
+
+function dropsToXrp(drops) { return (parseInt(drops) / 1e6).toFixed(6).replace(/\.?0+$/, ''); }
+function xrpToDrops(xrp)   { return Math.round(parseFloat(xrp) * 1e6); }
+
+function copyText(elId) {
+  const el = document.getElementById(elId);
+  const text = el.innerText.replace('[click to copy]','').replace('[REQUIRED — click to copy]','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = el.innerHTML;
+    el.style.color = 'var(--green)';
+    setTimeout(() => { el.style.color = ''; }, 1200);
+  });
+}
+
+function fillDemo() {
+  document.getElementById('issuer').value = 'rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
+  document.getElementById('taxon').value  = '';
+}
+
+function randTag() { return Math.floor(10000 + Math.random() * 89999); }
+
+function setLocked(id, locked) {
+  document.getElementById(id).classList.toggle('locked', locked);
+}
+
+function setStepDone(n) {
+  const el = document.getElementById('num-' + n);
+  el.classList.add('done');
+  el.textContent = '✓';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ─── XRPL RPC ────────────────────────────────────────────────────────────────
+async function rpc(method, params, nodeIndex) {
+  nodeIndex = nodeIndex || 0;
+  const node = XRPL_NODES[nodeIndex % XRPL_NODES.length];
+  const res = await fetch(node, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ method, params: [params] })
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} from ${node}`);
+  return res.json();
+}
+
+// ─── FETCH ALL NFTs ───────────────────────────────────────────────────────────
+async function fetchAllNFTs(issuer, taxon) {
+  let all = [];
+  let marker = null;
+  let page = 0;
+  const params = { issuer, limit: 400, ledger_index: 'validated' };
+  if (taxon !== null && taxon !== '') params.nft_taxon = parseInt(taxon);
+
+  setLog('scan-log', `Connecting to XRPL node…`);
+
+  while (true) {
+    if (marker) params.marker = marker;
+    let data, result, nodeIdx = 0;
+
+    while (nodeIdx < XRPL_NODES.length) {
+      try {
+        data = await rpc('nfts_by_issuer', params, nodeIdx);
+        result = data?.result;
+        if (result?.error) {
+          if (nodeIdx < XRPL_NODES.length - 1) { nodeIdx++; continue; }
+          throw new Error(result.error_message || result.error);
+        }
+        break;
+      } catch(e) {
+        nodeIdx++;
+        if (nodeIdx >= XRPL_NODES.length) throw e;
+        setLog('scan-log', `Trying node ${nodeIdx + 1}/${XRPL_NODES.length}…`);
+      }
+    }
+
+    const batch = result?.nfts || [];
+    all = all.concat(batch);
+    page++;
+    updateProgress(all.length);
+    setLog('scan-log', `Page ${page} — ${all.length} NFTs so far…`);
+
+    marker = result?.marker;
+    if (!marker) break;
+    await sleep(150);
+  }
+
+  return all;
+}
+
+function updateProgress(count) {
+  document.getElementById('prog-count').textContent = count.toLocaleString();
+  const fill = Math.min(100, (count / 200) * 100);
+  document.getElementById('prog-bar').style.width = fill + '%';
+}
+
+function setLog(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.style.display = ''; el.textContent = msg; }
+}
+
+// ─── FETCH METADATA ───────────────────────────────────────────────────────────
+async function fetchMetadataBatch(nfts, onProgress) {
+  const map = {};
+  const CONCURRENCY = 4;
+  let done = 0;
+
+  for (let i = 0; i < nfts.length; i += CONCURRENCY) {
+    const batch = nfts.slice(i, i + CONCURRENCY);
+    await Promise.all(batch.map(async nft => {
+      const rawUri = hexToUtf8(nft.URI || '');
+      if (!rawUri) { done++; onProgress(done, nfts.length); return; }
+      for (let gi = 0; gi < IPFS_GATEWAYS.length; gi++) {
+        try {
+          const url = ipfsToHttp(rawUri, gi);
+          const r = await fetch(url, { signal: AbortSignal.timeout(6000) });
+          if (!r.ok) continue;
+          const ct = r.headers.get('content-type') || '';
+          if (ct.includes('json')) {
+            map[nft.NFTokenID] = await r.json();
+          } else {
+            map[nft.NFTokenID] = { name: 'Non-JSON URI', uri: url };
+          }
+          break;
+        } catch {}
+      }
+      done++;
+      onProgress(done, nfts.length);
+    }));
+    await sleep(80);
+  }
+  return map;
+}
+
+// ─── START FETCH ─────────────────────────────────────────────────────────────
+async function startFetch() {
+  const issuer  = document.getElementById('issuer').value.trim();
+  const taxon   = document.getElementById('taxon').value.trim();
+  const doMeta  = document.getElementById('fetchMeta').checked;
+  const errEl   = document.getElementById('step1-error');
+
+  errEl.style.display = 'none';
+
+  if (!issuer || !/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(issuer)) {
+    errEl.textContent = 'Please enter a valid XRPL address (starts with "r", 25-35 characters).';
+    errEl.style.display = '';
+    return;
+  }
+
+  document.getElementById('btn-fetch').disabled = true;
+  setLocked('card-2', false);
+  document.getElementById('prog-bar').style.width = '0%';
+
+  try {
+    // Scan on-chain
+    allNFTs = await fetchAllNFTs(issuer, taxon);
+    updateProgress(allNFTs.length);
+    document.getElementById('prog-bar').style.width = '100%';
+    setLog('scan-log', `Scan complete — ${allNFTs.length} NFTs found on-chain.`);
+
+    if (allNFTs.length === 0) {
+      setLog('scan-log', 'No NFTs found for that issuer/taxon combination. Check the address and try again.');
+      document.getElementById('btn-fetch').disabled = false;
+      return;
+    }
+
+    // Fetch metadata
+    if (doMeta) {
+      const metaEl = document.getElementById('meta-log');
+      metaEl.style.display = '';
+      metaEl.textContent = 'Fetching metadata (0/' + allNFTs.length + ')…';
+      metadataMap = await fetchMetadataBatch(allNFTs, (done, total) => {
+        metaEl.textContent = `Fetching metadata (${done}/${total})…`;
+        document.getElementById('prog-bar').style.width = (done / total * 100) + '%';
+      });
+      metaEl.textContent = `Metadata loaded for ${Object.keys(metadataMap).length} of ${allNFTs.length} NFTs.`;
+    }
+
+    setStepDone(2);
+    buildResults(issuer, taxon, doMeta);
+
+  } catch(e) {
+    setLog('scan-log', 'Error: ' + (e.message || 'Unknown error. Check issuer address.'));
+    document.getElementById('btn-fetch').disabled = false;
+  }
+}
+
+// ─── BUILD RESULTS ────────────────────────────────────────────────────────────
+function buildResults(issuer, taxon, hasMeta) {
+  const count   = allNFTs.length;
+  const fee     = count >= FEE_THRESHOLD ? FEE_LARGE : FEE_SMALL;
+  const metaHit = Object.keys(metadataMap).length;
+
+  // Stats
+  document.getElementById('stat-total').textContent = count.toLocaleString();
+  document.getElementById('stat-taxon').textContent = taxon !== '' ? taxon : 'All';
+  document.getElementById('stat-fee').textContent   = fee + ' XRP';
+  document.getElementById('stat-meta').textContent  = hasMeta ? metaHit + ' / ' + count : 'Off';
+
+  // Preview table
+  buildPreviewTable(allNFTs.slice(0, 10));
+
+  // Payment
+  destTag = randTag();
+  const drops = xrpToDrops(fee);
+
+  document.getElementById('pay-amount').textContent  = fee + ' XRP';
+  document.getElementById('pay-address').innerHTML   = PAYMENT_ADDRESS + '<span class="copy-hint">[click to copy]</span>';
+  document.getElementById('pay-tag').innerHTML       = destTag + '<span class="copy-hint">[REQUIRED — click to copy]</span>';
+
+  // QR code (XRPL payment URI encoded)
+  const qrData = `xrpl:${PAYMENT_ADDRESS}?amount=${drops}&dt=${destTag}`;
+  const qrUrl  = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&qzone=1&data=${encodeURIComponent(qrData)}`;
+  document.getElementById('qr-img').src = qrUrl;
+
+  // Xaman payment link
+  const xamanUrl = `https://xumm.app/detect/request:${encodeURIComponent(JSON.stringify({txjson:{TransactionType:'Payment',Destination:PAYMENT_ADDRESS,Amount:String(drops),DestinationTag:destTag}}))}`;
+  document.getElementById('xumm-link').href = xamanUrl;
+
+  // Field list in export info
+  const fields = [
+    'NFTokenID','Issuer','NFTaxon','NFTSerial','TransferFee','Flags',
+    'URI (decoded)','Metadata: name','Metadata: description','Metadata: image (HTTP)',
+    'Metadata: attributes','XRP Cafe URL','Raw URI (hex)'
+  ];
+  document.getElementById('field-list').innerHTML = fields.map(f =>
+    `<span class="badge badge-muted">${f}</span>`
+  ).join('');
+
+  setLocked('card-3', false);
+  setStepDone(1);
+  document.getElementById('card-3').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildPreviewTable(nfts) {
+  const tbody = document.getElementById('preview-body');
+  tbody.innerHTML = '';
+  nfts.forEach(nft => {
+    const meta = metadataMap[nft.NFTokenID] || {};
+    const rawUri = hexToUtf8(nft.URI || '');
+    const imgUrl = ipfsToHttp(meta.image || '', 0);
+    const name   = meta.name || '—';
+    const cafeUrl = CAFE_BASE + nft.NFTokenID;
+    const fee    = nft.TransferFee ? ((nft.TransferFee / 1000).toFixed(2) + '%') : '—';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${imgUrl
+        ? `<img class="nft-thumb" src="${ipfsToHttp(meta.image||'',0)}" alt="${name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="nft-thumb-placeholder" style="display:none">?</div>`
+        : `<div class="nft-thumb-placeholder">?</div>`
+      }</td>
+      <td>${name}</td>
+      <td class="mono truncate" title="${nft.NFTokenID}">${nft.NFTokenID.slice(0,12)}…</td>
+      <td class="mono">${nft.nft_serial ?? nft.NFTSerial ?? '—'}</td>
+      <td>${fee}</td>
+      <td><a class="cafe-link" href="${cafeUrl}" target="_blank" rel="noopener">View &#x2197;</a></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ─── PAYMENT VERIFICATION ─────────────────────────────────────────────────────
+async function startPaymentVerification() {
+  const statusEl = document.getElementById('verify-status');
+  const msgEl    = document.getElementById('verify-msg');
+  const btnEl    = document.getElementById('btn-verify');
+
+  statusEl.style.display = 'flex';
+  statusEl.className     = 'verify-status polling';
+  btnEl.disabled         = true;
+  pollStart              = Date.now();
+
+  msgEl.textContent = 'Polling XRP Ledger for your payment…';
+
+  const fee    = allNFTs.length >= FEE_THRESHOLD ? FEE_LARGE : FEE_SMALL;
+  const drops  = xrpToDrops(fee);
+  const maxWait = 5 * 60 * 1000; // 5 minutes
+
+  const check = async () => {
+    try {
+      const data = await rpc('account_tx', {
+        account: PAYMENT_ADDRESS,
+        limit: 50,
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        forward: false
+      });
+
+      const txs = data?.result?.transactions || [];
+      for (const entry of txs) {
+        const tx = entry.tx || entry.transaction || entry;
+        const meta = entry.meta || entry.metaData;
+        if (
+          tx.TransactionType === 'Payment' &&
+          tx.Destination === PAYMENT_ADDRESS &&
+          parseInt(tx.Amount) >= drops &&
+          tx.DestinationTag === destTag &&
+          meta?.TransactionResult === 'tesSUCCESS'
+        ) {
+          clearTimeout(pollTimer);
+          statusEl.className = 'verify-status confirmed';
+          msgEl.textContent  = 'Payment confirmed! Tx: ' + (tx.hash || tx.Hash || '');
+          unlockExport(false);
+          return;
+        }
+      }
+
+      const elapsed = Date.now() - pollStart;
+      if (elapsed > maxWait) {
+        statusEl.className = 'verify-status failed';
+        msgEl.textContent  = 'Timeout — payment not detected after 5 minutes. Check your wallet and try again, or contact support.';
+        btnEl.disabled     = false;
+        return;
+      }
+
+      const secs = Math.round(elapsed / 1000);
+      msgEl.textContent = `Polling… (${secs}s elapsed, checking every 8s)`;
+      pollTimer = setTimeout(check, 8000);
+
+    } catch(e) {
+      msgEl.textContent = 'RPC error: ' + e.message + '. Retrying…';
+      pollTimer = setTimeout(check, 12000);
+    }
+  };
+
+  await check();
+}
+
+function unlockExport(preview) {
+  previewOnly = preview;
+  setLocked('card-4', false);
+  setStepDone(3);
+
+  if (!preview) {
+    paymentVerified = true;
+    document.getElementById('payment-confirmed-msg').style.display = '';
+    document.getElementById('export-sub').textContent = 'Payment confirmed — full export of all ' + allNFTs.length.toLocaleString() + ' NFTs ready below.';
+  } else {
+    document.getElementById('export-sub').textContent = 'Preview export — first 10 NFTs only. Pay to unlock the full collection.';
+  }
+
+  document.getElementById('card-4').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── EXPORT BUILDERS ──────────────────────────────────────────────────────────
+function getExportNFTs() {
+  return previewOnly ? allNFTs.slice(0, 10) : allNFTs;
+}
+
+function buildRow(nft) {
+  const meta    = metadataMap[nft.NFTokenID] || {};
+  const rawUri  = hexToUtf8(nft.URI || '');
+  const imgHttp = ipfsToHttp(meta.image || '', 0);
+  const attrs   = meta.attributes
+    ? JSON.stringify(meta.attributes).replace(/"/g, "'")
+    : '';
+  const fee     = nft.TransferFee ? ((nft.TransferFee / 1000).toFixed(3) + '%') : '0%';
+  return {
+    NFTokenID:           nft.NFTokenID    || '',
+    Issuer:              nft.Issuer || nft.issuer || '',
+    NFTaxon:             nft.NFTokenTaxon ?? nft.nft_taxon ?? '',
+    NFTSerial:           nft.nft_serial   ?? nft.NFTSerial ?? '',
+    TransferFee_Pct:     fee,
+    Flags:               nft.Flags ?? '',
+    URI_decoded:         rawUri,
+    URI_hex:             nft.URI || '',
+    Meta_name:           meta.name        || '',
+    Meta_description:    meta.description || '',
+    Meta_image_http:     imgHttp,
+    Meta_image_raw:      meta.image       || '',
+    Meta_external_url:   meta.external_url || meta.externalUrl || '',
+    Meta_attributes:     attrs,
+    XRP_Cafe_URL:        CAFE_BASE + nft.NFTokenID
+  };
+}
+
+function exportCSV() {
+  const rows = getExportNFTs().map(buildRow);
+  if (!rows.length) return;
+  const headers = Object.keys(rows[0]);
+  const csv = [
+    headers.join(','),
+    ...rows.map(r => headers.map(h => {
+      const v = String(r[h] ?? '').replace(/"/g, '""');
+      return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v}"` : v;
+    }).join(','))
+  ].join('\n');
+  download('xrpl-nft-export.csv', csv, 'text/csv');
+}
+
+function exportJSON() {
+  const rows = getExportNFTs().map(nft => ({
+    ...buildRow(nft),
+    raw: nft,
+    metadata: metadataMap[nft.NFTokenID] || null
+  }));
+  download('xrpl-nft-export.json', JSON.stringify(rows, null, 2), 'application/json');
+}
+
+function download(filename, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+</script>
+
+</body>
+</html>
