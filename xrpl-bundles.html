@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>$FAMILY — XRPL Wallet Bundle Analysis</title>
+<meta name="description" content="Identify linked wallet clusters, exchange-funded accounts, and on-chain connections for $FAMILY token on XRPL."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#04090f;--deep:#070f1c;--panel:#0b1628;--card:#0d1b2e;
+  --ice:#5bb8ff;--ice2:#a8d8ff;--muted:#5a7a99;
+  --text:#ddeeff;--white:#f4f9ff;--border:rgba(91,184,255,0.1);
+  --red:#ff5555;--orange:#ff8c42;--yellow:#ffd166;--green:#06d6a0;
+  --purple:#c084fc;--pink:#f472b6;
+}
+html,body{background:var(--ink);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+a{color:var(--ice);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(4,9,15,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.08em;color:var(--white)}
+.logo span{color:var(--ice)}
+.nav-back{font-size:0.75rem;font-weight:600;letter-spacing:0.08em;color:var(--muted);text-transform:uppercase}
+.nav-back:hover{color:var(--ice);text-decoration:none}
+
+/* ── HERO ── */
+.page-hero{padding:60px 32px 40px;max-width:900px;margin:0 auto}
+.page-hero .label{font-size:0.65rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ice);margin-bottom:12px}
+.page-hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4.5rem);line-height:0.9;letter-spacing:0.03em;color:var(--white);margin-bottom:16px}
+.page-hero p{font-size:0.95rem;color:var(--muted);line-height:1.75;max-width:560px;margin-bottom:28px}
+.token-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}
+.meta-chip{display:flex;align-items:center;gap:6px;background:rgba(91,184,255,0.06);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:0.72rem}
+.meta-chip .mc-label{color:var(--muted);font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.meta-chip .mc-val{font-family:monospace;color:var(--ice);font-size:0.78rem}
+
+/* ── CONTROLS ── */
+.controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.btn-primary{background:var(--ice);color:var(--ink);padding:11px 26px;border-radius:100px;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:var(--ice2);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;color:var(--text);padding:10px 20px;border-radius:100px;font-size:0.82rem;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.btn-ghost:hover:not(:disabled){border-color:rgba(91,184,255,0.4);color:var(--ice)}
+.btn-ghost:disabled{opacity:0.35;cursor:not-allowed}
+.node-select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:0.78rem;outline:none;cursor:pointer}
+.depth-select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:0.78rem;outline:none;cursor:pointer}
+
+/* ── PROGRESS ── */
+#progressSection{display:none;padding:0 32px 32px;max-width:900px;margin:0 auto}
+.progress-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px}
+.progress-bar-outer{height:6px;background:rgba(91,184,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.progress-bar-inner{height:100%;background:linear-gradient(to right,var(--ice),var(--ice2));border-radius:3px;width:0%;transition:width .4s ease}
+.progress-steps{display:flex;gap:0;margin-bottom:16px}
+.p-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.p-step-dot{width:28px;height:28px;border-radius:50%;background:var(--panel);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:var(--muted);transition:all .3s}
+.p-step-dot.active{background:rgba(91,184,255,0.15);border-color:var(--ice);color:var(--ice)}
+.p-step-dot.done{background:var(--ice);border-color:var(--ice);color:var(--ink)}
+.p-step-line{height:2px;background:var(--border);flex:1;margin-top:13px}
+.p-step-label{font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-align:center;max-width:70px}
+.p-step.active .p-step-label{color:var(--ice)}
+.progress-log{font-size:0.78rem;color:var(--muted);line-height:1.6}
+.progress-log .log-entry{padding:2px 0}
+.progress-log .log-entry.error{color:var(--red)}
+.progress-counts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.p-count{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.p-count-n{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--white);line-height:1}
+.p-count-l{font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+
+/* ── SUMMARY STATS ── */
+#summarySection{display:none;padding:0 32px 24px;max-width:900px;margin:0 auto}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px}
+.s-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 16px}
+.s-card-n{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.04em;color:var(--white);line-height:1}
+.s-card-n.ice{color:var(--ice)}.s-card-n.green{color:var(--green)}.s-card-n.orange{color:var(--orange)}.s-card-n.red{color:var(--red)}.s-card-n.purple{color:var(--purple)}
+.s-card-l{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* ── FILTERS ── */
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:24px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px}
+.filter-bar label{font-size:0.72rem;font-weight:600;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+.filter-bar select,.filter-bar input[type=number]{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:0.78rem;outline:none;width:90px}
+.filter-bar input[type=checkbox]{accent-color:var(--ice)}
+.f-sep{width:1px;height:22px;background:var(--border);margin:0 4px}
+
+/* ── BUNDLE CARDS ── */
+#resultsSection{display:none;padding:0 32px 80px;max-width:900px;margin:0 auto}
+.section-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.section-head h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.05em;color:var(--white)}
+.section-count{font-size:0.72rem;font-weight:700;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase}
+
+.bundle{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:16px;overflow:hidden;transition:border-color .2s}
+.bundle:hover{border-color:rgba(91,184,255,0.22)}
+.bundle-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;user-select:none}
+.bh-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.bundle-badge{font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.08em;padding:4px 12px;border-radius:100px;white-space:nowrap;flex-shrink:0}
+.risk-high{background:rgba(255,85,85,0.15);color:var(--red);border:1px solid rgba(255,85,85,0.3)}
+.risk-med{background:rgba(255,140,66,0.12);color:var(--orange);border:1px solid rgba(255,140,66,0.25)}
+.risk-exch{background:rgba(192,132,252,0.12);color:var(--purple);border:1px solid rgba(192,132,252,0.25)}
+.risk-low{background:rgba(6,214,160,0.1);color:var(--green);border:1px solid rgba(6,214,160,0.2)}
+.bh-info{min-width:0}
+.bh-title{font-size:0.95rem;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-right{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.bh-stat{text-align:right}
+.bh-stat-n{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.04em;color:var(--ice)}
+.bh-stat-l{font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.bh-toggle{color:var(--muted);font-size:1rem;transition:transform .2s;flex-shrink:0}
+.bundle.open .bh-toggle{transform:rotate(180deg)}
+
+.bundle-body{display:none;border-top:1px solid var(--border)}
+.bundle.open .bundle-body{display:block}
+
+/* evidence pills */
+.evidence-row{display:flex;flex-wrap:wrap;gap:6px;padding:12px 22px;background:rgba(91,184,255,0.02);border-bottom:1px solid var(--border)}
+.ev-pill{display:flex;align-items:center;gap:5px;font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:4px 10px;border-radius:100px}
+.ev-same-activator{background:rgba(255,85,85,0.1);color:var(--red);border:1px solid rgba(255,85,85,0.2)}
+.ev-cross-payment{background:rgba(255,140,66,0.1);color:var(--orange);border:1px solid rgba(255,140,66,0.2)}
+.ev-chain-activation{background:rgba(255,209,102,0.1);color:var(--yellow);border:1px solid rgba(255,209,102,0.2)}
+.ev-exchange{background:rgba(192,132,252,0.1);color:var(--purple);border:1px solid rgba(192,132,252,0.2)}
+.ev-time-cluster{background:rgba(6,214,160,0.08);color:var(--green);border:1px solid rgba(6,214,160,0.15)}
+
+/* wallet table */
+.wallet-table{width:100%;border-collapse:collapse}
+.wallet-table th{padding:8px 12px 8px 22px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)}
+.wallet-table th:last-child{text-align:right;padding-right:22px}
+.wallet-table td{padding:11px 12px 11px 22px;font-size:0.82rem;vertical-align:middle;border-bottom:1px solid rgba(91,184,255,0.05)}
+.wallet-table td:last-child{text-align:right;padding-right:22px}
+.wallet-table tr:last-child td{border-bottom:none}
+.wallet-table tr:hover td{background:rgba(91,184,255,0.02)}
+.wt-addr{font-family:monospace;font-size:0.78rem;color:var(--ice)}
+.wt-addr a{color:var(--ice)}
+.wt-balance{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.04em;color:var(--white)}
+.wt-pct{font-size:0.7rem;color:var(--muted)}
+.wt-tag{display:inline-block;font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:100px;margin-left:6px}
+.wt-tag.activator{background:rgba(255,85,85,0.12);color:var(--red)}
+.wt-tag.activated{background:rgba(255,140,66,0.1);color:var(--orange)}
+.wt-tag.crosslink{background:rgba(91,184,255,0.1);color:var(--ice)}
+
+/* connections section */
+.connections{padding:14px 22px;background:rgba(4,9,15,0.5);border-top:1px solid var(--border)}
+.conn-title{font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.conn-item{display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--muted);padding:4px 0}
+.conn-addr{font-family:monospace;color:var(--ice)}
+.conn-arrow{color:var(--border);font-size:0.9rem}
+.conn-type{font-size:0.6rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px}
+.ct-pay{background:rgba(255,140,66,0.1);color:var(--orange)}
+.ct-act{background:rgba(255,85,85,0.1);color:var(--red)}
+.ct-token{background:rgba(91,184,255,0.1);color:var(--ice)}
+.conn-date{font-size:0.65rem;color:var(--muted);margin-left:auto}
+
+/* singles section */
+.singles-toggle{display:flex;align-items:center;gap:10px;padding:16px 22px;cursor:pointer;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;user-select:none}
+.singles-toggle:hover{border-color:rgba(91,184,255,0.2)}
+.st-title{font-size:0.85rem;font-weight:700;color:var(--white)}
+.st-count{font-size:0.72rem;color:var(--muted)}
+.st-arrow{margin-left:auto;color:var(--muted);transition:transform .2s}
+.singles-toggle.open .st-arrow{transform:rotate(180deg)}
+#singlesBody{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;margin-top:-8px}
+
+/* export */
+.export-row{display:flex;gap:10px;margin-top:24px}
+.btn-export{background:rgba(91,184,255,0.08);border:1px solid var(--border);color:var(--ice);padding:9px 20px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-export:hover{background:rgba(91,184,255,0.15)}
+
+/* empty / error state */
+.state-box{text-align:center;padding:60px 32px;color:var(--muted)}
+.state-box .state-icon{font-size:2.5rem;margin-bottom:16px}
+.state-box h3{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:8px}
+.state-box p{font-size:0.85rem;line-height:1.6}
+
+/* spinner */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(91,184,255,0.2);border-top-color:var(--ice);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* tooltip */
+[data-tip]{position:relative;cursor:default}
+[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(13,27,46,0.97);border:1px solid var(--border);color:var(--text);font-size:0.7rem;padding:5px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;z-index:99}
+[data-tip]:hover::after{opacity:1}
+
+@media(max-width:700px){
+  .progress-counts{grid-template-columns:1fr 1fr}
+  .bh-right{gap:8px}
+  .wallet-table td,.wallet-table th{padding-left:12px}
+  nav{padding:0 16px}
+  .page-hero,.controls-wrap,#progressSection,#summarySection,#resultsSection{padding-left:16px;padding-right:16px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><span>$</span>FAMILY</div>
+  <a href="/" class="nav-back">← Back to Site</a>
+</nav>
+
+<div class="page-hero">
+  <div class="label">On-Chain Intelligence</div>
+  <h1>WALLET BUNDLE<br>ANALYSIS</h1>
+  <p>Scans all $FAMILY holders on XRPL, traces activation sources, detects cross-wallet payments, and surfaces linked wallet clusters (bundles). Exchange-funded wallets (Coinbase, Binance, etc.) are automatically labelled.</p>
+  <div class="token-meta">
+    <div class="meta-chip"><span class="mc-label">Issuer</span><span class="mc-val">rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi</span></div>
+    <div class="meta-chip"><span class="mc-label">Currency</span><span class="mc-val">FAMILY (46414D...)</span></div>
+    <div class="meta-chip"><span class="mc-label">Network</span><span class="mc-val">XRPL Mainnet</span></div>
+  </div>
+</div>
+
+<div class="controls-wrap" style="padding:0 32px 32px;max-width:900px;margin:0 auto">
+  <div class="controls">
+    <button class="btn-primary" id="startBtn">▶ Run Bundle Analysis</button>
+    <button class="btn-ghost" id="stopBtn" disabled>■ Stop</button>
+    <select class="node-select" id="nodeSelect" title="XRPL node">
+      <option value="https://xrplcluster.com">xrplcluster.com</option>
+      <option value="https://s2.ripple.com:51234">s2.ripple.com</option>
+      <option value="https://xrpl.ws">xrpl.ws</option>
+    </select>
+    <select class="depth-select" id="depthSelect" title="Enrichment depth">
+      <option value="200">Top 200 holders</option>
+      <option value="400" selected>Top 400 holders</option>
+      <option value="1000">All holders (slow)</option>
+    </select>
+  </div>
+  <div style="font-size:0.72rem;color:var(--muted);margin-top:6px">All data is fetched live from XRPL in your browser. No server involved.</div>
+</div>
+
+<div id="progressSection">
+  <div class="progress-wrap">
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar"></div></div>
+    <div class="progress-steps" id="progressSteps">
+      <div class="p-step" id="step1">
+        <div class="p-step-dot" id="dot1">1</div>
+        <div class="p-step-label">Holders</div>
+      </div>
+      <div class="p-step-line"></div>
+      <div class="p-step" id="step2">
+        <div class="p-step-dot" id="dot2">2</div>
+        <div class="p-step-label">Activation</div>
+      </div>
+      <div class="p-step-line"></div>
+      <div class="p-step" id="step3">
+        <div class="p-step-dot" id="dot3">3</div>
+        <div class="p-step-label">Transfers</div>
+      </div>
+      <div class="p-step-line"></div>
+      <div class="p-step" id="step4">
+        <div class="p-step-dot" id="dot4">4</div>
+        <div class="p-step-label">Bundles</div>
+      </div>
+    </div>
+    <div class="progress-counts">
+      <div class="p-count"><div class="p-count-n" id="cntHolders">—</div><div class="p-count-l">Holders Found</div></div>
+      <div class="p-count"><div class="p-count-n" id="cntEnriched">—</div><div class="p-count-l">Enriched</div></div>
+      <div class="p-count"><div class="p-count-n" id="cntConnections">—</div><div class="p-count-l">Connections</div></div>
+      <div class="p-count"><div class="p-count-n" id="cntBundles">—</div><div class="p-count-l">Bundles</div></div>
+    </div>
+    <div class="progress-log" id="progressLog" style="margin-top:14px;max-height:80px;overflow:hidden"></div>
+  </div>
+</div>
+
+<div id="summarySection">
+  <div class="summary-grid" id="summaryGrid"></div>
+  <div class="filter-bar">
+    <label>Min wallets/bundle</label>
+    <input type="number" id="filterMin" value="2" min="2" max="50" style="width:70px"/>
+    <div class="f-sep"></div>
+    <label>Show exchange bundles</label>
+    <input type="checkbox" id="filterExch" checked/>
+    <div class="f-sep"></div>
+    <label>Sort by</label>
+    <select id="filterSort" style="width:130px">
+      <option value="risk">Risk score</option>
+      <option value="size">Bundle size</option>
+      <option value="balance">Total balance</option>
+    </select>
+    <div class="f-sep"></div>
+    <button class="btn-export" id="exportBtn" onclick="exportData()">⬇ Export JSON</button>
+  </div>
+</div>
+
+<div id="resultsSection">
+  <div class="section-head">
+    <h2>BUNDLES</h2>
+    <span class="section-count" id="bundleCount">0 found</span>
+  </div>
+  <div id="bundleList"></div>
+
+  <div class="section-head" style="margin-top:32px">
+    <h2>SOLO WALLETS</h2>
+    <span class="section-count" id="soloCount">0 wallets</span>
+  </div>
+  <div class="singles-toggle" id="singlesToggle" onclick="toggleSingles()">
+    <span class="st-title">Single-wallet holders (no links detected)</span>
+    <span class="st-count" id="singlesCount">0 wallets</span>
+    <span class="st-arrow">▼</span>
+  </div>
+  <div id="singlesBody"></div>
+
+  <div class="export-row">
+    <button class="btn-export" onclick="exportData()">⬇ Export Full JSON</button>
+    <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── CONFIG ── */
+const ISSUER      = 'rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
+const FAMILY_HEX  = '46414D494C590000000000000000000000000000';
+const EPOCH_OFFSET = 946684800; // XRPL epoch → Unix
+
+/* Known exchange / notable addresses (public blockchain data) */
+const KNOWN = {
+  'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh': {name:'XRPL Genesis',  type:'system'},
+  'rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh': {name:'Binance',       type:'exchange'},
+  'rJb5KsHsDHF1YS5B5DU6QCkH5NsPaKQTcy': {name:'Binance',       type:'exchange'},
+  'rJnZ4bPLbF4HKTQnr5LQCDvnjqnH2Jxqh' : {name:'Binance',       type:'exchange'},
+  'rDsbeomae4FXwgQTJp9Rs64Qg9vDiTCdBv': {name:'Bitstamp',      type:'exchange'},
+  'rrpNnNLKrartuEqfJGpqyDwPj1BBN1ov77': {name:'Bitstamp',      type:'exchange'},
+  'rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh': {name:'Kraken',        type:'exchange'},
+  'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59': {name:'Ripple',        type:'ripple'},
+  'rPVMhWBsfF9iMXYj3aAzJVkPDTFNSyWdKy': {name:'Ripple',        type:'ripple'},
+  'rN7n3473SaZBCG4dFL83w7PB93CRxbRkRi': {name:'Coinbase',      type:'exchange'},
+  'rGWrZyax5eXbi5gs49MRZKkE3vjBBGm3AC': {name:'Coinbase',      type:'exchange'},
+  'rLW9gnQo7BQhU6igk5keqYnH3TVrCxGRzm': {name:'Coinbase',      type:'exchange'},
+  'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe': {name:'Coinbase',      type:'exchange'},
+  'r3bHkSQJDNF9Y3B2GUKxUBjrdNpsSp8ekp': {name:'Coinbase',      type:'exchange'},
+  'rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq': {name:'Gatehub',       type:'exchange'},
+  'razqnJkAAU5G3GG8G1k3NXzTfMaGcpkMoT': {name:'Gatehub',       type:'exchange'},
+  'r4GDFMLGJUKMjNEycZLSCCSmMBMCEd2GaX': {name:'Bittrex',       type:'exchange'},
+  'rBgnUKAEiFhCRLpodfFMzMDCpVuTAB1PkU': {name:'OKX',           type:'exchange'},
+  'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ': {name:'Huobi',         type:'exchange'},
+  'rKiCet8SdvWxPXnAgYarFUXMh1zCPz432Y': {name:'Kraken',        type:'exchange'},
+  [ISSUER]: {name:'$FAMILY Issuer', type:'self'},
+};
+
+/* ── STATE ── */
+let holders    = [];   // {address, balance, activator, activatorLabel, activatedAt, xrpBalance, connections:[]}
+let bundles    = [];   // {id, members:[], activator, activatorLabel, riskScore, riskLevel, evidence:[], connections:[]}
+let rawExport  = null;
+let abortCtrl  = null;
+
+/* ── DOM REFS ── */
+const $ = id => document.getElementById(id);
+const startBtn    = $('startBtn');
+const stopBtn     = $('stopBtn');
+const progressSec = $('progressSection');
+const summarySec  = $('summarySection');
+const resultsSec  = $('resultsSection');
+const progressBar = $('progressBar');
+const progressLog = $('progressLog');
+const bundleList  = $('bundleList');
+
+/* ── CONCURRENCY QUEUE ── */
+class Queue {
+  constructor(concurrency=6, delayMs=120){
+    this.c=concurrency; this.d=delayMs; this.active=0; this.q=[];
+  }
+  run(fn){ return new Promise((res,rej)=>{ this.q.push({fn,res,rej}); this._drain(); }); }
+  _drain(){
+    while(this.active<this.c && this.q.length){
+      const {fn,res,rej}=this.q.shift();
+      this.active++;
+      new Promise(r=>setTimeout(r,this.d))
+        .then(()=>fn())
+        .then(v=>{ res(v); this.active--; this._drain(); })
+        .catch(e=>{ rej(e); this.active--; this._drain(); });
+    }
+  }
+}
+const Q = new Queue(6,120);
+
+/* ── XRPL RPC ── */
+function node(){ return $('nodeSelect').value; }
+
+async function xrpl(method, params, retries=3){
+  for(let i=0;i<retries;i++){
+    try{
+      if(abortCtrl?.signal.aborted) throw new Error('aborted');
+      const res = await fetch(node(),{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({method, params:[params]}),
+        signal: AbortSignal.timeout(18000)
+      });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const d = await res.json();
+      if(d.result?.error && d.result.error!=='actNotFound') throw new Error(d.result.error_message||d.result.error);
+      return d.result;
+    }catch(e){
+      if(e.message==='aborted') throw e;
+      if(i===retries-1) throw e;
+      await sleep(800*(i+1));
+    }
+  }
+}
+
+/* ── UTILS ── */
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const fmt   = n  => n==null?'—':Number(n).toLocaleString(undefined,{maximumFractionDigits:0});
+const fmtXrp= n  => n==null?'—':(Number(n)/1e6).toLocaleString(undefined,{maximumFractionDigits:2})+' XRP';
+const short  = a  => a?`${a.slice(0,6)}…${a.slice(-5)}`:'—';
+const xrpscanUrl = a => `https://xrpscan.com/account/${a}`;
+const xrpScanTx  = h => `https://xrpscan.com/tx/${h}`;
+
+function hexToAscii(hex){
+  let s='';
+  for(let i=0;i<hex.length;i+=2){
+    const c=parseInt(hex.substr(i,2),16);
+    if(c>31&&c<127) s+=String.fromCharCode(c);
+  }
+  return s;
+}
+
+function xrplDate(d){ return d?new Date((d+EPOCH_OFFSET)*1000):null; }
+function fmtDate(d){ if(!d) return '—'; return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtRelDate(d){
+  if(!d) return '';
+  const days = Math.floor((Date.now()-d.getTime())/86400000);
+  if(days===0) return 'today';
+  if(days===1) return '1d ago';
+  if(days<30)  return `${days}d ago`;
+  if(days<365) return `${Math.round(days/30)}mo ago`;
+  return `${Math.round(days/365)}yr ago`;
+}
+
+function log(msg, cls=''){
+  const div=document.createElement('div');
+  div.className='log-entry'+(cls?' '+cls:'');
+  div.textContent=msg;
+  progressLog.insertBefore(div, progressLog.firstChild);
+  if(progressLog.children.length>8) progressLog.removeChild(progressLog.lastChild);
+}
+function setStep(n, state){ // state: active|done
+  for(let i=1;i<=4;i++){
+    const d=$(`dot${i}`);
+    if(i<n){ d.className='p-step-dot done'; d.textContent='✓'; }
+    else if(i===n){ d.className=`p-step-dot ${state}`; $(`step${i}`).className=`p-step ${state}`; }
+    else{ d.className='p-step-dot'; $(`step${i}`).className='p-step'; }
+  }
+}
+function setProgress(pct){ progressBar.style.width=pct+'%'; }
+
+/* ── PHASE 1: GET ALL HOLDERS ── */
+async function getAllHolders(){
+  setStep(1,'active'); log('Fetching FAMILY trustlines from issuer…');
+  const result=[];
+  let marker=null, page=0;
+  do{
+    const params={account:ISSUER, limit:400, ledger_index:'validated'};
+    if(marker) params.marker=marker;
+    const r = await xrpl('account_lines', params);
+    for(const line of (r.lines||[])){
+      const bal = parseFloat(line.balance);
+      if(bal<0 && line.currency===FAMILY_HEX){
+        result.push({address:line.account, balance:Math.abs(bal), activator:null, activatorLabel:null, activatedAt:null, xrpBalance:null, connections:[]});
+      }
+    }
+    marker=r.marker||null; page++;
+    $('cntHolders').textContent=result.length;
+    log(`Page ${page}: ${result.length} holders so far`);
+    setProgress(5+Math.min(page*2,20));
+  } while(marker && page<100);
+
+  result.sort((a,b)=>b.balance-a.balance);
+  setStep(1,'done'); log(`✓ ${result.length} FAMILY holders found`);
+  return result;
+}
+
+/* ── PHASE 2: ENRICH — ACTIVATION + XRP BALANCE ── */
+async function enrichHolder(h){
+  try{
+    // Get XRP balance + account info
+    const info = await xrpl('account_info',{account:h.address, ledger_index:'validated'});
+    if(info?.account_data) h.xrpBalance = parseInt(info.account_data.Balance||0);
+  }catch(e){}
+
+  try{
+    // Get first transaction (forward=true)
+    const txData = await xrpl('account_tx',{
+      account:h.address, limit:10,
+      ledger_index_min:-1, ledger_index_max:-1, forward:true
+    });
+    const txns=txData?.transactions||[];
+    for(const entry of txns){
+      const tx=entry.tx||entry.transaction;
+      if(!tx) continue;
+      // First Payment TO this address = funding / activation tx
+      if(tx.TransactionType==='Payment' && tx.Destination===h.address){
+        h.activator  = tx.Account;
+        h.activatedAt= xrplDate(tx.date);
+        break;
+      }
+    }
+    // Fallback: use the Account of very first tx if it's not self
+    if(!h.activator && txns.length){
+      const tx=txns[0].tx||txns[0].transaction;
+      if(tx && tx.Account && tx.Account!==h.address) h.activator=tx.Account;
+      if(tx?.date) h.activatedAt=xrplDate(tx.date);
+    }
+  }catch(e){}
+
+  // Label the activator
+  if(h.activator){
+    if(KNOWN[h.activator]){
+      h.activatorLabel=KNOWN[h.activator].name;
+    } else {
+      // Check domain field
+      try{
+        const info2 = await xrpl('account_info',{account:h.activator, ledger_index:'validated'});
+        const dom = info2?.account_data?.Domain;
+        if(dom){
+          const d=hexToAscii(dom).toLowerCase();
+          if(d.includes('coinbase'))    h.activatorLabel='Coinbase';
+          else if(d.includes('binance'))h.activatorLabel='Binance';
+          else if(d.includes('kraken')) h.activatorLabel='Kraken';
+          else if(d.includes('bitstamp'))h.activatorLabel='Bitstamp';
+          else if(d.includes('bitfinex'))h.activatorLabel='Bitfinex';
+          else if(d.includes('gemini')) h.activatorLabel='Gemini';
+          else if(d.includes('ripple')) h.activatorLabel='Ripple';
+          else if(d.includes('kucoin')) h.activatorLabel='KuCoin';
+          else if(d.includes('okx')||d.includes('okex'))h.activatorLabel='OKX';
+          else h.activatorLabel=d;
+        }
+      }catch(e){}
+    }
+  }
+}
+
+async function enrichAll(holderList){
+  setStep(2,'active'); log('Enriching holders: activation sources…');
+  const depth = parseInt($('depthSelect').value);
+  const target = holderList.slice(0, depth);
+  let done=0;
+  const tasks = target.map(h=>Q.run(async()=>{
+    await enrichHolder(h);
+    done++;
+    $('cntEnriched').textContent=done;
+    if(done%20===0) log(`Enriched ${done}/${target.length}…`);
+    setProgress(25+(done/target.length)*35);
+  }));
+  await Promise.allSettled(tasks);
+  setStep(2,'done'); log(`✓ Enriched ${done} holders`);
+}
+
+/* ── PHASE 3: CROSS-TRANSFER DETECTION ── */
+async function findConnections(holderList){
+  setStep(3,'active'); log('Scanning for cross-wallet transfers…');
+  const holderSet = new Set(holderList.map(h=>h.address));
+  const addrToHolder = new Map(holderList.map(h=>[h.address,h]));
+  let connCount=0;
+  const depth = Math.min(parseInt($('depthSelect').value), 150); // cap transfer scan
+  const target = holderList.slice(0, depth);
+  let done=0;
+  const tasks = target.map(h=>Q.run(async()=>{
+    try{
+      const txData=await xrpl('account_tx',{
+        account:h.address, limit:50,
+        ledger_index_min:-1, ledger_index_max:-1
+      });
+      for(const entry of (txData?.transactions||[])){
+        const tx=entry.tx||entry.transaction;
+        if(!tx) continue;
+        const type=tx.TransactionType;
+        if(type==='Payment'){
+          const cp = tx.Account===h.address ? tx.Destination : tx.Account;
+          if(cp && holderSet.has(cp) && cp!==h.address){
+            const isSend=tx.Account===h.address;
+            const isToken = typeof tx.Amount==='object';
+            h.connections.push({
+              with:cp,
+              type: isSend
+                ? (isToken?'sent_token':'sent_xrp')
+                : (isToken?'recv_token':'recv_xrp'),
+              txHash:tx.hash,
+              date:xrplDate(tx.date),
+              amount: typeof tx.Amount==='string'
+                ? (parseInt(tx.Amount)/1e6)+' XRP'
+                : (parseFloat(tx.Amount.value)+' '+hexToAscii(tx.Amount.currency||'?'))
+            });
+            connCount++;
+            $('cntConnections').textContent=connCount;
+          }
+        }
+      }
+    }catch(e){}
+    done++;
+    setProgress(60+(done/target.length)*20);
+  }));
+  await Promise.allSettled(tasks);
+  setStep(3,'done'); log(`✓ Found ${connCount} cross-holder connections`);
+  return connCount;
+}
+
+/* ── PHASE 4: BUNDLE DETECTION ── */
+class UnionFind{
+  constructor(){ this.p={}; this.r={}; }
+  find(x){ if(!this.p[x]) this.p[x]=x; if(this.p[x]!==x) this.p[x]=this.find(this.p[x]); return this.p[x]; }
+  union(x,y){ let px=this.find(x),py=this.find(y); if(px===py) return; if((this.r[px]||0)<(this.r[py]||0)){[px,py]=[py,px];} this.p[py]=px; if((this.r[px]||0)===(this.r[py]||0)) this.r[px]=(this.r[px]||0)+1; }
+}
+
+function isExchange(activator){
+  if(!activator) return false;
+  if(KNOWN[activator]?.type==='exchange') return true;
+  const lbl=(KNOWN[activator]?.name||'').toLowerCase();
+  return ['coinbase','binance','kraken','bitstamp','bitfinex','gemini','kucoin','okx','huobi','bittrex','gatehub'].some(e=>lbl.includes(e));
+}
+function labelType(activator, label){
+  if(!activator) return 'unknown';
+  const k=KNOWN[activator];
+  if(k) return k.type;
+  if(label){
+    const l=label.toLowerCase();
+    if(['coinbase','binance','kraken','bitstamp','bitfinex','gemini','kucoin','okx','huobi','bittrex','gatehub'].some(e=>l.includes(e))) return 'exchange';
+  }
+  return 'wallet';
+}
+
+function buildBundles(holderList){
+  setStep(4,'active');
+  const uf = new UnionFind();
+  const addrToHolder = new Map(holderList.map(h=>[h.address,h]));
+  const edges=[]; // {from, to, type, detail}
+
+  /* --- Edge type 1: same non-exchange activator --- */
+  const activatorGroups=new Map();
+  for(const h of holderList){
+    if(!h.activator) continue;
+    if(!activatorGroups.has(h.activator)) activatorGroups.set(h.activator,[]);
+    activatorGroups.get(h.activator).push(h.address);
+  }
+  for(const [act, members] of activatorGroups){
+    if(members.length<2) continue;
+    const exchg = isExchange(act) || (KNOWN[act]?.type==='system');
+    for(let i=1;i<members.length;i++){
+      if(!exchg){
+        // Non-exchange same activator → hard bundle
+        uf.union(members[0], members[i]);
+        edges.push({from:members[0],to:members[i],type:'same_activator',meta:act});
+      }
+      // Exchange activators handled separately as "exchange group" — still tracked
+    }
+  }
+
+  /* --- Edge type 2: cross-payments between holders --- */
+  for(const h of holderList){
+    for(const conn of h.connections){
+      if(addrToHolder.has(conn.with)){
+        uf.union(h.address, conn.with);
+        edges.push({from:h.address, to:conn.with, type:conn.type, meta:conn.txHash, date:conn.date, amount:conn.amount});
+      }
+    }
+  }
+
+  /* --- Edge type 3: activation chain (holder A activated holder B) --- */
+  for(const h of holderList){
+    if(h.activator && addrToHolder.has(h.activator)){
+      uf.union(h.address, h.activator);
+      edges.push({from:h.activator, to:h.address, type:'chain_activation'});
+    }
+  }
+
+  /* Build primary bundles from union-find */
+  const groups=new Map();
+  for(const h of holderList){
+    const root=uf.find(h.address);
+    if(!groups.has(root)) groups.set(root,[]);
+    groups.get(root).push(h);
+  }
+
+  /* Build exchange groups (secondary) */
+  const exchGroups=new Map();
+  for(const [act, members] of activatorGroups){
+    if(members.length<2) continue;
+    if(!isExchange(act)&&KNOWN[act]?.type!=='system') continue;
+    const key=act;
+    if(!exchGroups.has(key)) exchGroups.set(key,{activator:act, label:KNOWN[act]?.name||(members[0].activatorLabel)||act, members:new Set()});
+    for(const m of members) exchGroups.get(key).members.add(m);
+  }
+
+  /* Score and format bundles */
+  const result=[];
+
+  for(const [root, members] of groups){
+    if(members.length<2) continue;
+    // Collect evidence
+    const evidence=new Set();
+    const bundleEdges=edges.filter(e=>members.some(m=>m.address===e.from||m.address===e.to));
+    for(const e of bundleEdges){
+      if(e.type==='same_activator')  evidence.add('same_activator');
+      if(e.type.includes('xrp')||e.type.includes('token')) evidence.add('cross_payment');
+      if(e.type==='chain_activation') evidence.add('chain_activation');
+    }
+    // Timing cluster?
+    const dates=members.map(m=>m.activatedAt).filter(Boolean).map(d=>d.getTime());
+    if(dates.length>=2){
+      const span=Math.max(...dates)-Math.min(...dates);
+      if(span<3600000*24) evidence.add('time_cluster_1d');
+      else if(span<3600000*24*7) evidence.add('time_cluster_7d');
+    }
+    // Activator consensus
+    const actMap=new Map();
+    for(const m of members){ if(m.activator) actMap.set(m.activator,(actMap.get(m.activator)||0)+1); }
+    const topAct=[...actMap.entries()].sort((a,b)=>b[1]-a[1])[0];
+    const activator=topAct?.[0]||null;
+    const activatorLabel=activator?(KNOWN[activator]?.name||members.find(m=>m.activator===activator)?.activatorLabel||null):null;
+    const exchg=isExchange(activator);
+
+    // Risk score
+    let risk=0;
+    if(evidence.has('same_activator')&&!exchg)   risk+=40;
+    if(evidence.has('chain_activation'))          risk+=30;
+    if(evidence.has('cross_payment'))             risk+=25;
+    if(evidence.has('time_cluster_1d'))           risk+=20;
+    else if(evidence.has('time_cluster_7d'))      risk+=10;
+    if(exchg)                                     risk=Math.max(0,risk-20);
+    risk=Math.min(100,risk);
+
+    const riskLevel=risk>=60?'high':risk>=30?'medium':'low';
+
+    result.push({
+      id:`B${result.length+1}`,
+      members, activator, activatorLabel,
+      riskScore:risk, riskLevel, evidence:[...evidence],
+      connections:bundleEdges
+    });
+  }
+
+  /* Add exchange groups not already in result */
+  for(const [act, grp] of exchGroups){
+    const mList=[...grp.members].map(a=>addrToHolder.get(a)).filter(Boolean);
+    if(mList.length<2) continue;
+    // Check if already captured in primary bundles
+    const alreadyCovered=result.some(b=>b.activator===act&&b.members.length>=mList.length*0.8);
+    if(alreadyCovered) continue;
+    result.push({
+      id:`E${result.length+1}`,
+      members:mList,
+      activator:act,
+      activatorLabel:grp.label,
+      riskScore:15, riskLevel:'exchange',
+      evidence:['exchange_funded'],
+      connections:[]
+    });
+  }
+
+  result.sort((a,b)=>b.riskScore-a.riskScore||b.members.length-a.members.length);
+  $('cntBundles').textContent=result.length;
+  setStep(4,'done'); log(`✓ ${result.length} bundles detected`);
+  return result;
+}
+
+/* ── RENDER ── */
+function riskBadgeClass(lvl){ return {high:'risk-high',medium:'risk-med',exchange:'risk-exch',low:'risk-low'}[lvl]||'risk-low'; }
+function riskLabel(lvl,score){ return {high:`HIGH RISK · ${score}`,medium:`MEDIUM RISK · ${score}`,exchange:'EXCHANGE FUNDED',low:`LOW RISK · ${score}`}[lvl]||`RISK ${score}`; }
+
+function evidencePills(ev){
+  const map={
+    same_activator:   {cls:'ev-same-activator',  text:'Same Activator'},
+    cross_payment:    {cls:'ev-cross-payment',   text:'Cross-Payments'},
+    chain_activation: {cls:'ev-chain-activation',text:'Activation Chain'},
+    exchange_funded:  {cls:'ev-exchange',        text:'Exchange Funded'},
+    time_cluster_1d:  {cls:'ev-time-cluster',    text:'Funded <24h Apart'},
+    time_cluster_7d:  {cls:'ev-time-cluster',    text:'Funded <7d Apart'},
+  };
+  return ev.map(e=>map[e]?`<span class="ev-pill ${map[e].cls}">${map[e].text}</span>`:'').join('');
+}
+
+function walletRow(h, bundle){
+  const isAct  = bundle.activator===h.address;
+  const actStr = h.activator
+    ? `<span class="wt-addr" data-tip="${h.activator}"><a href="${xrpscanUrl(h.activator)}" target="_blank">${h.activatorLabel||short(h.activator)}</a></span>`
+    : '<span class="wt-addr" style="color:var(--muted)">—</span>';
+  const tag = isAct
+    ? '<span class="wt-tag activator">ACTIVATOR</span>'
+    : h.activator&&bundle.members.some(m=>m.address===h.activator)
+      ? '<span class="wt-tag activated">ACTIVATED BY BUNDLE</span>'
+      : '';
+  return `<tr>
+    <td><a class="wt-addr" href="${xrpscanUrl(h.address)}" target="_blank" rel="noopener">${short(h.address)}</a>${tag}</td>
+    <td class="wt-balance">${fmt(h.balance)}<br><span class="wt-pct">${h.xrpBalance!=null?fmtXrp(h.xrpBalance):''}</span></td>
+    <td>${actStr}</td>
+    <td style="color:var(--muted);font-size:0.72rem">${fmtRelDate(h.activatedAt)||'—'}</td>
+    <td style="text-align:right;font-size:0.72rem;color:var(--muted)">${h.connections.length>0?`<span style="color:var(--ice)">${h.connections.length} link${h.connections.length!==1?'s':''}</span>`:'—'}</td>
+  </tr>`;
+}
+
+function connItem(e){
+  const typeInfo={
+    same_activator:    {cls:'ct-act',   label:'Same activator'},
+    chain_activation:  {cls:'ct-act',   label:'Activation →'},
+    sent_xrp:          {cls:'ct-pay',   label:'Sent XRP'},
+    recv_xrp:          {cls:'ct-pay',   label:'Recv XRP'},
+    sent_token:        {cls:'ct-token', label:'Sent FAMILY'},
+    recv_token:        {cls:'ct-token', label:'Recv FAMILY'},
+  }[e.type]||{cls:'ct-pay',label:e.type};
+  const txLink=e.meta&&e.meta.length>20
+    ?`<a href="${xrpScanTx(e.meta)}" target="_blank" rel="noopener" style="font-size:0.65rem;color:var(--muted)">tx↗</a>`
+    :'';
+  return `<div class="conn-item">
+    <span class="conn-addr">${short(e.from)}</span>
+    <span class="conn-arrow">→</span>
+    <span class="conn-addr">${short(e.to)}</span>
+    <span class="conn-type ${typeInfo.cls}">${typeInfo.label}</span>
+    ${e.amount?`<span style="font-size:0.7rem;color:var(--muted)">${e.amount}</span>`:''}
+    ${txLink}
+    <span class="conn-date">${fmtDate(e.date)}</span>
+  </div>`;
+}
+
+function renderBundle(b, idx){
+  const totalBal=b.members.reduce((s,m)=>s+m.balance,0);
+  const totalSupply=holders.reduce((s,h)=>s+h.balance,0);
+  const pctOfHolders=(totalBal/totalSupply*100).toFixed(2);
+  const div=document.createElement('div');
+  div.className='bundle';
+  div.id=`bundle-${idx}`;
+
+  const uniqueConns=[...new Map(b.connections.map(c=>[c.from+'|'+c.to+c.type,c])).values()];
+
+  div.innerHTML=`
+  <div class="bundle-header" onclick="toggleBundle(${idx})">
+    <div class="bh-left">
+      <span class="bundle-badge ${riskBadgeClass(b.riskLevel)}">${riskLabel(b.riskLevel,b.riskScore)}</span>
+      <div class="bh-info">
+        <div class="bh-title">${b.activatorLabel?`Activator: ${b.activatorLabel}`:`${b.id} — ${b.members.length} wallets`}</div>
+        <div class="bh-sub">${b.activator?`<a href="${xrpscanUrl(b.activator)}" target="_blank" onclick="event.stopPropagation()">${short(b.activator)}</a> · `:''}${b.members.length} wallet${b.members.length!==1?'s':''} · ${pctOfHolders}% of tracked supply</div>
+      </div>
+    </div>
+    <div class="bh-right">
+      <div class="bh-stat"><div class="bh-stat-n">${b.members.length}</div><div class="bh-stat-l">Wallets</div></div>
+      <div class="bh-stat"><div class="bh-stat-n" style="font-size:0.85rem">${fmt(totalBal)}</div><div class="bh-stat-l">FAMILY</div></div>
+      <span class="bh-toggle">▼</span>
+    </div>
+  </div>
+  <div class="bundle-body">
+    <div class="evidence-row">${evidencePills(b.evidence)}</div>
+    <table class="wallet-table">
+      <tr>
+        <th>Address</th>
+        <th>FAMILY Balance</th>
+        <th>Activated By</th>
+        <th>Funded</th>
+        <th style="text-align:right">Links</th>
+      </tr>
+      ${b.members.sort((a,c)=>c.balance-a.balance).map(m=>walletRow(m,b)).join('')}
+    </table>
+    ${uniqueConns.length?`<div class="connections"><div class="conn-title">On-Chain Connections (${uniqueConns.length})</div>${uniqueConns.slice(0,30).map(connItem).join('')}${uniqueConns.length>30?`<div style="font-size:0.7rem;color:var(--muted);margin-top:6px">+${uniqueConns.length-30} more connections</div>`:''}</div>`:''}
+  </div>`;
+  return div;
+}
+
+function renderSummary(bList, holderList){
+  const totalBal=holderList.reduce((s,h)=>s+h.balance,0);
+  const bundledWallets=new Set(bList.flatMap(b=>b.members.map(m=>m.address)));
+  const exchBundles=bList.filter(b=>b.riskLevel==='exchange');
+  const highRisk=bList.filter(b=>b.riskLevel==='high');
+  const exchWallets=new Set(holderList.filter(h=>h.activator&&isExchange(h.activator)).map(h=>h.address));
+  const uniqueActivators=new Set(holderList.filter(h=>h.activator).map(h=>h.activator));
+  const exchActivators=new Set([...uniqueActivators].filter(a=>isExchange(a)));
+
+  $('summaryGrid').innerHTML=`
+    <div class="s-card"><div class="s-card-n ice">${holderList.length}</div><div class="s-card-l">Total Holders</div></div>
+    <div class="s-card"><div class="s-card-n">${bList.length}</div><div class="s-card-l">Bundles Found</div></div>
+    <div class="s-card"><div class="s-card-n red">${highRisk.length}</div><div class="s-card-l">High-Risk Bundles</div></div>
+    <div class="s-card"><div class="s-card-n purple">${exchWallets.size}</div><div class="s-card-l">Exchange-Funded</div></div>
+    <div class="s-card"><div class="s-card-n orange">${bundledWallets.size}</div><div class="s-card-l">Wallets in Bundles</div></div>
+    <div class="s-card"><div class="s-card-n">${uniqueActivators.size}</div><div class="s-card-l">Unique Activators</div></div>
+    <div class="s-card"><div class="s-card-n green">${exchActivators.size}</div><div class="s-card-l">Exchange Sources</div></div>
+    <div class="s-card"><div class="s-card-n">${fmt(totalBal)}</div><div class="s-card-l">Total FAMILY Tracked</div></div>`;
+}
+
+function renderResults(){
+  const minSize=parseInt($('filterMin').value)||2;
+  const showExch=$('filterExch').checked;
+  const sortBy=$('filterSort').value;
+
+  let filtered=bundles.filter(b=>b.members.length>=minSize);
+  if(!showExch) filtered=filtered.filter(b=>b.riskLevel!=='exchange');
+
+  if(sortBy==='risk') filtered.sort((a,b)=>b.riskScore-a.riskScore||b.members.length-a.members.length);
+  else if(sortBy==='size') filtered.sort((a,b)=>b.members.length-a.members.length);
+  else filtered.sort((a,b)=>b.members.reduce((s,m)=>s+m.balance,0)-a.members.reduce((s,m)=>s+m.balance,0));
+
+  bundleList.innerHTML='';
+  filtered.forEach((b,i)=>bundleList.appendChild(renderBundle(b,i)));
+  $('bundleCount').textContent=`${filtered.length} found`;
+
+  // Singles
+  const bundledAddrs=new Set(bundles.flatMap(b=>b.members.map(m=>m.address)));
+  const singles=holders.filter(h=>!bundledAddrs.has(h.address));
+  $('soloCount').textContent=`${singles.length} wallets`;
+  $('singlesCount').textContent=singles.length;
+
+  $('singlesBody').innerHTML=singles.length?`
+    <table class="wallet-table">
+      <tr><th>Address</th><th>FAMILY Balance</th><th>Activated By</th><th>Funded</th></tr>
+      ${singles.slice(0,200).map(h=>`<tr>
+        <td><a class="wt-addr" href="${xrpscanUrl(h.address)}" target="_blank">${short(h.address)}</a></td>
+        <td class="wt-balance">${fmt(h.balance)}</td>
+        <td>${h.activatorLabel||short(h.activator)||'—'}</td>
+        <td style="font-size:0.72rem;color:var(--muted)">${fmtRelDate(h.activatedAt)||'—'}</td>
+      </tr>`).join('')}
+      ${singles.length>200?`<tr><td colspan="4" style="text-align:center;padding:12px;color:var(--muted);font-size:0.75rem">+${singles.length-200} more not shown</td></tr>`:''}
+    </table>`:'<div style="padding:20px;text-align:center;color:var(--muted);font-size:0.82rem">All holders are in bundles</div>';
+}
+
+/* ── INTERACTIVE ── */
+function toggleBundle(i){
+  const el=$(`bundle-${i}`);
+  el.classList.toggle('open');
+}
+function toggleSingles(){
+  const t=$('singlesToggle'), b=$('singlesBody');
+  t.classList.toggle('open');
+  b.style.display=t.classList.contains('open')?'block':'none';
+}
+
+['filterMin','filterExch','filterSort'].forEach(id=>{
+  const el=$(id);
+  if(el) el.addEventListener('change',()=>renderResults());
+});
+
+/* ── EXPORT ── */
+function exportData(){
+  const data={
+    generatedAt:new Date().toISOString(),
+    issuer:ISSUER, currency:'FAMILY',
+    totalHolders:holders.length,
+    bundles:bundles.map(b=>({
+      id:b.id, riskLevel:b.riskLevel, riskScore:b.riskScore,
+      activator:b.activator, activatorLabel:b.activatorLabel,
+      evidence:b.evidence,
+      members:b.members.map(m=>({
+        address:m.address, balance:m.balance,
+        activator:m.activator, activatorLabel:m.activatorLabel,
+        activatedAt:m.activatedAt?.toISOString(),
+        xrpBalance:m.xrpBalance
+      })),
+      connections:b.connections.map(c=>({from:c.from,to:c.to,type:c.type,txHash:c.meta,date:c.date?.toISOString(),amount:c.amount}))
+    })),
+    allHolders:holders.map(h=>({
+      address:h.address, balance:h.balance,
+      activator:h.activator, activatorLabel:h.activatorLabel,
+      activatedAt:h.activatedAt?.toISOString(),
+      xrpBalance:h.xrpBalance
+    }))
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`family-bundles-${Date.now()}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+function exportCSV(){
+  const rows=[['Bundle ID','Risk Level','Risk Score','Member Address','FAMILY Balance','Activator','Activator Label','Funded Date']];
+  for(const b of bundles){
+    for(const m of b.members){
+      rows.push([b.id,b.riskLevel,b.riskScore,m.address,m.balance,m.activator||'',m.activatorLabel||'',m.activatedAt?fmtDate(m.activatedAt):'']);
+    }
+  }
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`family-bundles-${Date.now()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+/* ── MAIN ── */
+async function run(){
+  abortCtrl=new AbortController();
+  startBtn.disabled=true; stopBtn.disabled=false;
+  progressSec.style.display='block';
+  summarySec.style.display='none';
+  resultsSec.style.display='none';
+  bundleList.innerHTML='';
+  $('progressLog').innerHTML='';
+  holders=[]; bundles=[];
+  setProgress(2);
+
+  try{
+    holders = await getAllHolders();
+    if(!holders.length){ log('No FAMILY holders found.','error'); return; }
+    setProgress(25);
+
+    await enrichAll(holders);
+    setProgress(60);
+
+    await findConnections(holders);
+    setProgress(80);
+
+    bundles = buildBundles(holders);
+    setProgress(100);
+
+    summarySec.style.display='block';
+    resultsSec.style.display='block';
+    renderSummary(bundles, holders);
+    renderResults();
+    log(`Analysis complete: ${bundles.length} bundles, ${holders.length} holders`);
+
+  }catch(e){
+    if(e.message!=='aborted') log('Error: '+e.message,'error');
+  }finally{
+    startBtn.disabled=false; stopBtn.disabled=true;
+  }
+}
+
+startBtn.addEventListener('click', run);
+stopBtn.addEventListener('click', ()=>{ abortCtrl?.abort(); stopBtn.disabled=true; log('Stopped by user'); });
+</script>
+</body>
+</html>
