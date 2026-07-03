@@ -32,9 +32,260 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{background:var(--bg)}
 body{background:var(--bg);color:var(--txt);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+a{color:inherit}
+
+.wrap{max-width:1400px;margin:0 auto;padding:28px 20px 60px}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--sol);box-shadow:0 0 12px var(--sol)}
+h1{font-family:var(--disp);font-size:20px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.sub{color:var(--mut);font-size:12.5px;font-family:var(--mono)}
+
+.status-line{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;color:var(--mut)}
+.status-line .live{color:var(--win)}
+.status-line .stale{color:var(--rug)}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.stat{background:var(--srf);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.stat .n{font-family:var(--disp);font-size:22px;font-weight:700}
+.stat .l{color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.stat.win .n{color:var(--win)}
+.stat.rug .n{color:var(--rug)}
+.stat.sol .n{color:var(--sol)}
+
+.controls{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.controls input[type=text]{background:var(--srf);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:13px;min-width:200px}
+.controls select{background:var(--srf);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;font-family:var(--mono);font-size:13px}
+.controls .count{color:var(--mut);font-size:12.5px;font-family:var(--mono);margin-left:auto}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--srf)}
+table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:var(--srf2);color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;cursor:pointer;user-select:none}
+th:hover{color:var(--txt)}
+tbody tr:hover{background:var(--srf2)}
+tbody tr:last-child td{border-bottom:none}
+td.mono,th.mono{font-family:var(--mono)}
+
+.badge{display:inline-block;padding:3px 9px;border-radius:6px;font-family:var(--mono);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.badge.win{background:var(--win-soft);color:var(--win)}
+.badge.rug{background:var(--rug-soft);color:var(--rug)}
+.badge.fade{background:rgba(255,177,61,.1);color:var(--amb)}
+.badge.pending{background:rgba(139,139,163,.12);color:var(--mut)}
+
+.flag{color:var(--rug)}
+.ok{color:var(--win)}
+.dim{color:var(--mut)}
+
+.name{font-weight:600}
+.ticker{color:var(--mut);font-size:12px}
+
+.empty,.err{padding:60px 20px;text-align:center;color:var(--mut);font-family:var(--mono);font-size:13px}
+.err{color:var(--rug)}
+
+footer{margin-top:18px;color:var(--mut);font-size:11.5px;font-family:var(--mono);text-align:center}
 </style>
 </head>
 <body>
-<p>Loading...</p>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <h1>Survivor Lab</h1>
+        <div class="sub">solana launch forensics</div>
+      </div>
+    </div>
+    <div class="status-line" id="statusLine">connecting…</div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="search name / ticker / mint / deployer…">
+    <select id="outcomeFilter">
+      <option value="">all outcomes</option>
+      <option value="win">win</option>
+      <option value="rug">rug</option>
+      <option value="fade">fade</option>
+    </select>
+    <select id="sortBy">
+      <option value="graduated_at">sort: recent</option>
+      <option value="peakX">sort: peak x</option>
+      <option value="bundlePct">sort: bundle %</option>
+      <option value="top10Pct">sort: top10 %</option>
+      <option value="hoursAlive">sort: hours alive</option>
+    </select>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="tablewrap">
+    <table id="table" style="display:none">
+      <thead>
+        <tr>
+          <th data-k="name">Token</th>
+          <th class="mono" data-k="mint">Mint</th>
+          <th data-k="outcome">Outcome</th>
+          <th class="mono" data-k="peakX">Peak</th>
+          <th class="mono" data-k="bundlePct">Bundle%</th>
+          <th class="mono" data-k="top10Pct">Top10%</th>
+          <th class="mono" data-k="devAgeDays">Dev Age</th>
+          <th class="mono" data-k="devPriorRugs">Prior Rugs</th>
+          <th class="mono" data-k="sameBlockSnipes">Snipes</th>
+          <th class="mono" data-k="hasSocials">Socials</th>
+          <th class="mono" data-k="devSoldEarly">Dev Sold</th>
+          <th class="mono" data-k="saleDurationMin">Sale Dur</th>
+          <th class="mono" data-k="hoursAlive">Hrs Alive</th>
+          <th class="mono" data-k="deployerId">Deployer</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none">no graduated launches labeled yet</div>
+    <div class="err" id="err" style="display:none"></div>
+  </div>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+const REFRESH_MS = 30000;
+let launches = [];
+let sortKey = 'graduated_at';
+let sortDir = -1;
+
+const $ = (id) => document.getElementById(id);
+
+function fmtNum(v, d=1){ return (v===null||v===undefined||isNaN(v)) ? '—' : Number(v).toFixed(d); }
+function fmtInt(v){ return (v===null||v===undefined||isNaN(v)) ? '—' : Math.round(v); }
+function shortMint(m){ return m ? m.slice(0,4)+'…'+m.slice(-4) : '—'; }
+function timeAgo(ts){
+  if(!ts) return '—';
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return s+'s ago';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+async function loadStatus(){
+  try{
+    const res = await fetch('/status', {cache:'no-store'});
+    const s = await res.json();
+    $('statusLine').innerHTML = `<span class="live">● live</span> · uptime ${Math.floor(s.uptime/60)}m · helius ${s.helius.creditsToday}/${s.helius.dailyBudget}`;
+    $('stats').innerHTML = `
+      <div class="stat"><div class="n">${s.launches.total||0}</div><div class="l">Total Launches</div></div>
+      <div class="stat sol"><div class="n">${s.launches.graduated||0}</div><div class="l">Graduated</div></div>
+      <div class="stat win"><div class="n">${s.launches.wins||0}</div><div class="l">Wins</div></div>
+      <div class="stat rug"><div class="n">${s.launches.rugs||0}</div><div class="l">Rugs</div></div>
+      <div class="stat"><div class="n">${s.launches.fades||0}</div><div class="l">Fades</div></div>
+      <div class="stat"><div class="n">${s.launches.labeled||0}</div><div class="l">Labeled</div></div>
+    `;
+    return true;
+  }catch(e){
+    $('statusLine').innerHTML = `<span class="stale">● offline</span> — collector not reachable`;
+    return false;
+  }
+}
+
+async function loadLaunches(){
+  try{
+    const res = await fetch('/launches.json', {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const j = await res.json();
+    launches = j.launches || [];
+    $('err').style.display = 'none';
+    render();
+  }catch(e){
+    $('table').style.display = 'none';
+    $('empty').style.display = 'none';
+    $('err').style.display = 'block';
+    $('err').textContent = 'Could not load launches.json — ' + e.message;
+  }
+}
+
+function outcomeBadge(o){
+  const cls = o==='win'?'win':o==='rug'?'rug':o==='fade'?'fade':'pending';
+  return `<span class="badge ${cls}">${o||'pending'}</span>`;
+}
+
+function flagged(val, threshold, gte=true){
+  if(val===null||val===undefined) return 'dim';
+  return gte ? (val>=threshold?'flag':'') : (val<=threshold?'flag':'');
+}
+
+function render(){
+  const q = $('search').value.trim().toLowerCase();
+  const outcomeQ = $('outcomeFilter').value;
+
+  let rows = launches.filter(l=>{
+    if(outcomeQ && l.outcome!==outcomeQ) return false;
+    if(!q) return true;
+    return (l.name||'').toLowerCase().includes(q)
+      || (l.ticker||'').toLowerCase().includes(q)
+      || (l.mint||'').toLowerCase().includes(q)
+      || (l.deployerId||'').toLowerCase().includes(q);
+  });
+
+  rows.sort((a,b)=>{
+    const av = a[sortKey], bv = b[sortKey];
+    if(av===null||av===undefined) return 1;
+    if(bv===null||bv===undefined) return -1;
+    return av > bv ? sortDir : av < bv ? -sortDir : 0;
+  });
+
+  $('count').textContent = `${rows.length} / ${launches.length}`;
+
+  if(!rows.length){
+    $('table').style.display = 'none';
+    $('empty').style.display = 'block';
+    return;
+  }
+  $('empty').style.display = 'none';
+  $('table').style.display = 'table';
+
+  $('rows').innerHTML = rows.map(l=>`
+    <tr>
+      <td><div class="name">${l.name||'Unknown'}</div><div class="ticker">$${l.ticker||'???'}</div></td>
+      <td class="mono"><a href="https://solscan.io/token/${l.mint}" target="_blank" rel="noopener">${shortMint(l.mint)}</a></td>
+      <td>${outcomeBadge(l.outcome)}</td>
+      <td class="mono">${l.peakX?fmtNum(l.peakX)+'x':'—'}</td>
+      <td class="mono ${flagged(l.bundlePct,15)}">${fmtNum(l.bundlePct)}%</td>
+      <td class="mono ${flagged(l.top10Pct,40)}">${fmtNum(l.top10Pct,0)}%</td>
+      <td class="mono ${flagged(l.devAgeDays,3,false)}">${fmtInt(l.devAgeDays)}d</td>
+      <td class="mono ${l.devPriorRugs>0?'flag':''}">${fmtInt(l.devPriorRugs)}</td>
+      <td class="mono ${l.sameBlockSnipes>2?'flag':''}">${fmtInt(l.sameBlockSnipes)}</td>
+      <td class="mono ${l.hasSocials?'ok':'flag'}">${l.hasSocials?'yes':'no'}</td>
+      <td class="mono ${l.devSoldEarly?'flag':'ok'}">${l.devSoldEarly?'yes':'no'}</td>
+      <td class="mono">${fmtInt(l.saleDurationMin)}m</td>
+      <td class="mono">${fmtNum(l.hoursAlive)}h</td>
+      <td class="mono dim">${l.deployerId||'—'}</td>
+    </tr>
+  `).join('');
+}
+
+document.querySelectorAll('th[data-k]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const k = th.dataset.k;
+    if(sortKey===k) sortDir *= -1; else { sortKey=k; sortDir=-1; }
+    render();
+  });
+});
+
+$('search').addEventListener('input', render);
+$('outcomeFilter').addEventListener('change', render);
+$('sortBy').addEventListener('change', e=>{ sortKey=e.target.value; sortDir=-1; render(); });
+
+async function refresh(){
+  await Promise.all([loadStatus(), loadLaunches()]);
+  $('footer').textContent = 'last updated ' + new Date().toLocaleTimeString();
+}
+
+refresh();
+setInterval(refresh, REFRESH_MS);
+</script>
 </body>
 </html>
