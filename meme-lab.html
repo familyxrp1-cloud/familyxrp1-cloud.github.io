@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>$FAMILY Meme Lab — Waddles Goes Anywhere</title>
+<meta name="description" content="Turn Waddles the $FAMILY penguin into famous movie scenes, music videos, cartoons, history and fantasy. Generate unlimited on-brand prompts and images."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#04090f;--deep:#070f1c;--panel:#0b1628;--card:#0d1b2e;
+  --ice:#5bb8ff;--ice2:#a8d8ff;--muted:#5a7a99;
+  --text:#ddeeff;--white:#f4f9ff;--border:rgba(91,184,255,0.1);
+  --mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(4,9,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:0.08em;color:var(--white);text-decoration:none}
+.logo span{color:var(--ice)}
+.nav-back{font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--ice)}
+
+.wrap{max-width:1100px;margin:0 auto;padding:120px 24px 100px}
+
+.lab-head{text-align:center;margin-bottom:56px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(91,184,255,0.08);border:1px solid rgba(91,184,255,0.2);padding:7px 16px;border-radius:100px;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ice);margin-bottom:22px}
+.eyebrow::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--ice)}
+.lab-head h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.6rem,6vw,5rem);line-height:0.92;letter-spacing:0.02em;color:var(--white);margin-bottom:18px}
+.lab-head h1 .ice{color:var(--ice)}
+.lab-head p{font-size:1rem;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.75;font-weight:300}
+
+/* Character bible */
+.bible{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 30px;margin-bottom:44px}
+.bible-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.bible-lbl{font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ice)}
+.bible-reset{font-size:0.72rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:100px;padding:6px 14px;cursor:pointer;transition:all .2s}
+.bible-reset:hover{color:var(--ice);border-color:rgba(91,184,255,0.35)}
+#bibleText{width:100%;min-height:88px;background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:14px 16px;color:var(--text);font-family:var(--mono);font-size:0.82rem;line-height:1.6;resize:vertical}
+.bible-note{font-size:0.75rem;color:var(--muted);margin-top:10px;line-height:1.5}
+
+/* Category tabs */
+.cats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.cat-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:100px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+.cat-btn:hover{border-color:rgba(91,184,255,0.3);color:var(--text)}
+.cat-btn.active{background:rgba(91,184,255,0.12);border-color:rgba(91,184,255,0.4);color:var(--ice)}
+
+/* Template grid */
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:30px}
+.tpl-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .2s}
+.tpl-card:hover{border-color:rgba(91,184,255,0.3);transform:translateY(-2px)}
+.tpl-card.active{border-color:var(--ice);background:rgba(91,184,255,0.08);box-shadow:0 0 0 1px rgba(91,184,255,0.25)}
+.tpl-emoji{font-size:1.6rem;margin-bottom:8px;display:block}
+.tpl-name{font-size:0.92rem;font-weight:700;color:var(--white);margin-bottom:4px}
+.tpl-style{font-size:0.72rem;color:var(--muted);line-height:1.4}
+
+/* Builder panel */
+.builder{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:30px;margin-bottom:36px}
+.builder-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.field label{display:block;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.field input{width:100%;background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif}
+.field input:focus{outline:none;border-color:rgba(91,184,255,0.4)}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}
+.btn-ice{background:var(--ice);color:var(--ink);padding:13px 26px;border-radius:100px;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;transition:all .25s}
+.btn-ice:hover{background:var(--ice2);transform:translateY(-2px);box-shadow:0 14px 40px rgba(91,184,255,0.3)}
+.btn-ghost{background:transparent;color:var(--white);padding:13px 26px;border-radius:100px;font-size:0.85rem;font-weight:600;border:1px solid rgba(255,255,255,0.18);cursor:pointer;transition:all .25s}
+.btn-ghost:hover{border-color:rgba(91,184,255,0.5);color:var(--ice)}
+
+.prompt-out{position:relative}
+.prompt-out textarea{width:100%;min-height:170px;background:var(--deep);border:1px solid var(--border);border-radius:12px;padding:18px 20px;color:var(--ice2);font-family:var(--mono);font-size:0.83rem;line-height:1.65;resize:vertical}
+.copy-fab{position:absolute;top:14px;right:14px;background:rgba(91,184,255,0.12);border:1px solid rgba(91,184,255,0.3);color:var(--ice);padding:7px 16px;border-radius:100px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all .2s}
+.copy-fab:hover{background:rgba(91,184,255,0.22)}
+.hint{font-size:0.78rem;color:var(--muted);margin-top:14px;line-height:1.6}
+.hint b{color:var(--text)}
+
+/* Generate section */
+.gen-toggle{text-align:center;margin:8px 0 36px}
+.gen-toggle button{background:none;border:1px solid var(--border);color:var(--muted);padding:10px 22px;border-radius:100px;font-size:0.8rem;cursor:pointer;transition:all .2s}
+.gen-toggle button:hover{color:var(--ice);border-color:rgba(91,184,255,0.35)}
+.gen-panel{display:none;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px;margin-bottom:44px}
+.gen-panel.open{display:block}
+.gen-warn{background:rgba(255,177,61,0.08);border:1px solid rgba(255,177,61,0.25);border-radius:10px;padding:14px 16px;font-size:0.8rem;color:#ffcd8a;line-height:1.6;margin-bottom:20px}
+.gen-row{display:grid;grid-template-columns:2fr 1fr auto;gap:12px;margin-bottom:14px}
+.gen-row input,.gen-row select{background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:0.85rem;font-family:'DM Sans',sans-serif}
+.gen-remember{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--muted);margin-bottom:18px}
+.gen-status{font-size:0.82rem;color:var(--muted);margin-top:10px;min-height:20px}
+.gen-status.err{color:#ff6a6a}
+.gen-status.ok{color:var(--ice)}
+.gen-result{margin-top:20px;display:none}
+.gen-result.show{display:block}
+.gen-result img{width:100%;border-radius:12px;border:1px solid var(--border)}
+.gen-dl{display:inline-block;margin-top:14px;background:var(--ice);color:var(--ink);padding:11px 24px;border-radius:100px;font-size:0.82rem;font-weight:700;text-decoration:none}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(91,184,255,0.25);border-top-color:var(--ice);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Inspiration gallery */
+.gallery-head{text-align:center;margin-bottom:32px}
+.gallery-head h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,4vw,3rem);color:var(--white);margin-bottom:10px}
+.gallery-head p{font-size:0.9rem;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.gal-item{border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--card);position:relative}
+.gal-item img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.gal-cap{padding:12px 14px;font-size:0.75rem;color:var(--muted);line-height:1.5}
+.gal-cap b{color:var(--ice)}
+
+footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid var(--border);padding:36px 24px;text-align:center}
+footer a{color:var(--ice);text-decoration:none;font-size:0.82rem}
+footer a:hover{text-decoration:underline}
+
+@media(max-width:700px){
+  nav{padding:0 20px}
+  .builder-row{grid-template-columns:1fr}
+  .gen-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo"><span>$</span>FAMILY</a>
+  <a href="index.html" class="nav-back">← Back to Home</a>
+</nav>
+
+<div class="wrap">
+  <div class="lab-head">
+    <div class="eyebrow">Community Tool</div>
+    <h1>MEME LAB —<br><span class="ice">WADDLES GOES ANYWHERE.</span></h1>
+    <p>Waddles is the $FAMILY penguin. Drop him into movie scenes, music videos, cartoons, history, fantasy — a different <strong>art style</strong> for every world, so nothing looks copy-pasted. Pick a scene, add your own line, generate a prompt (or a full image), repeat forever.</p>
+  </div>
+
+  <div class="bible">
+    <div class="bible-top">
+      <span class="bible-lbl">Waddles — Character Bible (stays constant across every image)</span>
+      <button class="bible-reset" id="bibleReset">Reset to default</button>
+    </div>
+    <textarea id="bibleText"></textarea>
+    <div class="bible-note">This description is glued into every prompt so Waddles stays recognizable no matter the art style. Edit it if you want a different accessory, expression, or detail baked into everything you generate.</div>
+  </div>
+
+  <div class="cats" id="cats"></div>
+  <div class="tpl-grid" id="tplGrid"></div>
+
+  <div class="builder">
+    <div class="builder-row">
+      <div class="field">
+        <label>Caption / Line of Dialogue (optional)</label>
+        <input type="text" id="capInput" placeholder='e.g. "I&#39;m gonna make him an offer he can&#39;t refuse."'/>
+      </div>
+      <div class="field">
+        <label>Extra Details (optional)</label>
+        <input type="text" id="extraInput" placeholder="e.g. add a second penguin as the sidekick"/>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ice" id="btnRandom">🎲 Surprise Me</button>
+      <button class="btn-ghost" id="btnBuild">⚡ Build Prompt</button>
+    </div>
+    <div class="prompt-out">
+      <button class="copy-fab" id="btnCopy">Copy</button>
+      <textarea id="promptOut" readonly placeholder="Pick a scene above, then hit Build Prompt — your ready-to-paste prompt shows up here."></textarea>
+    </div>
+    <div class="hint">Paste this into <b>ChatGPT / GPT image, Midjourney, Grok Imagine, or any AI image tool</b> you already use. Because the character bible + art style travel with every prompt, you can generate thousands of on-brand $FAMILY images without ever repeating the same look twice.</div>
+  </div>
+
+  <div class="gen-toggle">
+    <button id="genToggleBtn">✨ Optional: Generate the image right here (bring your own OpenAI key)</button>
+  </div>
+  <div class="gen-panel" id="genPanel">
+    <div class="gen-warn">Your API key is sent <b>directly from your browser to OpenAI</b> — it never touches familyxrp.com or any server we run. Image generation costs money on your OpenAI account (a few cents per image). Only paste a key you're comfortable using client-side, and only on a device you trust.</div>
+    <div class="gen-row">
+      <input type="password" id="apiKey" placeholder="sk-... your OpenAI API key"/>
+      <select id="genSize">
+        <option value="1024x1024">Square 1024²</option>
+        <option value="1024x1536">Portrait poster</option>
+        <option value="1536x1024">Landscape</option>
+      </select>
+      <button class="btn-ice" id="btnGenerate">Generate</button>
+    </div>
+    <label class="gen-remember"><input type="checkbox" id="rememberKey"/> Remember key on this device (stored in localStorage, plaintext)</label>
+    <div class="gen-status" id="genStatus"></div>
+    <div class="gen-result" id="genResult">
+      <img id="genImg" alt="Generated Waddles scene"/>
+      <br><a class="gen-dl" id="genDl" download="waddles-meme.png">Download PNG</a>
+    </div>
+  </div>
+
+  <div class="gallery-head">
+    <h2>INSPIRATION GALLERY</h2>
+    <p>Examples already made in this exact style — one per world, so you can see how differently each category should render.</p>
+  </div>
+  <div class="gallery">
+    <div class="gal-item"><img src="assets/meme-lab/example-godfather.jpg" alt="Waddles as The Godfather"/><div class="gal-cap"><b>Movie Scenes</b> — 1970s oil-painting mob poster</div></div>
+    <div class="gal-item"><img src="assets/meme-lab/example-fresco.jpg" alt="Waddles Renaissance fresco"/><div class="gal-cap"><b>Historical & Fine Art</b> — Renaissance fresco / codex sketch</div></div>
+    <div class="gal-item"><img src="assets/meme-lab/example-anime.jpg" alt="Waddles anime battle"/><div class="gal-cap"><b>Cartoons & Anime</b> — cel-shaded shonen battle</div></div>
+    <div class="gal-item"><img src="assets/meme-lab/example-kingdom.jpg" alt="Waddles fantasy kingdom"/><div class="gal-cap"><b>Fantasy & Game Worlds</b> — painterly storybook illustration</div></div>
+    <div class="gal-item"><img src="assets/meme-lab/example-holiday.png" alt="Waddles July 4th"/><div class="gal-cap"><b>Holiday & Everyday</b> — flat vector sticker style</div></div>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">← Back to $FAMILY Home</a>
+</footer>
+
+<script>
+const DEFAULT_BIBLE = `Waddles, the $FAMILY mascot: a small emperor penguin with a jet-black back, snow-white belly, pale-yellow chest patch, and an orange-yellow beak and feet. Round, expressive dark eyes with a warm, slightly mischievous personality — loyal, patient, endearing. A subtle X-shaped mark (the $FAMILY / XRP emblem) is worked into one accessory somewhere in frame (a pin, a ring, a belt buckle, a flag, a coin — whatever fits the scene). Waddles' proportions and markings never change; only his clothing, setting, and the overall art style change per scene.`;
+
+const QUALITY_SUFFIX = "Composition reads like a real poster/keyframe from the source material — no visible watermark, no signature, no extra text unless a caption is specified.";
+
+const CATEGORIES = [
+  {id:'movie', label:'Movie Scenes', emoji:'🎬'},
+  {id:'music', label:'Music & Album Art', emoji:'🎤'},
+  {id:'cartoon', label:'Cartoons & Anime', emoji:'📺'},
+  {id:'history', label:'Historical & Fine Art', emoji:'🏛️'},
+  {id:'fantasy', label:'Fantasy & Game Worlds', emoji:'🏰'},
+  {id:'holiday', label:'Holiday & Everyday', emoji:'🎉'},
+];
+
+const TEMPLATES = [
+  // ---- MOVIE SCENES ----
+  {cat:'movie', id:'godfather', emoji:'🎩', name:'The Godfather',
+    style:'1970s oil-painting movie poster illustration, angular cubist brushwork, deep chiaroscuro lighting, muted gold-and-black palette',
+    scene:'Waddles sits behind a mahogany desk as a mafia don, in a black tuxedo with a red rose boutonniere, one wing raised in a thoughtful gesture, a glass of whiskey and a smoking cigar on the desk, a ledger book stamped "FAMILY" in front of him, dim office light through venetian blinds behind him'},
+  {cat:'movie', id:'titanic', emoji:'🚢', name:'Titanic Bow Scene',
+    style:'sweeping 1997 cinematic film-still render, golden-hour ocean light, epic wide-lens composition, soft film grain',
+    scene:'Waddles stands at the bow of a grand ocean liner, wings outstretched wide, another penguin behind holding him steady at the waist, wind-blown feathers, endless orange-gold ocean and sky ahead'},
+  {cat:'movie', id:'rocky', emoji:'🥊', name:'Rocky Steps',
+    style:'gritty 1976 film-still, desaturated Philadelphia dawn light, documentary photojournalism grain',
+    scene:'Waddles in grey sweats and red boxing gloves raises both wings in triumph at the top of a long stone museum staircase, a small crowd of cheering penguins gathered far below, city skyline in hazy morning light'},
+  {cat:'movie', id:'matrix', emoji:'🕶️', name:'The Matrix — Bullet Time',
+    style:'cyberpunk digital render, green-tinted falling code overlay, motion-blur bullet-time freeze frame, glossy trench-coat sheen',
+    scene:'Waddles in a long black trench coat and small round sunglasses leans backward in mid-air dodging bullets frozen in a circular blur around him, green digital rain falling in the background'},
+  {cat:'movie', id:'jaws', emoji:'🦈', name:'Jaws',
+    style:'1975 illustrated horror-thriller poster, painted deep-blue ocean gradient, minimal high-contrast composition',
+    scene:'Waddles swims obliviously near the ocean surface while a giant shark silhouette rises from the murky deep directly below him, painted poster-style ocean gradient from light blue at the top to inky black at the bottom'},
+  {cat:'movie', id:'topgun', emoji:'✈️', name:'Top Gun',
+    style:'1980s sun-flared action-movie poster, warm backlit haze, glossy photographic realism',
+    scene:'Waddles wears an aviator flight suit, leather jacket over one shoulder, mirrored aviator sunglasses, standing in front of a fighter jet on a sunset tarmac, lens-flare and heat-haze in the air'},
+  {cat:'movie', id:'jurassic', emoji:'🦖', name:'Jurassic Park',
+    style:'1993 cinematic adventure film-still, amber park-at-night lighting, photoreal texture and depth of field',
+    scene:'Waddles stands in a safari jeep gripping the roll bar, headlights cutting through dusk, awestruck expression, a towering dinosaur silhouette visible in the misty distance beyond tall iron gates'},
+  {cat:'movie', id:'pulpfiction', emoji:'💼', name:'Pulp Fiction',
+    style:'1994 stylish crime-film poster, saturated red-and-black palette, retro halftone grain',
+    scene:'Waddles in a skinny black suit and thin tie sits in a red vinyl diner booth, briefcase glowing faintly on the table, cool detached expression, neon diner sign visible through the window behind him'},
+  {cat:'movie', id:'starwars', emoji:'⚔️', name:'Star Wars Duel',
+    style:'space-opera illustrated poster, dramatic rim lighting, painted sci-fi matte backdrop',
+    scene:'Waddles wields a glowing blue lightsaber in a dramatic duel pose against a shadowy robed opponent, a starfield and distant space station visible behind them, sparks flying from crossed blades'},
+  {cat:'movie', id:'homealone', emoji:'😱', name:'Home Alone Scream',
+    style:'1990 warm holiday-comedy film-still, soft indoor Christmas light, exaggerated comedic expression',
+    scene:'Waddles stands in a cozy living room, both wings pressed to the sides of his face in an exaggerated shocked scream, Christmas tree and twinkling lights glowing softly behind him'},
+  {cat:'movie', id:'grease', emoji:'🕺', name:'Grease — Drive-In Night',
+    style:'late-1970s musical-poster illustration, warm neon-diner palette, retro Americana linework',
+    scene:'Waddles in a black leather jacket with slicked-back head feathers leans against a classic convertible at a neon-lit drive-in, jukebox glow reflecting off the chrome'},
+
+  // ---- MUSIC & ALBUM ART ----
+  {cat:'music', id:'thriller', emoji:'🧟', name:'MJ "Thriller"',
+    style:'1983 horror-music-video film still, red-and-black leather jacket, fog-lit graveyard, VHS grain and light scan-lines',
+    scene:'Waddles wears a red-and-black zippered jacket, mid dramatic dance pose with claw-like wings raised, fog rolling across a moonlit graveyard, a group of shuffling zombie penguins behind him'},
+  {cat:'music', id:'abbeyroad', emoji:'🚸', name:'Abbey Road Crossing',
+    style:'1969 candid documentary photograph, flat overcast daylight, grainy 35mm film photo texture',
+    scene:'Four Waddles-like penguins in matching sharp suits walk single-file across a black-and-white zebra crossing, a red London bus and brick townhouses blurred in the background'},
+  {cat:'music', id:'liveaid', emoji:'🎸', name:'Arena Rock Frontman',
+    style:'1985 arena-rock concert photo, hot spotlight glare, denim-and-tank-top rock aesthetic, crowd silhouettes',
+    scene:'Waddles stands center-stage gripping a microphone stand with one wing raised to a roaring crowd, spotlight beams cutting through haze, denim vest and wristbands'},
+  {cat:'music', id:'psychalbum', emoji:'🔺', name:'Prism Album Cover',
+    style:'minimalist psychedelic album-art illustration, pure black background, clean vector line art, rainbow-prism light beam',
+    scene:'a single beam of white light enters from the left, splits into a rainbow through a glass prism, and reforms into a small silhouette of Waddles walking out the other side, on a pure black square canvas'},
+  {cat:'music', id:'rapcover', emoji:'💿', name:'Rooftop Album Cover',
+    style:'gritty photographic album-cover portrait, golden urban rooftop backdrop, bold graffiti-style title lockup space left at the top',
+    scene:'Waddles stands arms-crossed on a city rooftop at golden hour wearing an oversized chain with an X-shaped pendant, skyline stretching out behind him, dramatic low-angle hero shot'},
+  {cat:'music', id:'vhsstatic', emoji:'📼', name:'MTV VHS Static',
+    style:'lo-fi 1980s VHS still, visible scan-lines and tracking distortion, oversaturated neon colors, chunky retro TV-graphic overlay corner',
+    scene:'Waddles dances mid-frame in a neon-lit garage set with checkerboard floor, boombox at his feet, captured as a slightly warped, oversaturated VHS freeze-frame'},
+
+  // ---- CARTOONS & ANIME ----
+  {cat:'cartoon', id:'dbz', emoji:'💥', name:'Shonen Battle Splash',
+    style:'cel-shaded 1990s anime, dynamic speed-lines, saturated primary colors, dramatic glowing power-aura, wide cinematic anime composition',
+    scene:'Waddles and a rival penguin face off in a dusty canyon, both crouched in powered-up battle stances with crackling energy auras (blue for Waddles, gold for the rival), rocks levitating around them from the shockwave'},
+  {cat:'cartoon', id:'ghibli', emoji:'🌾', name:'Studio-Ghibli Countryside',
+    style:'soft hand-painted watercolor animation background, warm pastel light, whimsical hand-drawn linework, gentle painterly texture',
+    scene:'Waddles walks down a grassy hillside path at golden afternoon, wind moving through tall grass, a small quiet village and rolling clouds in the distance, a woven basket in one wing'},
+  {cat:'cartoon', id:'rickmorty', emoji:'🧪', name:'Sci-Fi Flat Cartoon',
+    style:'flat vector adult-cartoon linework, bold thick outlines, minimal cel shading, glowing green portal light, slightly wobbly hand-drawn line quality',
+    scene:'Waddles steps out of a swirling green oval portal in a cluttered garage-lab, wide surprised eyes, test tubes and gadgets scattered around, drool-free comic exaggeration'},
+  {cat:'cartoon', id:'simpsons', emoji:'🛋️', name:'Couch Gag',
+    style:'flat yellow-toned classic cartoon style, thick black outlines, simple flat primary-color palette, sitcom living-room framing',
+    scene:'Waddles rushes into a cluttered living room and dives onto an overstuffed couch in front of a glowing TV, other family members already piling in from every doorway'},
+  {cat:'cartoon', id:'spongebob', emoji:'🧽', name:'Bikini Bottom',
+    style:'hand-drawn 2D Nickelodeon cartoon, bright candy-color palette, exaggerated bubbly linework, playful underwater lighting',
+    scene:'Waddles wears a tiny sailor hat and swims through a candy-colored coral reef town, bubbles trailing behind him, a pineapple-shaped house visible in the background'},
+  {cat:'cartoon', id:'naruto', emoji:'🍥', name:'Ninja Poster',
+    style:'cel-shaded shonen-anime poster, wind-swept dynamic action pose, orange-and-blue palette, dramatic sunset backlight',
+    scene:'Waddles runs forward in a leaning ninja sprint with a orange headband, a small scroll strapped to his back, wind whipping his feathers, sunset sky streaked behind him'},
+  {cat:'cartoon', id:'onepiece', emoji:'🏴‍☠️', name:'Pirate Crew Poster',
+    style:'bold-outline pirate-anime group poster, sun-bleached adventure color palette, wide heroic group composition',
+    scene:'Waddles stands at the front of a ragtag crew of penguin pirates on the deck of a wooden ship, straw hat tilted back, wing pointed toward the horizon, ocean spray and a distant island'},
+
+  // ---- HISTORICAL & FINE ART ----
+  {cat:'history', id:'fresco', emoji:'⛪', name:'Renaissance Fresco',
+    style:'Renaissance fresco / da-Vinci-codex sketch style, warm sepia parchment tones, fine cross-hatched pen linework, faint gold-leaf highlight',
+    scene:'Waddles stands robed with wings raised in a grand domed cathedral ceiling fresco, a congregation of smaller penguins gathered below in reverence, ornate architectural detail and Latin-style banner script framing the scene'},
+  {cat:'history', id:'romanmosaic', emoji:'🏺', name:'Roman Emperor Mosaic',
+    style:'ancient Roman mosaic tile-art, marble-and-gold color palette, flattened profile pose, geometric tile-grain texture',
+    scene:'Waddles is depicted in profile as a Roman emperor wearing a laurel wreath and toga, mosaic tile texture throughout, bordered by a classical meander (Greek key) pattern'},
+  {cat:'history', id:'egyptian', emoji:'𓂀', name:'Egyptian Tomb Wall',
+    style:'flat Egyptian tomb-painting illustration, ochre-and-lapis color palette, strict profile pose, hieroglyphic border decoration',
+    scene:'Waddles is painted in the flat profile pose of a pharaoh, holding a crook and flail, a stylized sun disk above his head, hieroglyphic symbols and papyrus-reed border framing the scene'},
+  {cat:'history', id:'napoleon', emoji:'👑', name:'Coronation Portrait',
+    style:'grand early-1800s oil-portrait painting, opulent velvet-and-gold palette, dramatic Baroque lighting, richly textured brushwork',
+    scene:'Waddles stands in an ermine-trimmed velvet cape and gold laurel crown in a palace hall, one wing resting on an ornate scepter, heavy drapery and candlelight behind him'},
+  {cat:'history', id:'ukiyoe', emoji:'🌊', name:'Ukiyo-e Woodblock',
+    style:'Japanese Edo-period woodblock print, flat bold color fields, thick black outline linework, stylized wave and cloud motifs',
+    scene:'Waddles rides atop a great cresting wave in the style of a classic woodblock print, a distant mountain peak on the horizon, foam rendered as stylized curling claws of white'},
+  {cat:'history', id:'viking', emoji:'🛡️', name:'Viking Saga Illustration',
+    style:'Norse-saga illuminated-manuscript illustration, weathered parchment texture, interlace knotwork border, muted earthy palette',
+    scene:'Waddles stands at the prow of a longship wearing a fur-lined cloak and horned helmet, oar-wielding penguin crew behind him, a stormy grey sea and dragon-headed bow beneath him'},
+
+  // ---- FANTASY & GAME WORLDS ----
+  {cat:'fantasy', id:'snowykingdom', emoji:'❄️', name:'Snowy Kingdom',
+    style:'painterly digital fantasy illustration, aurora-lit night palette, storybook-epic level of detail, warm lantern-glow accents',
+    scene:'Waddles and fellow penguin villagers work together building a great glowing clocktower monument on a snowy hillside, a winding lantern-lit cobblestone path, aurora borealis streaking the night sky above'},
+  {cat:'fantasy', id:'dragonrider', emoji:'🐉', name:'Dragon Rider',
+    style:'epic painterly fantasy-book-cover illustration, dramatic backlit storm clouds, dynamic wind-swept motion, rich atmospheric depth',
+    scene:'Waddles rides atop a great ice-blue dragon soaring between towering cliffs, cloak whipping in the wind, storm clouds parting to reveal a shaft of sunlight ahead'},
+  {cat:'fantasy', id:'wizardcourt', emoji:'🔮', name:"Wizard's Court",
+    style:'painterly high-fantasy illustration, warm candlelit stone-hall interior, floating magic particle light, rich tapestry detail',
+    scene:'Waddles stands robed as a court wizard before a ring of glowing candles, an ancient tome open on a stone pedestal, magical sparks drifting upward around him'},
+  {cat:'fantasy', id:'steampunk', emoji:'⚙️', name:'Steampunk City',
+    style:'detailed steampunk engraving illustration, brass-and-copper color palette, dense cross-hatched linework, mechanical gear ornamentation',
+    scene:'Waddles stands on an iron balcony overlooking a sprawling brass-and-steam city, goggles pushed up on his head, airships drifting between smoke-stacked towers below'},
+  {cat:'fantasy', id:'pixelkingdom', emoji:'🕹️', name:'Pixel-Art Overworld',
+    style:'16-bit pixel-art video-game overworld, limited retro color palette, clean tile-based composition, chunky pixel outlines',
+    scene:'Waddles stands as a tiny pixel-art hero sprite at the entrance to a castle town, a health bar and coin counter in the HUD corner, a pixelated overworld map stretching into the distance'},
+
+  // ---- HOLIDAY & EVERYDAY ----
+  {cat:'holiday', id:'july4', emoji:'🎆', name:'July 4th Picnic',
+    style:'clean flat vector mascot illustration, bright sticker-style bold outlines, warm celebratory red-white-and-blue palette',
+    scene:'Waddles wears a star-spangled party hat and sunglasses, holding a sparkler in one wing and a gold coin in the other, fireworks bursting over a picnic blanket and string lights behind him'},
+  {cat:'holiday', id:'christmas', emoji:'🎄', name:'Cozy Christmas Sweater',
+    style:'cozy flat-vector holiday illustration, warm reds-and-greens palette, soft glowing light, gentle rounded shapes',
+    scene:'Waddles wears a chunky knit Christmas sweater with a snowflake pattern, sipping cocoa by a crackling fireplace, a decorated tree glowing warmly in the background'},
+  {cat:'holiday', id:'halloween', emoji:'🎃', name:'Halloween Costume',
+    style:'playful flat-vector spooky illustration, purple-and-orange palette, cartoon-cute rather than scary, rounded friendly shapes',
+    scene:'Waddles wears a tiny vampire cape and plastic fangs, holding a candy bucket shaped like a jack-o-lantern, friendly bats and a crescent moon in the background'},
+  {cat:'holiday', id:'newyear', emoji:'🥳', name:"New Year's Countdown",
+    style:'flat-vector confetti-filled celebration illustration, midnight-blue-and-gold palette, festive glittering accents',
+    scene:'Waddles wears a sparkly top hat and holds a glass of sparkling cider, confetti and balloons falling around him, a giant glowing countdown clock in the background reading "12:00"'},
+  {cat:'holiday', id:'beachday', emoji:'🏖️', name:'Beach Day',
+    style:'clean flat-vector summer illustration, bright pastel palette, sun-soaked cheerful composition',
+    scene:'Waddles wears round sunglasses and swim trunks, lounging on a striped beach towel under a colorful umbrella, a cooler and beach ball nearby, calm turquoise water behind him'},
+];
+
+const CAPTION_BANK = [
+  '"One Ledger. One Family."',
+  '"Through every cycle, we stayed."',
+  '"Built by the people who never left."',
+  '"This is the way."',
+  '"We waddle together or not at all."',
+  '"History remembers who stayed."',
+  '',
+  ''
+];
+
+// ---- State ----
+let activeCat = 'movie';
+let activeTpl = TEMPLATES.find(t=>t.cat==='movie');
+
+// ---- Character bible ----
+const bibleEl = document.getElementById('bibleText');
+bibleEl.value = localStorage.getItem('familyMemeBible') || DEFAULT_BIBLE;
+bibleEl.addEventListener('input', ()=> localStorage.setItem('familyMemeBible', bibleEl.value));
+document.getElementById('bibleReset').addEventListener('click', ()=>{
+  bibleEl.value = DEFAULT_BIBLE;
+  localStorage.setItem('familyMemeBible', DEFAULT_BIBLE);
+});
+
+// ---- Render categories ----
+const catsEl = document.getElementById('cats');
+CATEGORIES.forEach(c=>{
+  const b = document.createElement('button');
+  b.className = 'cat-btn' + (c.id===activeCat?' active':'');
+  b.innerHTML = `${c.emoji} ${c.label}`;
+  b.addEventListener('click', ()=>{ activeCat = c.id; renderCats(); renderTemplates(); });
+  catsEl.appendChild(b);
+});
+function renderCats(){
+  [...catsEl.children].forEach((b,i)=> b.classList.toggle('active', CATEGORIES[i].id===activeCat));
+}
+
+// ---- Render templates ----
+const gridEl = document.getElementById('tplGrid');
+function renderTemplates(){
+  gridEl.innerHTML = '';
+  TEMPLATES.filter(t=>t.cat===activeCat).forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'tpl-card' + (activeTpl && activeTpl.id===t.id ? ' active':'');
+    card.innerHTML = `<span class="tpl-emoji">${t.emoji}</span><div class="tpl-name">${t.name}</div><div class="tpl-style">${t.style.split(',')[0]}</div>`;
+    card.addEventListener('click', ()=>{ activeTpl = t; renderTemplates(); });
+    gridEl.appendChild(card);
+  });
+}
+renderTemplates();
+
+// ---- Prompt building ----
+function buildPrompt(t, caption, extra){
+  let p = bibleEl.value.trim() + `\n\nScene: ${t.scene}.\nArt style: ${t.style}.`;
+  if(caption) p += `\nInclude this line of text/dialogue prominently in the composition: ${caption}.`;
+  if(extra) p += `\nAdditional details: ${extra}.`;
+  p += `\n${QUALITY_SUFFIX}`;
+  return p;
+}
+
+document.getElementById('btnBuild').addEventListener('click', ()=>{
+  if(!activeTpl) return;
+  const cap = document.getElementById('capInput').value.trim();
+  const extra = document.getElementById('extraInput').value.trim();
+  document.getElementById('promptOut').value = buildPrompt(activeTpl, cap, extra);
+});
+
+document.getElementById('btnRandom').addEventListener('click', ()=>{
+  activeTpl = TEMPLATES[Math.floor(Math.random()*TEMPLATES.length)];
+  activeCat = activeTpl.cat;
+  renderCats(); renderTemplates();
+  const cap = CAPTION_BANK[Math.floor(Math.random()*CAPTION_BANK.length)];
+  document.getElementById('capInput').value = cap;
+  document.getElementById('promptOut').value = buildPrompt(activeTpl, cap, '');
+  document.getElementById('tplGrid').scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+document.getElementById('btnCopy').addEventListener('click', (e)=>{
+  const ta = document.getElementById('promptOut');
+  if(!ta.value) return;
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    e.target.textContent = 'Copied!';
+    setTimeout(()=> e.target.textContent = 'Copy', 1500);
+  });
+});
+
+// ---- Optional direct generation (BYOK) ----
+const genToggleBtn = document.getElementById('genToggleBtn');
+const genPanel = document.getElementById('genPanel');
+genToggleBtn.addEventListener('click', ()=>{
+  genPanel.classList.toggle('open');
+});
+
+const apiKeyEl = document.getElementById('apiKey');
+const rememberEl = document.getElementById('rememberKey');
+const storedKey = localStorage.getItem('familyOpenAIKey');
+if(storedKey){ apiKeyEl.value = storedKey; rememberEl.checked = true; }
+rememberEl.addEventListener('change', ()=>{
+  if(!rememberEl.checked) localStorage.removeItem('familyOpenAIKey');
+});
+
+document.getElementById('btnGenerate').addEventListener('click', async ()=>{
+  const key = apiKeyEl.value.trim();
+  const statusEl = document.getElementById('genStatus');
+  const resultEl = document.getElementById('genResult');
+  const promptText = document.getElementById('promptOut').value.trim();
+  if(!key){ statusEl.className='gen-status err'; statusEl.textContent='Paste your OpenAI API key first.'; return; }
+  if(!promptText){ statusEl.className='gen-status err'; statusEl.textContent='Build a prompt above first.'; return; }
+  if(rememberEl.checked) localStorage.setItem('familyOpenAIKey', key);
+
+  statusEl.className='gen-status'; statusEl.innerHTML='<span class="spinner"></span>Generating — this can take 10-30 seconds...';
+  resultEl.classList.remove('show');
+  try{
+    const res = await fetch('https://api.openai.com/v1/images/generations', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body: JSON.stringify({ model:'gpt-image-1', prompt: promptText, size: document.getElementById('genSize').value, n:1 })
+    });
+    const data = await res.json();
+    if(!res.ok){ throw new Error(data?.error?.message || ('Request failed with status '+res.status)); }
+    const b64 = data?.data?.[0]?.b64_json;
+    if(!b64) throw new Error('No image returned.');
+    const src = 'data:image/png;base64,'+b64;
+    document.getElementById('genImg').src = src;
+    document.getElementById('genDl').href = src;
+    resultEl.classList.add('show');
+    statusEl.className='gen-status ok'; statusEl.textContent='Done.';
+  }catch(err){
+    statusEl.className='gen-status err';
+    statusEl.textContent = 'Generation failed: ' + err.message + ' — copy the prompt above and paste it into ChatGPT/Midjourney/Grok Imagine instead.';
+  }
+});
+</script>
+</body>
+</html>
