@@ -78,15 +78,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:62px;display:flex;ali
 .hint b{color:var(--text)}
 
 /* Generate section */
-.gen-toggle{text-align:center;margin:8px 0 36px}
-.gen-toggle button{background:none;border:1px solid var(--border);color:var(--muted);padding:10px 22px;border-radius:100px;font-size:0.8rem;cursor:pointer;transition:all .2s}
-.gen-toggle button:hover{color:var(--ice);border-color:rgba(91,184,255,0.35)}
-.gen-panel{display:none;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px;margin-bottom:44px}
-.gen-panel.open{display:block}
-.gen-warn{background:rgba(255,177,61,0.08);border:1px solid rgba(255,177,61,0.25);border-radius:10px;padding:14px 16px;font-size:0.8rem;color:#ffcd8a;line-height:1.6;margin-bottom:20px}
-.gen-row{display:grid;grid-template-columns:2fr 1fr auto;gap:12px;margin-bottom:14px}
-.gen-row input,.gen-row select{background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:0.85rem;font-family:'DM Sans',sans-serif}
-.gen-remember{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--muted);margin-bottom:18px}
+.gen-row2{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.gen-row2 select{background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:0.85rem;font-family:'DM Sans',sans-serif}
 .gen-status{font-size:0.82rem;color:var(--muted);margin-top:10px;min-height:20px}
 .gen-status.err{color:#ff6a6a}
 .gen-status.ok{color:var(--ice)}
@@ -162,24 +155,15 @@ footer a:hover{text-decoration:underline}
       <button class="copy-fab" id="btnCopy">Copy</button>
       <textarea id="promptOut" readonly placeholder="Pick a scene above, then hit Build Prompt — your ready-to-paste prompt shows up here."></textarea>
     </div>
-    <div class="hint">Paste this into <b>ChatGPT / GPT image, Midjourney, Grok Imagine, or any AI image tool</b> you already use. Because the character bible + art style travel with every prompt, you can generate thousands of on-brand $FAMILY images without ever repeating the same look twice.</div>
-  </div>
-
-  <div class="gen-toggle">
-    <button id="genToggleBtn">✨ Optional: Generate the image right here (bring your own OpenAI key)</button>
-  </div>
-  <div class="gen-panel" id="genPanel">
-    <div class="gen-warn">Your API key is sent <b>directly from your browser to OpenAI</b> — it never touches familyxrp.com or any server we run. Image generation costs money on your OpenAI account (a few cents per image). Only paste a key you're comfortable using client-side, and only on a device you trust.</div>
-    <div class="gen-row">
-      <input type="password" id="apiKey" placeholder="sk-... your OpenAI API key"/>
+    <div class="hint">Paste this into <b>ChatGPT / GPT image, Midjourney, Grok Imagine, or any AI image tool</b> you already use — or hit Generate Image below to render it right here, no key needed. Because the character bible + art style travel with every prompt, you can generate thousands of on-brand $FAMILY images without ever repeating the same look twice.</div>
+    <div class="gen-row2">
       <select id="genSize">
         <option value="1024x1024">Square 1024²</option>
         <option value="1024x1536">Portrait poster</option>
         <option value="1536x1024">Landscape</option>
       </select>
-      <button class="btn-ice" id="btnGenerate">Generate</button>
+      <button class="btn-ice" id="btnGenerate">✨ Generate Image</button>
     </div>
-    <label class="gen-remember"><input type="checkbox" id="rememberKey"/> Remember key on this device (stored in localStorage, plaintext)</label>
     <div class="gen-status" id="genStatus"></div>
     <div class="gen-result" id="genResult">
       <img id="genImg" alt="Generated Waddles scene"/>
@@ -438,50 +422,34 @@ document.getElementById('btnCopy').addEventListener('click', (e)=>{
   });
 });
 
-// ---- Optional direct generation (BYOK) ----
-const genToggleBtn = document.getElementById('genToggleBtn');
-const genPanel = document.getElementById('genPanel');
-genToggleBtn.addEventListener('click', ()=>{
-  genPanel.classList.toggle('open');
-});
-
-const apiKeyEl = document.getElementById('apiKey');
-const rememberEl = document.getElementById('rememberKey');
-const storedKey = localStorage.getItem('familyOpenAIKey');
-if(storedKey){ apiKeyEl.value = storedKey; rememberEl.checked = true; }
-rememberEl.addEventListener('change', ()=>{
-  if(!rememberEl.checked) localStorage.removeItem('familyOpenAIKey');
-});
+// ---- One-click generation via the meme-api relay (holds the OpenAI key server-side) ----
+// Point this at your deployed meme-api instance — see /meme-api in this repo for the server + deploy script.
+const API_BASE = 'https://api.familyxrp.com';
 
 document.getElementById('btnGenerate').addEventListener('click', async ()=>{
-  const key = apiKeyEl.value.trim();
   const statusEl = document.getElementById('genStatus');
   const resultEl = document.getElementById('genResult');
   const promptText = document.getElementById('promptOut').value.trim();
-  if(!key){ statusEl.className='gen-status err'; statusEl.textContent='Paste your OpenAI API key first.'; return; }
   if(!promptText){ statusEl.className='gen-status err'; statusEl.textContent='Build a prompt above first.'; return; }
-  if(rememberEl.checked) localStorage.setItem('familyOpenAIKey', key);
 
   statusEl.className='gen-status'; statusEl.innerHTML='<span class="spinner"></span>Generating — this can take 10-30 seconds...';
   resultEl.classList.remove('show');
   try{
-    const res = await fetch('https://api.openai.com/v1/images/generations', {
+    const res = await fetch(API_BASE + '/generate', {
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body: JSON.stringify({ model:'gpt-image-1', prompt: promptText, size: document.getElementById('genSize').value, n:1 })
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt: promptText, size: document.getElementById('genSize').value })
     });
     const data = await res.json();
-    if(!res.ok){ throw new Error(data?.error?.message || ('Request failed with status '+res.status)); }
-    const b64 = data?.data?.[0]?.b64_json;
-    if(!b64) throw new Error('No image returned.');
-    const src = 'data:image/png;base64,'+b64;
-    document.getElementById('genImg').src = src;
-    document.getElementById('genDl').href = src;
+    if(!res.ok) throw new Error(data?.error || ('Request failed with status '+res.status));
+    if(!data.image) throw new Error('No image returned.');
+    document.getElementById('genImg').src = data.image;
+    document.getElementById('genDl').href = data.image;
     resultEl.classList.add('show');
     statusEl.className='gen-status ok'; statusEl.textContent='Done.';
   }catch(err){
     statusEl.className='gen-status err';
-    statusEl.textContent = 'Generation failed: ' + err.message + ' — copy the prompt above and paste it into ChatGPT/Midjourney/Grok Imagine instead.';
+    statusEl.textContent = "Direct generation isn't live yet (" + err.message + ') — copy the prompt above and paste it into ChatGPT/Midjourney/Grok Imagine instead.';
   }
 });
 </script>
