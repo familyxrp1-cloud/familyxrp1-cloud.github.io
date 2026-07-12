@@ -27,6 +27,14 @@ app.get('/launches.json', (req, res) => {
   });
 });
 
+app.get('/strategies.json', (req, res) => {
+  const { mineStrategies } = require('./strategy');
+  const target = Math.min(Math.max(parseFloat(req.query.target)||1.5, 1.1), 100);
+  const minSample = Math.min(Math.max(parseInt(req.query.min,10)||30, 5), 1000);
+  const top = Math.min(Math.max(parseInt(req.query.top,10)||20, 1), 100);
+  res.json(mineStrategies({ rows: getFinishedLaunches(), target, minSample, top }));
+});
+
 app.get('/status', (req, res) => {
   const s = db.prepare('SELECT COUNT(*) AS total,SUM(graduated_at IS NOT NULL) AS graduated,SUM(forensics_done=1) AS forensics_done,SUM(outcome IS NOT NULL) AS labeled,SUM(outcome="win") AS wins,SUM(outcome="rug") AS rugs,SUM(outcome="fade") AS fades FROM launches').get();
   const today = new Date().toISOString().slice(0,10);
