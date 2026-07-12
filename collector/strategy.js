@@ -178,4 +178,4 @@ if (require.main === module) {
   else printReport(rep);
 }
 
-module.exports = { mineStrategies, PREDICATES };
+module.exports = { mineStrategies, PREDICATES, normalize };
