@@ -23,8 +23,10 @@
   --ice:#5bb8ff;--ice2:#a8d8ff;--muted:#5a7a99;
   --text:#ddeeff;--white:#f4f9ff;--border:rgba(91,184,255,0.1);
 }
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden;background:var(--ink)}
 body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:10px;height:10px;background:var(--ink)}
+::-webkit-scrollbar-thumb{background:rgba(91,184,255,0.22);border-radius:999px}
 #snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.25}
 
 /* NAV */
@@ -204,6 +206,21 @@ nav.scrolled{height:52px;background:rgba(4,9,15,0.98);box-shadow:0 1px 24px rgba
   mask-image:linear-gradient(to bottom,transparent 0%,black 15%,black 75%,transparent 100%);
 }
 
+/* ══ FAMILY WORLD ══ */
+.world{position:relative;z-index:2;background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;min-height:620px;overflow:hidden}
+.world-scene{position:relative;background:url('./assets/community-sunset.jpg') center 36%/cover no-repeat;-webkit-mask-image:linear-gradient(to right,transparent 0%,black 26%);mask-image:linear-gradient(to right,transparent 0%,black 26%)}
+.world-scene::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 54% 42%,rgba(91,184,255,0.2),transparent 42%),linear-gradient(to top,rgba(11,22,40,0.68),transparent 48%)}
+.world-copy{padding:92px 80px 92px 48px;display:flex;flex-direction:column;justify-content:center}
+.world-copy h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,4.8vw,5rem);line-height:0.88;letter-spacing:0.03em;color:var(--white);margin-bottom:18px}
+.world-copy p{font-size:1rem;color:var(--muted);line-height:1.8;max-width:430px;font-weight:300;margin-bottom:28px}
+.world-copy p strong{color:var(--text);font-weight:600}
+.world-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:28px;max-width:520px}
+.world-tile{background:rgba(4,9,15,0.42);border:1px solid rgba(91,184,255,0.12);border-radius:14px;padding:15px 16px}
+.world-tile b{display:block;font-size:0.76rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ice);margin-bottom:5px}
+.world-tile span{font-size:0.84rem;color:rgba(168,216,255,0.66);line-height:1.45}
+.world-actions{display:flex;gap:12px;flex-wrap:wrap}
+.world-note{margin-top:16px;font-size:0.76rem;color:rgba(168,216,255,0.45);line-height:1.6;max-width:480px}
+
 /* ══ COMMUNITY ══ */
 .community{
   position:relative;z-index:2;background:var(--panel);
@@ -317,6 +334,11 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   .phases{grid-template-columns:1fr}
   .phase:first-child{border-radius:18px 18px 0 0}.phase:last-child{border-radius:0 0 18px 18px}
 
+  .world{grid-template-columns:1fr}
+  .world-scene{min-height:64vw;order:-1;-webkit-mask-image:linear-gradient(to bottom,black 0%,black 82%,transparent 100%);mask-image:linear-gradient(to bottom,black 0%,black 82%,transparent 100%)}
+  .world-copy{padding:48px 24px}
+  .world-grid{grid-template-columns:1fr}
+
   .community{grid-template-columns:1fr}
   .comm-img{
     min-height:70vw;
@@ -420,6 +442,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   <ul class="nav-links" id="navlinks">
     <li><a href="#story">About</a></li>
     <li><a href="#token">Token</a></li>
+    <li><a href="#world">World</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#nft">NFT</a></li>
     <li><a href="#community">Community</a></li>
@@ -439,6 +462,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <p>The XRP community survived the cold years together. Bear markets. Years of waiting. Being underestimated.<br><strong>People stayed.</strong></p>
     <div class="hero-ctas">
       <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" class="btn-ice" target="_blank" rel="noopener">Buy $FAMILY</a>
+      <a href="world.html" class="btn-ghost">Family World</a>
       <a href="#story" class="btn-ghost">Our Story</a>
     </div>
   </div>
@@ -499,6 +523,26 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   </div>
 </section>
 
+<section class="world" id="world">
+  <div class="world-scene rl"></div>
+  <div class="world-copy rr">
+    <div class="label">Family World</div>
+    <h2>THE GAME<br>HUB FOR<br>THE FAMILY.</h2>
+    <p><strong>Family World</strong> is the private Telegram-linked community hub we are building around points, missions, fishing, arcade games, the vault, and future owned PFP selection.</p>
+    <div class="world-grid">
+      <div class="world-tile"><b>Telegram login</b><span>Open from the Family Vault bot and your Telegram ID becomes your game profile.</span></div>
+      <div class="world-tile"><b>Real scores</b><span>Game points save into the same vault bot database as leaderboard and wallet data.</span></div>
+      <div class="world-tile"><b>Daily games</b><span>Fishing, arcade runs, missions and monthly races can add points.</span></div>
+      <div class="world-tile"><b>Wallet later</b><span>Verified wallets can unlock owned PFP choices once the next layer is ready.</span></div>
+    </div>
+    <div class="world-actions">
+      <a href="world.html" class="btn-ice">Enter Family World</a>
+      <a href="https://t.me/familyrewards_bot?start=world" class="btn-ghost" target="_blank" rel="noopener">Open Bot</a>
+    </div>
+    <div class="world-note">Private prototype. The live game opens through Telegram once the Mini App URL is connected.</div>
+  </div>
+</section>
+
 <section class="roadmap" id="roadmap">
   <div class="roadmap-head rl">
     <div class="label">The Plan</div>
@@ -507,7 +551,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   </div>
   <div class="phases rv">
     <div class="phase active"><div class="phase-bg-n">01</div><div class="phase-lbl">Phase 01</div><div class="phase-title">Launch</div><ul class="phase-items"><li>Launch $FAMILY on XRPL</li><li>Website live</li><li>Discord open</li><li>Burn first escrow release</li></ul></div>
-    <div class="phase"><div class="phase-bg-n">02</div><div class="phase-lbl">Phase 02</div><div class="phase-title">Grow</div><ul class="phase-items"><li>Grow the community</li><li>Increase holders</li><li>Community events</li><li>Family NFT collection</li></ul></div>
+    <div class="phase"><div class="phase-bg-n">02</div><div class="phase-lbl">Phase 02</div><div class="phase-title">Grow</div><ul class="phase-items"><li>Grow the community</li><li>Increase holders</li><li>Community events</li><li>Family World private prototype</li><li>Family NFT collection</li></ul></div>
     <div class="phase"><div class="phase-bg-n">03</div><div class="phase-lbl">Phase 03</div><div class="phase-title">Long Term</div><ul class="phase-items"><li>Deliver on roadmap</li><li>Continue building</li><li>Show other chains what community looks like</li></ul></div>
   </div>
   <div class="sledding-strip rv"></div>
@@ -629,7 +673,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   </div>
   <div class="footer-bottom">
     <div class="footer-links">
-      <a href="#story">About</a><a href="#token">Token</a><a href="#roadmap">Roadmap</a>
+      <a href="#story">About</a><a href="#token">Token</a><a href="world.html">World</a><a href="#roadmap">Roadmap</a>
       <a href="https://x.com/family_xrpl" target="_blank" rel="noopener">X</a>
       <a href="https://discord.gg/dkRAzZKCj" target="_blank" rel="noopener">Discord</a>
     </div>

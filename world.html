@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>$FAMILY World - Private Game Hub</title>
+<meta name="description" content="Private Telegram-linked game hub prototype for the $FAMILY XRPL community."/>
+<meta property="og:title" content="$FAMILY World - Private Game Hub"/>
+<meta property="og:description" content="The Telegram-linked community game hub for $FAMILY points, missions, vault rewards and arcade games."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://familyxrp.com/world.html"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#04090f;--deep:#07111f;--panel:#0b1628;--card:#0d1b2e;
+  --ice:#5bb8ff;--ice2:#a8d8ff;--gold:#f4bf4a;--green:#54db8a;
+  --muted:#6f8aa7;--text:#ddeeff;--white:#f4f9ff;--border:rgba(91,184,255,0.13);
+}
+html{scroll-behavior:smooth;overflow-x:hidden;background:var(--ink)}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+::-webkit-scrollbar{width:10px;height:10px;background:var(--ink)}
+::-webkit-scrollbar-thumb{background:rgba(91,184,255,0.22);border-radius:999px}
+#snow{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.18}
+.page{position:relative;z-index:2;min-height:100vh;background:
+  radial-gradient(circle at 78% 12%,rgba(91,184,255,0.2),transparent 30%),
+  radial-gradient(circle at 8% 70%,rgba(84,219,138,0.08),transparent 34%),
+  linear-gradient(145deg,#04090f 0%,#07111f 48%,#03070d 100%);
+}
+.topbar{height:68px;position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 42px;background:rgba(4,9,15,0.9);border-bottom:1px solid var(--border);backdrop-filter:blur(18px)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#11345b,#0a1830);border:1px solid rgba(91,184,255,0.32);box-shadow:0 0 24px rgba(91,184,255,0.18);position:relative}
+.mark::before{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:var(--gold);top:7px;left:11px}
+.mark::after{content:'';position:absolute;width:18px;height:12px;border-radius:8px 8px 12px 12px;background:var(--white);bottom:7px;left:10px}
+.brand strong{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.05em;color:var(--white);line-height:1}
+.brand span{display:block;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(168,216,255,0.55);font-weight:700;margin-top:1px}
+.nav-actions{display:flex;gap:10px;align-items:center}
+.pill-link{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.15);font-size:0.76rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;color:var(--white);transition:all .22s}
+.pill-link:hover{border-color:rgba(91,184,255,0.48);color:var(--ice);transform:translateY(-1px)}
+.pill-link.primary{background:var(--ice);border-color:var(--ice);color:var(--ink)}
+.pill-link.primary:hover{background:var(--ice2);color:var(--ink);box-shadow:0 14px 36px rgba(91,184,255,0.28)}
+.hero{min-height:100vh;display:grid;grid-template-columns:minmax(0,0.92fr) minmax(420px,1.08fr);gap:42px;align-items:center;padding:112px 64px 72px}
+.copy{max-width:570px}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;background:rgba(91,184,255,0.08);border:1px solid rgba(91,184,255,0.24);border-radius:999px;padding:8px 15px;color:var(--ice);font-size:0.68rem;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;margin-bottom:26px}
+.eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green)}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,8vw,8.4rem);line-height:0.82;letter-spacing:0.025em;color:var(--white);margin-bottom:18px}
+h1 span{color:var(--ice)}
+.lead{font-size:1rem;line-height:1.86;color:rgba(168,216,255,0.68);font-weight:300;max-width:470px;margin-bottom:30px}
+.lead strong{color:var(--text);font-weight:700}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+.status-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:550px}
+.status{background:rgba(13,27,46,0.72);border:1px solid var(--border);border-radius:16px;padding:15px 16px;backdrop-filter:blur(14px)}
+.status b{display:block;font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:0.04em;color:var(--white);line-height:1;margin-bottom:5px}
+.status span{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.world-card{position:relative;min-height:650px;border:1px solid rgba(91,184,255,0.18);border-radius:26px;overflow:hidden;background:#07111f;box-shadow:0 34px 90px rgba(0,0,0,0.48)}
+.world-card::before{content:'';position:absolute;inset:0;background:url('./assets/community-sunset.jpg') center 46%/cover no-repeat;filter:saturate(1.08) contrast(1.04)}
+.world-card::after{content:'';position:absolute;inset:0;background:
+  linear-gradient(to top,rgba(4,9,15,0.86) 0%,rgba(4,9,15,0.22) 47%,rgba(4,9,15,0.5) 100%),
+  radial-gradient(circle at 50% 38%,rgba(91,184,255,0.18),transparent 40%);
+}
+.hud{position:absolute;inset:0;z-index:3;padding:22px;display:flex;flex-direction:column;justify-content:space-between}
+.hud-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.player{display:flex;gap:12px;align-items:center;background:rgba(4,9,15,0.72);border:1px solid rgba(91,184,255,0.2);border-radius:18px;padding:11px 13px;backdrop-filter:blur(12px)}
+.avatar{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#0e3154,#07111f);border:1px solid rgba(168,216,255,0.25);position:relative;overflow:hidden}
+.avatar::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#ffce41;top:7px;left:12px}
+.avatar::after{content:'';position:absolute;width:22px;height:14px;border-radius:12px 12px 14px 14px;background:#f3f8ff;bottom:7px;left:10px}
+.player strong{display:block;color:var(--white);font-size:1rem}
+.player span{display:block;font-size:0.72rem;color:rgba(168,216,255,0.58);font-weight:700;margin-top:1px}
+.points{background:linear-gradient(135deg,rgba(91,184,255,0.92),rgba(33,89,222,0.92));color:#fff;border-radius:18px;padding:15px 20px;font-weight:800;font-size:1.08rem;box-shadow:0 16px 40px rgba(31,118,226,0.26)}
+.label-chip{position:absolute;background:rgba(4,9,15,0.78);border:1px solid rgba(91,184,255,0.24);box-shadow:0 10px 28px rgba(0,0,0,0.3);border-radius:12px;padding:9px 13px;font-size:0.72rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--white)}
+.label-chip span{color:var(--gold)}
+.chip-house{top:23%;left:16%}
+.chip-vault{top:18%;left:46%}
+.chip-lake{top:47%;right:9%}
+.chip-dock{bottom:34%;left:12%}
+.chip-centre{bottom:24%;left:42%}
+.hud-bottom{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);gap:14px}
+.panel{background:rgba(4,9,15,0.78);border:1px solid rgba(91,184,255,0.18);border-radius:20px;padding:20px;backdrop-filter:blur(16px)}
+.panel h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.04em;color:var(--white);line-height:1;margin-bottom:8px}
+.panel p{font-size:0.86rem;line-height:1.65;color:rgba(168,216,255,0.62)}
+.mission-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.mission{display:flex;justify-content:space-between;gap:12px;background:rgba(91,184,255,0.07);border:1px solid rgba(91,184,255,0.12);border-radius:12px;padding:10px 12px;font-size:0.82rem;color:var(--text);font-weight:700}
+.mission span:last-child{color:var(--gold)}
+.section{padding:0 64px 86px}
+.section-head{max-width:620px;margin-bottom:30px}
+.section-head .label{font-size:0.68rem;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--ice);margin-bottom:14px}
+.section-head h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,5vw,5rem);line-height:0.9;letter-spacing:0.03em;color:var(--white);margin-bottom:12px}
+.section-head p{color:var(--muted);line-height:1.75;max-width:520px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.feature{background:rgba(13,27,46,0.72);border:1px solid var(--border);border-radius:18px;padding:22px;min-height:190px;position:relative;overflow:hidden}
+.feature::after{content:'';position:absolute;right:-44px;top:-44px;width:110px;height:110px;border-radius:50%;background:rgba(91,184,255,0.08)}
+.feature b{display:block;color:var(--white);font-size:1.02rem;margin-bottom:10px}
+.feature p{font-size:0.86rem;line-height:1.65;color:rgba(168,216,255,0.62)}
+.feature small{display:inline-flex;margin-top:18px;color:var(--ice);font-weight:900;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase}
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.step{background:linear-gradient(180deg,rgba(13,27,46,0.86),rgba(7,17,31,0.78));border:1px solid var(--border);border-radius:20px;padding:24px}
+.step-num{font-family:'Bebas Neue',sans-serif;color:rgba(91,184,255,0.32);font-size:4.2rem;line-height:0.8;margin-bottom:12px}
+.step b{display:block;color:var(--white);font-size:1.02rem;margin-bottom:9px}
+.step p{font-size:0.86rem;line-height:1.65;color:rgba(168,216,255,0.62)}
+.footer{padding:38px 64px 46px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;color:rgba(168,216,255,0.52);font-size:0.82rem}
+.footer a{color:var(--ice);text-decoration:none;font-weight:800}
+@media(max-width:1080px){
+  .hero{grid-template-columns:1fr;padding:104px 28px 62px}
+  .world-card{min-height:560px}
+  .section{padding:0 28px 70px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:720px){
+  .topbar{height:auto;padding:14px 16px;align-items:flex-start}
+  .brand strong{font-size:1.55rem}
+  .brand span{font-size:0.58rem}
+  .nav-actions{flex-direction:column;align-items:stretch}
+  .pill-link{min-height:34px;padding:0 13px;font-size:0.66rem}
+  .hero{padding:128px 14px 50px;gap:24px}
+  .status-row{grid-template-columns:1fr}
+  .world-card{min-height:580px;border-radius:22px}
+  .hud{padding:14px}
+  .hud-top{align-items:stretch}
+  .player{padding:9px}
+  .points{padding:13px 15px;font-size:0.95rem}
+  .hud-bottom{grid-template-columns:1fr}
+  .panel{padding:17px}
+  .label-chip{font-size:0.58rem;padding:7px 9px}
+  .chip-house{top:25%;left:10%}
+  .chip-vault{top:20%;left:47%}
+  .chip-lake{top:43%;right:5%}
+  .chip-dock{bottom:38%;left:9%}
+  .chip-centre{bottom:28%;left:34%}
+  .grid,.flow{grid-template-columns:1fr}
+  .section{padding:0 14px 58px}
+  .footer{padding:28px 18px 36px}
+}
+</style>
+</head>
+<body>
+<canvas id="snow"></canvas>
+<main class="page">
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="mark"></span>
+      <span><strong>$FAMILY</strong><span>World prototype</span></span>
+    </a>
+    <div class="nav-actions">
+      <a class="pill-link" href="index.html">Main Site</a>
+      <a class="pill-link primary" href="https://t.me/familyrewards_bot?start=world" target="_blank" rel="noopener">Open Bot</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="copy">
+      <div class="eyebrow">Private build</div>
+      <h1>ENTER<br><span>FAMILY</span><br>WORLD.</h1>
+      <p class="lead"><strong>The website entry is ready.</strong> The game itself will run as a Telegram Mini App so profiles, scores, vault points and future wallet-owned PFPs can all belong to the actual community member.</p>
+      <div class="cta-row">
+        <a class="pill-link primary" href="https://t.me/familyrewards_bot?start=world" target="_blank" rel="noopener">Open Family Bot</a>
+        <a class="pill-link" href="index.html#world">Back To World Section</a>
+      </div>
+      <div class="status-row">
+        <div class="status"><b>JR</b><span>Demo profile</span></div>
+        <div class="status"><b>1,405</b><span>Demo points</span></div>
+        <div class="status"><b>4/4</b><span>Daily missions</span></div>
+      </div>
+    </div>
+
+    <div class="world-card" aria-label="Family World visual preview">
+      <div class="hud">
+        <div class="hud-top">
+          <div class="player">
+            <div class="avatar"></div>
+            <div><strong>JR</strong><span>tg_demo_8421</span></div>
+          </div>
+          <div class="points">1,405 pts</div>
+        </div>
+
+        <div class="label-chip chip-house"><span>01</span> My House</div>
+        <div class="label-chip chip-vault"><span>02</span> Vault</div>
+        <div class="label-chip chip-lake"><span>03</span> LP Lake</div>
+        <div class="label-chip chip-dock"><span>04</span> Fishing Dock</div>
+        <div class="label-chip chip-centre"><span>05</span> Village Centre</div>
+
+        <div class="hud-bottom">
+          <div class="panel">
+            <h2>Village Centre</h2>
+            <p>Community announcements, daily streaks, reward claims and account status will sit here once the bot link is active.</p>
+          </div>
+          <div class="panel">
+            <h2>Missions</h2>
+            <p>Prototype scoring is ready to connect to Telegram identities.</p>
+            <div class="mission-list">
+              <div class="mission"><span>Daily check-in</span><span>Done</span></div>
+              <div class="mission"><span>Fishing catch</span><span>+40</span></div>
+              <div class="mission"><span>Vault visit</span><span>+30</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="label">What it becomes</div>
+      <h2>ONE HUB,<br>REAL COMMUNITY DATA.</h2>
+      <p>The public website can introduce the World. The real account and score layer should open through Telegram so nobody needs a separate password.</p>
+    </div>
+    <div class="grid">
+      <div class="feature"><b>Telegram login</b><p>Users open the game from the Family Vault bot. Telegram sends signed user data that the game server verifies.</p><small>Identity</small></div>
+      <div class="feature"><b>Shared points</b><p>Fishing, arcade scores, missions and vault actions can all write to the same community points table.</p><small>Leaderboard</small></div>
+      <div class="feature"><b>Vault profile</b><p>The vault screen can show estimated rewards, user share, countdowns and claimed points from the bot database.</p><small>Rewards</small></div>
+      <div class="feature"><b>PFP ownership</b><p>Wallet verification can unlock PFP choices from NFTs or assets owned by the connected wallet.</p><small>V2 layer</small></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="label">Login flow</div>
+      <h2>NO PASSWORDS.<br>BOT-FIRST.</h2>
+      <p>This is the clean path for launch: the site sends people to the bot, the bot opens the game, and the game trusts only verified Telegram init data.</p>
+    </div>
+    <div class="flow">
+      <div class="step"><div class="step-num">01</div><b>Open the bot</b><p>The user taps Family World from the existing Family Vault bot menu or a website deep link.</p></div>
+      <div class="step"><div class="step-num">02</div><b>Verify Telegram</b><p>The game backend validates the signed Mini App payload using the bot token before any score is saved.</p></div>
+      <div class="step"><div class="step-num">03</div><b>Save progress</b><p>Scores, missions, vault stats and future wallet/PFP links attach to that Telegram user record.</p></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div>Private prototype entry for $FAMILY World.</div>
+    <div><a href="index.html">familyxrp.com</a> / <a href="https://t.me/familyrewards_bot?start=world" target="_blank" rel="noopener">Family Vault bot</a></div>
+  </footer>
+</main>
+
+<script>
+const cv=document.getElementById('snow'),cx=cv.getContext('2d');
+let W,H,fl=[];
+function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+rsz();addEventListener('resize',rsz);
+for(let i=0;i<80;i++)fl.push({x:Math.random()*3000,y:Math.random()*2000,r:Math.random()*1.3+0.35,s:Math.random()*0.35+0.1,o:Math.random()*0.22+0.04,dx:Math.random()*0.2-0.1});
+function snow(){cx.clearRect(0,0,W,H);fl.forEach(f=>{cx.beginPath();cx.arc(f.x%W,f.y%H,f.r,0,Math.PI*2);cx.fillStyle=`rgba(168,216,255,${f.o})`;cx.fill();f.y+=f.s;f.x+=f.dx;if(f.y>H)f.y=0;if(f.x>W)f.x=0;if(f.x<0)f.x=W});requestAnimationFrame(snow)}
+snow();
+</script>
+</body>
+</html>
