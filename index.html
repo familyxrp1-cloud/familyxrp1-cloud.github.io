@@ -368,12 +368,15 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
 .tracker-live-note{background:rgba(4,9,15,0.48);border:1px solid var(--border);border-radius:16px;padding:20px;color:rgba(168,216,255,0.68);line-height:1.65;font-size:0.9rem}
 .tracker-live-note b{display:block;color:var(--white);font-size:0.96rem;margin-bottom:5px}
 .tracker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
-.tracker-card{background:linear-gradient(180deg,rgba(13,27,46,0.9),rgba(4,9,15,0.66));border:1px solid var(--border);border-radius:16px;padding:18px;min-height:132px;position:relative;overflow:hidden}
+.tracker-card{background:linear-gradient(180deg,rgba(13,27,46,0.9),rgba(4,9,15,0.66));border:1px solid var(--border);border-radius:16px;padding:18px;min-height:132px;position:relative;overflow:hidden;text-decoration:none;color:inherit;display:block}
 .tracker-card::after{content:'';position:absolute;right:-32px;top:-32px;width:92px;height:92px;border-radius:50%;background:rgba(91,184,255,0.08)}
 .tracker-card small{display:block;font-size:0.62rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
 .tracker-card strong{display:block;font-family:'Bebas Neue',sans-serif;font-size:2.15rem;letter-spacing:0.04em;color:var(--white);line-height:1}
 .tracker-card span{display:block;margin-top:9px;font-size:0.78rem;color:rgba(168,216,255,0.58);line-height:1.45}
 .tracker-card.live strong{color:var(--ice)}
+.tracker-card.tracker-link:hover{border-color:rgba(91,184,255,0.46);transform:translateY(-2px);box-shadow:0 18px 48px rgba(0,0,0,0.24)}
+.tracker-live-link{display:inline-flex;margin-top:12px;color:var(--ice);font-weight:800;text-decoration:none}
+.tracker-live-link:hover{text-decoration:underline}
 .tracker-status{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--border);border-radius:16px;padding:16px 18px;background:rgba(91,184,255,0.045);margin-bottom:26px}
 .tracker-status span{font-size:0.8rem;color:rgba(168,216,255,0.6);line-height:1.55}
 .tracker-status b{color:var(--ice)}
@@ -533,7 +536,8 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       </div>
       <div class="tracker-live-note">
         <b>LP support bot is active.</b>
-        Use <strong>/lp</strong> in the Family Contributor Bot for the full LP support readout. The bot also posts World activity updates when members earn points.
+        Public XRPL pool data loads on this page. Full support deposits, 24h/7d support and the LP target readout open directly inside Telegram.
+        <a class="tracker-live-link" href="https://t.me/familyrewards_bot?start=lp" target="_blank" rel="noopener">Open LP Tracker</a>
       </div>
     </div>
 
@@ -543,16 +547,16 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
         <strong id="trackerPool">Checking</strong>
         <span>Live XRPL AMM estimate</span>
       </div>
-      <div class="tracker-card">
+      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=lp" target="_blank" rel="noopener" aria-label="Open LP support tracker in Telegram">
         <small>LP support added</small>
         <strong id="trackerSupport">Checking</strong>
-        <span>Baseline plus tracked support deposits</span>
-      </div>
-      <div class="tracker-card">
+        <span>Tap for live bot support details</span>
+      </a>
+      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=lp" target="_blank" rel="noopener" aria-label="Open support deposit count in Telegram">
         <small>Support deposits</small>
         <strong id="trackerDeposits">Checking</strong>
-        <span>LP support bot deposit count</span>
-      </div>
+        <span>Tap for 24h, 7d and all-time support</span>
+      </a>
       <div class="tracker-card">
         <small>FAMILY price</small>
         <strong id="trackerPrice">Checking</strong>
@@ -572,7 +576,8 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     </div>
 
     <div class="tracker-actions rv">
-      <a href="https://t.me/familyrewards_bot?start=world" target="_blank" rel="noopener" class="btn-ice">Open Bot</a>
+      <a href="https://t.me/familyrewards_bot?start=lp" target="_blank" rel="noopener" class="btn-ice">Open LP Tracker</a>
+      <a href="https://t.me/familyrewards_bot?start=world" target="_blank" rel="noopener" class="btn-ghost">Open World</a>
       <a href="world.html" class="btn-ghost">View World</a>
       <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" target="_blank" rel="noopener" class="btn-ghost">Buy / LP</a>
     </div>
@@ -734,8 +739,8 @@ function hasFamilyXrpAssets(tx){
     setTrackerText('trackerPool',`${compactNumber(poolValue,0)} XRP`);
     setTrackerText('trackerPrice',price?`${price.toPrecision(4)} XRP`:'—');
   }catch(error){
-    setTrackerText('trackerPool','Open /lp');
-    setTrackerText('trackerPrice','Bot live');
+    setTrackerText('trackerPool','Open bot');
+    setTrackerText('trackerPrice','Live in bot');
   }
 
   try{
@@ -782,8 +787,8 @@ function hasFamilyXrpAssets(tx){
       if(bar)bar.style.width=`${progress}%`;
     }
   }catch(error){
-    setTrackerText('trackerSupport','Use /lp');
-    setTrackerText('trackerDeposits','Bot live');
+    setTrackerText('trackerSupport','Open bot');
+    setTrackerText('trackerDeposits','Live in bot');
     const bar=document.getElementById('trackerProgress');
     if(bar)bar.style.width='35%';
   }
