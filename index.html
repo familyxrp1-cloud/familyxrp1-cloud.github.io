@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>$FAMILY — One Ledger. One Family.</title>
-<meta name="description" content="Built by the people who never left. The XRP community token. One Ledger. One Family."/>
-<meta property="og:title" content="$FAMILY — One Ledger. One Family."/>
-<meta property="og:description" content="Built by the people who never left. The XRP community token. One Ledger. One Family."/>
+<title>$FAMILY — XRPL Community, Vault & World</title>
+<meta name="description" content="$FAMILY is the XRPL community project with Family Vault, Family World, LP tracking, points, missions and bot-powered community rewards."/>
+<meta property="og:title" content="$FAMILY — XRPL Community, Vault & World"/>
+<meta property="og:description" content="Family Vault, Family World, LP tracking, points, missions and bot-powered community rewards on XRPL."/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="https://familyxrp1.github.io/"/>
+<meta property="og:url" content="https://familyxrp.com/"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:site" content="@family_xrpl"/>
-<meta name="twitter:title" content="$FAMILY — One Ledger. One Family."/>
-<meta name="twitter:description" content="Built by the people who never left. The XRP community token. One Ledger. One Family."/>
+<meta name="twitter:title" content="$FAMILY — XRPL Community, Vault & World"/>
+<meta name="twitter:description" content="Family Vault, Family World, LP tracking, points, missions and bot-powered community rewards on XRPL."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -359,80 +359,46 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   .hero-ctas{flex-direction:column}
   .btn-ice,.btn-ghost{text-align:center}
 }
-/* ══ NFT SECTION ══ */
-.nft-section{background:var(--deep);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:100px 0}
-.nft-inner{max-width:860px;margin:0 auto;padding:0 24px}
-.nft-head{text-align:center;margin-bottom:52px}
-.nft-head h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5rem);line-height:0.9;color:var(--white);margin:10px 0 16px}
-.nft-sub{font-size:1rem;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.7}
-.nft-split{display:flex;align-items:stretch;gap:0;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:36px}
-.nft-half{flex:1;padding:36px 28px;text-align:center}
-.nft-half.holders{background:rgba(91,184,255,0.05)}
-.nft-half.lp{background:rgba(91,184,255,0.02)}
-.nft-half-pct{font-family:'Bebas Neue',sans-serif;font-size:4rem;line-height:1;color:var(--ice);margin-bottom:6px}
-.nft-half-label{font-size:0.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--white);margin-bottom:8px}
-.nft-half-desc{font-size:0.82rem;color:var(--muted);line-height:1.5}
-.nft-divider{width:1px;background:var(--border);flex-shrink:0}
-.nft-examples{margin-bottom:36px}
-.nft-ex-label{font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
-.nft-ex-grid{border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.nft-ex-head{display:grid;grid-template-columns:1fr 1fr;padding:10px 18px;background:rgba(91,184,255,0.06);font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
-.nft-ex-row{display:grid;grid-template-columns:1fr 1fr;padding:14px 18px;border-top:1px solid var(--border);font-size:0.9rem;color:var(--text);transition:background .15s}
-.nft-ex-row:hover{background:rgba(91,184,255,0.04)}
-.nft-ex-row.hot{background:rgba(91,184,255,0.06)}
-.nft-ex-row.hot:hover{background:rgba(91,184,255,0.1)}
-.xrp-val{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:0.04em;color:var(--ice)}
-.nft-wallet{border:1px solid var(--border);border-radius:14px;padding:26px;margin-bottom:30px;background:rgba(91,184,255,0.03)}
-.nft-wallet-label{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.nft-wallet-addr{font-family:monospace;font-size:0.82rem;color:var(--ice);margin-bottom:20px;word-break:break-all}
-.nft-balance-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.nft-bal-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
-.nft-bal-title{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.nft-bal-val{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.04em;color:var(--white)}
-.nft-bal-val.highlight{color:var(--ice)}
-.nft-snap{display:flex;flex-direction:column;gap:12px}
-.nft-snap-item{display:flex;align-items:flex-start;gap:12px;font-size:0.9rem;color:var(--muted);line-height:1.5}
-.nft-snap-item b{color:var(--text)}
+/* ══ LIVE TRACKER ══ */
+.tracker-section{background:var(--deep);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:104px 0}
+.tracker-inner{max-width:1060px;margin:0 auto;padding:0 24px}
+.tracker-head{display:grid;grid-template-columns:minmax(0,0.85fr) minmax(320px,1.15fr);gap:40px;align-items:end;margin-bottom:36px}
+.tracker-head h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5.5rem);line-height:0.88;color:var(--white);margin:10px 0 16px;letter-spacing:0.03em}
+.tracker-sub{font-size:1rem;color:var(--muted);max-width:520px;line-height:1.75}
+.tracker-live-note{background:rgba(4,9,15,0.48);border:1px solid var(--border);border-radius:16px;padding:20px;color:rgba(168,216,255,0.68);line-height:1.65;font-size:0.9rem}
+.tracker-live-note b{display:block;color:var(--white);font-size:0.96rem;margin-bottom:5px}
+.tracker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.tracker-card{background:linear-gradient(180deg,rgba(13,27,46,0.9),rgba(4,9,15,0.66));border:1px solid var(--border);border-radius:16px;padding:18px;min-height:132px;position:relative;overflow:hidden}
+.tracker-card::after{content:'';position:absolute;right:-32px;top:-32px;width:92px;height:92px;border-radius:50%;background:rgba(91,184,255,0.08)}
+.tracker-card small{display:block;font-size:0.62rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.tracker-card strong{display:block;font-family:'Bebas Neue',sans-serif;font-size:2.15rem;letter-spacing:0.04em;color:var(--white);line-height:1}
+.tracker-card span{display:block;margin-top:9px;font-size:0.78rem;color:rgba(168,216,255,0.58);line-height:1.45}
+.tracker-card.live strong{color:var(--ice)}
+.tracker-status{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--border);border-radius:16px;padding:16px 18px;background:rgba(91,184,255,0.045);margin-bottom:26px}
+.tracker-status span{font-size:0.8rem;color:rgba(168,216,255,0.6);line-height:1.55}
+.tracker-status b{color:var(--ice)}
+.tracker-bar{height:10px;border-radius:999px;background:rgba(4,9,15,0.72);border:1px solid rgba(91,184,255,0.14);overflow:hidden;min-width:190px;flex:0 0 30%}
+.tracker-bar i{display:block;height:100%;width:0%;border-radius:inherit;background:linear-gradient(90deg,var(--ice),#54db8a);box-shadow:0 0 20px rgba(91,184,255,0.35);transition:width .6s ease}
+.bot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:28px}
+.bot-card{background:rgba(4,9,15,0.42);border:1px solid rgba(91,184,255,0.12);border-radius:14px;padding:18px}
+.bot-card b{display:block;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ice);margin-bottom:8px}
+.bot-card p{font-size:0.86rem;line-height:1.6;color:rgba(168,216,255,0.64)}
+.tracker-actions{display:flex;gap:12px;flex-wrap:wrap}
 @media(max-width:900px){
-  .nft-balance-row{grid-template-columns:1fr 1fr}
-  .nft-section{padding:72px 0}
+  .tracker-head{grid-template-columns:1fr}
+  .tracker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tracker-section{padding:72px 0}
 }
 @media(max-width:560px){
-  .nft-split{flex-direction:column}
-  .nft-divider{width:100%;height:1px}
-  .nft-balance-row{grid-template-columns:1fr 1fr}
+  .tracker-grid,.bot-grid{grid-template-columns:1fr}
+  .tracker-status{align-items:flex-start;flex-direction:column}
+  .tracker-bar{width:100%;flex-basis:auto}
 }
 .ca-wrap{display:flex;align-items:center;gap:10px;margin-top:22px;background:rgba(91,184,255,0.05);border:1px solid rgba(91,184,255,0.15);border-radius:8px;padding:10px 16px;flex-wrap:wrap}
 .ca-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
 .ca-addr{font-family:monospace;font-size:0.8rem;color:var(--ice);word-break:break-all;flex:1}
 .ca-copy{background:rgba(91,184,255,0.12);border:1px solid rgba(91,184,255,0.25);color:var(--ice);padding:5px 14px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
 .ca-copy:hover{background:rgba(91,184,255,0.22)}
-.nft-coll-stats{display:flex;gap:10px;justify-content:center;margin-top:36px;padding-top:28px;border-top:1px solid var(--border);flex-wrap:wrap}
-.nft-stat-chip{background:rgba(91,184,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px 22px;text-align:center;min-width:88px}
-.nft-stat-v{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.04em;color:var(--ice)}
-.nft-stat-l{font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px}
-.nft-strip-hdr{display:flex;align-items:center;justify-content:space-between;margin-top:26px}
-.nft-strip-title{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
-.nft-strip-link{font-size:0.72rem;color:var(--ice);text-decoration:none;opacity:.8}
-.nft-strip-link:hover{opacity:1;text-decoration:underline}
-.nft-strip-outer{overflow:hidden;position:relative;margin:14px -24px 0;padding:14px 0;background:rgba(91,184,255,0.02);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.nft-strip-outer::before,.nft-strip-outer::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:1;pointer-events:none}
-.nft-strip-outer::before{left:0;background:linear-gradient(to right,var(--deep),transparent)}
-.nft-strip-outer::after{right:0;background:linear-gradient(to left,var(--deep),transparent)}
-.nft-scroll-track{display:flex;gap:12px;width:max-content;animation:marquee 55s linear infinite;padding:0 40px}
-.nft-scroll-track:hover{animation-play-state:paused}
-.nft-c{flex-shrink:0;width:96px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:transform .2s,border-color .15s}
-.nft-c:hover{transform:scale(1.05);border-color:rgba(91,184,255,.4)}
-.nft-c img{width:96px;height:96px;object-fit:cover;display:block}
-.nft-c span{display:block;font-size:0.55rem;font-weight:600;letter-spacing:0.04em;color:var(--muted);padding:4px 6px 5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nft-mint-btn{display:inline-flex;align-items:center;gap:8px;background:var(--ice);color:var(--ink);padding:13px 30px;border-radius:100px;font-size:0.88rem;font-weight:700;text-decoration:none;margin-top:24px;transition:all .25s}
-.nft-mint-btn:hover{background:var(--ice2);transform:translateY(-2px);box-shadow:0 12px 36px rgba(91,184,255,0.3)}
-.nft-c.sk{pointer-events:none}
-.nft-c.sk .sk-img{width:96px;height:96px;background:linear-gradient(90deg,rgba(91,184,255,0.04) 25%,rgba(91,184,255,0.1) 50%,rgba(91,184,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite}
-.nft-c.sk .sk-lbl{height:9px;margin:6px 10px 5px;border-radius:4px;background:linear-gradient(90deg,rgba(91,184,255,0.04) 25%,rgba(91,184,255,0.1) 50%,rgba(91,184,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.nft-soon{display:flex;align-items:center;gap:10px;justify-content:center;padding:26px;font-size:0.82rem;color:var(--muted)}
-.nft-soon a{color:var(--ice);text-decoration:none}.nft-soon a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -444,7 +410,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <li><a href="#token">Token</a></li>
     <li><a href="#world">World</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#nft">NFT</a></li>
+    <li><a href="#tracker">Tracker</a></li>
     <li><a href="#community">Community</a></li>
   </ul>
   <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" class="nav-btn" target="_blank" rel="noopener">Buy $FAMILY</a>
@@ -462,7 +428,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <p>The XRP community survived the cold years together. Bear markets. Years of waiting. Being underestimated.<br><strong>People stayed.</strong></p>
     <div class="hero-ctas">
       <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" class="btn-ice" target="_blank" rel="noopener">Buy $FAMILY</a>
-      <a href="world.html" class="btn-ghost">Family World</a>
+      <a href="https://t.me/familyrewards_bot?start=world" class="btn-ghost" target="_blank" rel="noopener">Open Bot</a>
       <a href="#story" class="btn-ghost">Our Story</a>
     </div>
   </div>
@@ -527,19 +493,19 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   <div class="world-scene rl"></div>
   <div class="world-copy rr">
     <div class="label">Family World</div>
-    <h2>THE GAME<br>HUB FOR<br>THE FAMILY.</h2>
-    <p><strong>Family World</strong> is the private Telegram-linked community hub we are building around points, missions, fishing, arcade games, the vault, and future owned PFP selection.</p>
+    <h2>THE GAME<br>HUB IS<br>LIVE.</h2>
+    <p><strong>Family World v1</strong> is live inside the Family Contributor Bot. Members can walk the village, open their house, check the Vault, play daily games and earn World points that add to their monthly total.</p>
     <div class="world-grid">
-      <div class="world-tile"><b>Telegram login</b><span>Open from the Family Vault bot and your Telegram ID becomes your game profile.</span></div>
-      <div class="world-tile"><b>Real scores</b><span>Game points save into the same vault bot database as leaderboard and wallet data.</span></div>
-      <div class="world-tile"><b>Daily games</b><span>Fishing, arcade runs, missions and monthly races can add points.</span></div>
-      <div class="world-tile"><b>Wallet later</b><span>Verified wallets can unlock owned PFP choices once the next layer is ready.</span></div>
+      <div class="world-tile"><b>Telegram synced</b><span>The game opens from the bot so each score belongs to a real Telegram profile.</span></div>
+      <div class="world-tile"><b>Wallet gated</b><span>Members need a profile and eligible linked wallet before entering the World.</span></div>
+      <div class="world-tile"><b>Daily points</b><span>Fishing, missions and arcade activity feed the same monthly points race.</span></div>
+      <div class="world-tile"><b>V2 building</b><span>The bigger metaverse-style world is already in development for the next phase.</span></div>
     </div>
     <div class="world-actions">
       <a href="world.html" class="btn-ice">Enter Family World</a>
       <a href="https://t.me/familyrewards_bot?start=world" class="btn-ghost" target="_blank" rel="noopener">Open Bot</a>
     </div>
-    <div class="world-note">Private prototype. The live game opens through Telegram once the Mini App URL is connected.</div>
+    <div class="world-note">Use the Family Contributor Bot to enter, earn, and track points safely through Telegram.</div>
   </div>
 </section>
 
@@ -550,78 +516,65 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <p>Three phases. One direction. No pivots. Just building.</p>
   </div>
   <div class="phases rv">
-    <div class="phase active"><div class="phase-bg-n">01</div><div class="phase-lbl">Phase 01</div><div class="phase-title">Launch</div><ul class="phase-items"><li>Launch $FAMILY on XRPL</li><li>Website live</li><li>Discord open</li><li>Burn first escrow release</li></ul></div>
-    <div class="phase"><div class="phase-bg-n">02</div><div class="phase-lbl">Phase 02</div><div class="phase-title">Grow</div><ul class="phase-items"><li>Grow the community</li><li>Increase holders</li><li>Community events</li><li>Family World private prototype</li><li>Family NFT collection</li></ul></div>
-    <div class="phase"><div class="phase-bg-n">03</div><div class="phase-lbl">Phase 03</div><div class="phase-title">Long Term</div><ul class="phase-items"><li>Deliver on roadmap</li><li>Continue building</li><li>Show other chains what community looks like</li></ul></div>
+    <div class="phase active"><div class="phase-bg-n">01</div><div class="phase-lbl">Phase 01</div><div class="phase-title">Launch</div><ul class="phase-items"><li>Launch $FAMILY on XRPL</li><li>Website live</li><li>Family Vault bot live</li><li>Burn first escrow release</li></ul></div>
+    <div class="phase"><div class="phase-bg-n">02</div><div class="phase-lbl">Phase 02</div><div class="phase-title">Grow</div><ul class="phase-items"><li>Family World v1 live in Telegram</li><li>Wallet-gated profiles and points</li><li>LP support tracker bot</li><li>Daily games and arcade contests</li><li>Hourly activity posts when points are earned</li></ul></div>
+    <div class="phase"><div class="phase-bg-n">03</div><div class="phase-lbl">Phase 03</div><div class="phase-title">V2 World</div><ul class="phase-items"><li>Build the bigger metaverse layer</li><li>Improve gameplay and map depth</li><li>Expand rewards, missions and identity</li><li>Show other chains what community looks like</li></ul></div>
   </div>
   <div class="sledding-strip rv"></div>
 </section>
 
-<section class="nft-section" id="nft">
-  <div class="nft-inner">
-    <div class="nft-head rv">
-      <div class="label">Phase 2</div>
-      <h2>$FAMILY<br>NFT UTILITY</h2>
-      <p class="nft-sub">1,000 NFTs. 10 XRP mint price. Monthly royalties split automatically — no staking, no locking. Just hold.</p>
-      <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener" class="nft-mint-btn">Mint / Buy NFT →</a>
-    </div>
-
-    <div class="nft-split rv">
-      <div class="nft-half holders">
-        <div class="nft-half-pct">70%</div>
-        <div class="nft-half-label">To NFT Holders</div>
-        <div class="nft-half-desc">Split equally across all 1,000 NFTs every month</div>
+<section class="tracker-section" id="tracker">
+  <div class="tracker-inner">
+    <div class="tracker-head rv">
+      <div>
+        <div class="label">Live Tracker</div>
+        <h2>BOT TRACKED.<br>LIVE ON XRPL.</h2>
+        <p class="tracker-sub">The Family Vault bot tracks verified wallets, points, LP support, GM activity, referrals and Family World scores. The public site shows the live pool layer while private member points stay inside Telegram.</p>
       </div>
-      <div class="nft-divider"></div>
-      <div class="nft-half lp">
-        <div class="nft-half-pct">30%</div>
-        <div class="nft-half-label">To Liquidity Pool</div>
-        <div class="nft-half-desc">Deepens liquidity, strengthens the floor</div>
+      <div class="tracker-live-note">
+        <b>LP support bot is active.</b>
+        Use <strong>/lp</strong> in the Family Contributor Bot for the full LP support readout. The bot also posts World activity updates when members earn points.
       </div>
     </div>
 
-    <div class="nft-examples rv">
-      <div class="nft-ex-label">Example monthly earnings per NFT</div>
-      <div class="nft-ex-grid">
-        <div class="nft-ex-head"><span>Monthly Royalties</span><span>Per NFT (70% ÷ 1,000)</span></div>
-        <div class="nft-ex-row"><span>1,000 XRP</span><span class="xrp-val">0.70 XRP</span></div>
-        <div class="nft-ex-row"><span>5,000 XRP</span><span class="xrp-val">3.50 XRP</span></div>
-        <div class="nft-ex-row"><span>10,000 XRP</span><span class="xrp-val">7.00 XRP</span></div>
-        <div class="nft-ex-row hot"><span>20,000 XRP 🔥</span><span class="xrp-val">14.00 XRP</span></div>
+    <div class="tracker-grid rv">
+      <div class="tracker-card live">
+        <small>AMM pool value</small>
+        <strong id="trackerPool">Checking</strong>
+        <span>Live XRPL AMM estimate</span>
+      </div>
+      <div class="tracker-card">
+        <small>LP support added</small>
+        <strong id="trackerSupport">Checking</strong>
+        <span>Baseline plus tracked support deposits</span>
+      </div>
+      <div class="tracker-card">
+        <small>Support deposits</small>
+        <strong id="trackerDeposits">Checking</strong>
+        <span>LP support bot deposit count</span>
+      </div>
+      <div class="tracker-card">
+        <small>FAMILY price</small>
+        <strong id="trackerPrice">Checking</strong>
+        <span>XRPL AMM implied XRP price</span>
       </div>
     </div>
 
-    <div class="nft-snap rv">
-      <div class="nft-snap-item">📸<span>Snapshot: last day of every month at <b>7pm UTC</b></span></div>
-      <div class="nft-snap-item">⚡<span>Rewards distributed within <b>24 hours</b></span></div>
-      <div class="nft-snap-item">💎<span>No staking. No locking. <b>Just hold your NFT.</b></span></div>
+    <div class="tracker-status rv">
+      <span><b id="trackerTargetText">50% LP target tracked by the bot.</b><br>Public AMM figures update from XRPL. Holder profiles, World points and leaderboard positions are verified through Telegram.</span>
+      <div class="tracker-bar" aria-label="LP support target progress"><i id="trackerProgress"></i></div>
     </div>
 
-    <div class="nft-coll-stats rv" id="nftCollStats" style="display:none">
-      <div class="nft-stat-chip">
-        <div class="nft-stat-v" id="nftMinted">—</div>
-        <div class="nft-stat-l">Minted</div>
-      </div>
-      <div class="nft-stat-chip">
-        <div class="nft-stat-v">1,000</div>
-        <div class="nft-stat-l">Max Supply</div>
-      </div>
-      <div class="nft-stat-chip" id="nftFloorWrap" style="display:none">
-        <div class="nft-stat-v" id="nftFloor">—</div>
-        <div class="nft-stat-l">Floor Price</div>
-      </div>
+    <div class="bot-grid rv">
+      <div class="bot-card"><b>Family Vault Bot</b><p>Links wallets, verifies holders, tracks GM streaks, chat points, referrals and monthly totals.</p></div>
+      <div class="bot-card"><b>LP Tracker</b><p>Tracks LP support deposits, 24h and 7d support, all-time support and LP milestones.</p></div>
+      <div class="bot-card"><b>Family World</b><p>Fishing, missions and arcade scores add separate World points into the monthly race.</p></div>
     </div>
 
-    <div class="nft-strip-hdr rv">
-      <span class="nft-strip-title">MINTED NFTS</span>
-      <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener" class="nft-strip-link">View all on XRP Cafe →</a>
-    </div>
-    <div class="nft-strip-outer" id="nftStripOuter">
-      <div class="nft-scroll-track" id="nftScrollTrack"></div>
-      <div class="nft-soon" id="nftSoon" style="display:none">
-        <span>🚀</span>
-        <span>NFT minting opens soon — <a href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener">watch on XRP Cafe</a></span>
-      </div>
+    <div class="tracker-actions rv">
+      <a href="https://t.me/familyrewards_bot?start=world" target="_blank" rel="noopener" class="btn-ice">Open Bot</a>
+      <a href="world.html" class="btn-ghost">View World</a>
+      <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" target="_blank" rel="noopener" class="btn-ghost">Buy / LP</a>
     </div>
   </div>
 </section>
@@ -659,7 +612,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <div class="faq-item"><div class="faq-q">Why $FAMILY?</div><div class="faq-a">Built for the people who stayed. The XRP community proved its loyalty through years of uncertainty. $FAMILY reflects that. Community first, always.</div></div>
     <div class="faq-item"><div class="faq-q">What's the dev hold?</div><div class="faq-a">50% of supply locked in escrow. No rugs, no sudden dumps. Designed for long-term commitment from day one.</div></div>
     <div class="faq-item"><div class="faq-q">How does the burn work?</div><div class="faq-a">25% unlocks automatically 24 hours after launch on First Ledger and is burned forever. The remaining 75% stays locked for a minimum of one full year. That's the floor, not the ceiling.</div></div>
-    <div class="faq-item"><div class="faq-q">What about the NFT collection?</div><div class="faq-a">A Family NFT collection is in the works as part of Phase 2. Details shared as it develops.</div></div>
+    <div class="faq-item"><div class="faq-q">What does the bot track?</div><div class="faq-a">The Family Vault bot tracks verified wallets, holding points, GM streaks, referrals, chat activity, LP support and Family World points. Private profile data stays inside Telegram.</div></div>
     <div class="faq-item"><div class="faq-q">Is this just another meme coin?</div><div class="faq-a">$FAMILY is about community, not hype. No rocket emojis, no fake utility. Just people who believe in each other and the XRP ledger. Through every cycle.</div></div>
   </div>
 </section>
@@ -673,7 +626,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   </div>
   <div class="footer-bottom">
     <div class="footer-links">
-      <a href="#story">About</a><a href="#token">Token</a><a href="world.html">World</a><a href="#roadmap">Roadmap</a>
+      <a href="#story">About</a><a href="#token">Token</a><a href="world.html">World</a><a href="#tracker">Tracker</a><a href="#roadmap">Roadmap</a>
       <a href="https://x.com/family_xrpl" target="_blank" rel="noopener">X</a>
       <a href="https://discord.gg/dkRAzZKCj" target="_blank" rel="noopener">Discord</a>
     </div>
@@ -721,77 +674,118 @@ document.querySelectorAll('.faq-item').forEach(item=>{
   q.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
 });
 
-// NFT collection strip — uses account_tx to find NFTokenMint txns → URIs → images
-function hexToUtf8(h){
-  try{return decodeURIComponent(h.replace(/../g,'%$&'))}
-  catch(e){let s='';for(let i=0;i<h.length;i+=2)s+=String.fromCharCode(parseInt(h.substr(i,2),16));return s}
+async function xrplRequest(method, params){
+  const response=await fetch('https://xrplcluster.com',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({method,params})
+  });
+  const payload=await response.json();
+  if(payload.error||payload.result?.error)throw new Error(payload.error_message||payload.result?.error_message||'XRPL request failed');
+  return payload.result;
 }
-function ipfsUrl(u){
-  if(!u)return '';
-  if(u.startsWith('ipfs://'))return 'https://nftstorage.link/ipfs/'+u.slice(7);
-  return u;
+function dropsToXrp(drops){return Number(drops||0)/1000000}
+function compactNumber(value,digits=0){
+  const n=Number(value||0);
+  if(!Number.isFinite(n))return '—';
+  const abs=Math.abs(n);
+  if(abs>=1000000)return `${(n/1000000).toFixed(1)}M`;
+  if(abs>=1000)return `${(n/1000).toFixed(1)}K`;
+  return n.toLocaleString(undefined,{maximumFractionDigits:digits,minimumFractionDigits:digits});
 }
-(async function loadNftStrip(){
-  const ISSUER='rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
-  const track=document.getElementById('nftScrollTrack');
-  const soon=document.getElementById('nftSoon');
-  if(!track)return;
+function setTrackerText(id,value){const el=document.getElementById(id);if(el)el.textContent=value}
+function rippleTimeMs(seconds){return Number.isFinite(Number(seconds))?(Number(seconds)+946684800)*1000:0}
+function hasFamilyXrpAssets(tx){
+  const familyIssuer='rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
+  const familyCurrency='46414D494C590000000000000000000000000000';
+  const assets=[tx?.Asset,tx?.Asset2,tx?.asset,tx?.asset2];
+  return assets.some(a=>a?.currency==='XRP')&&assets.some(a=>a?.currency===familyCurrency&&a?.issuer===familyIssuer);
+}
+(async function loadFamilyTracker(){
+  const familyIssuer='rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
+  const familyCurrency='46414D494C590000000000000000000000000000';
+  const supportAccount='rhP6dymQ3ABoaRHGLz6gZ6ziUwk4CoS8qP';
+  const supportAccounts=[
+    'rhP6dymQ3ABoaRHGLz6gZ6ziUwk4CoS8qP',
+    'rPxWq2dcidWr3AfqXFzdSVBpe4GrATGpSB',
+    'r4xpS7RMpEQZb92dqvpDwuyoCHjumrQfh'
+  ];
+  const supportStart=Date.parse('2026-06-23T00:00:00Z');
+  const baselineXrp=887;
+  const baselineDeposits=51;
+  const targetPercent=50;
+  let lpCurrency='';
+  let lpIssuer='';
+  let lpSupply=0;
 
-  // Skeletons while loading
-  const sk='<div class="nft-c sk"><div class="sk-img"></div><div class="sk-lbl"></div></div>';
-  track.innerHTML=sk.repeat(16)+sk.repeat(16);
-
-  // Fetch NFTokenMint transactions from issuer — works on standard rippled (no Clio needed)
-  let mintTxns=[];
   try{
-    const r=await fetch('https://xrplcluster.com',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({method:'account_tx',params:[{
-        account:ISSUER,limit:200,
-        ledger_index_min:-1,ledger_index_max:-1,forward:true
-      }]})
-    });
-    const d=await r.json();
-    const txns=d?.result?.transactions||[];
-    mintTxns=txns
-      .filter(t=>t.tx?.TransactionType==='NFTokenMint' && t.meta?.TransactionResult==='tesSUCCESS')
-      .map(t=>({uri:t.tx.URI, serial:t.tx.LastLedgerSequence}))
-      .filter(t=>t.uri);
-  }catch(e){}
-
-  // Show minted count
-  if(mintTxns.length){
-    const el=document.getElementById('nftMinted');
-    if(el)el.textContent=mintTxns.length.toLocaleString();
-    const wrap=document.getElementById('nftCollStats');
-    if(wrap)wrap.style.display='flex';
+    const amm=await xrplRequest('amm_info',[{
+      asset:{currency:'XRP'},
+      asset2:{currency:familyCurrency,issuer:familyIssuer},
+      ledger_index:'validated'
+    }]).then(r=>r.amm);
+    const xrpReserve=dropsToXrp(amm.amount);
+    const familyReserve=Number(amm.amount2?.value||0);
+    const poolValue=xrpReserve*2;
+    const price=familyReserve>0?xrpReserve/familyReserve:0;
+    lpCurrency=amm.lp_token?.currency||'';
+    lpIssuer=amm.lp_token?.issuer||'';
+    lpSupply=Number(amm.lp_token?.value||0);
+    setTrackerText('trackerPool',`${compactNumber(poolValue,0)} XRP`);
+    setTrackerText('trackerPrice',price?`${price.toPrecision(4)} XRP`:'—');
+  }catch(error){
+    setTrackerText('trackerPool','Open /lp');
+    setTrackerText('trackerPrice','Bot live');
   }
 
-  if(!mintTxns.length){
-    track.innerHTML='';
-    if(soon)soon.style.display='flex';
-    return;
-  }
-
-  // Fetch metadata for first 20 NFTs concurrently
-  const sample=mintTxns.slice(0,20);
-  const fetched=await Promise.allSettled(sample.map(async t=>{
-    const metaUrl=ipfsUrl(hexToUtf8(t.uri));
-    if(!metaUrl)return null;
-    try{
-      const m=await fetch(metaUrl,{signal:AbortSignal.timeout(6000)}).then(r=>r.ok?r.json():null);
-      if(!m?.image)return null;
-      return{name:m.name||'XRP Family',image:ipfsUrl(m.image)};
-    }catch{return null}
-  }));
-  const items=fetched.filter(r=>r.status==='fulfilled'&&r.value).map(r=>r.value);
-
-  if(items.length){
-    const card=n=>`<a class="nft-c" href="https://xrp.cafe/collection/xrp-family" target="_blank" rel="noopener"><img src="${n.image}" alt="${n.name}" loading="lazy" onerror="this.closest('.nft-c').style.display='none'"><span>${n.name}</span></a>`;
-    track.innerHTML=items.map(card).join('')+items.map(card).join('');
-  }else{
-    track.innerHTML='';
-    if(soon)soon.style.display='flex';
+  try{
+    const result=await xrplRequest('account_tx',[{
+      account:supportAccount,
+      ledger_index_min:-1,
+      ledger_index_max:-1,
+      limit:200,
+      forward:false
+    }]);
+    let liveXrp=0;
+    let deposits=0;
+    for(const row of result.transactions||[]){
+      const tx=row.tx_json||row.tx||row.transaction;
+      const meta=row.meta||row.metaData;
+      if(!tx||!meta)continue;
+      if(meta.TransactionResult!=='tesSUCCESS')continue;
+      if(tx.TransactionType!=='AMMDeposit'||tx.Account!==supportAccount)continue;
+      if(!hasFamilyXrpAssets(tx)||typeof tx.Amount!=='string')continue;
+      const txTime=rippleTimeMs(tx.date);
+      if(txTime&&txTime<supportStart)continue;
+      liveXrp+=dropsToXrp(tx.Amount);
+      deposits+=1;
+    }
+    const totalXrp=baselineXrp+liveXrp;
+    const totalDeposits=baselineDeposits+deposits;
+    setTrackerText('trackerSupport',`${compactNumber(totalXrp,0)} XRP`);
+    setTrackerText('trackerDeposits',compactNumber(totalDeposits,0));
+    if(lpCurrency&&lpIssuer&&lpSupply>0){
+      const lineResults=await Promise.allSettled(supportAccounts.map(account=>xrplRequest('account_lines',[{
+        account,
+        ledger_index:'validated',
+        limit:400
+      }])));
+      const combinedLp=lineResults.reduce((total,result)=>{
+        if(result.status!=='fulfilled')return total;
+        const line=(result.value.lines||[]).find(item=>item.account===lpIssuer&&item.currency===lpCurrency);
+        return total+Number(line?.balance||0);
+      },0);
+      const ownership=combinedLp>0?(combinedLp/lpSupply)*100:0;
+      const progress=Math.max(0,Math.min(100,(ownership/targetPercent)*100));
+      setTrackerText('trackerTargetText',`LP support ownership: ${ownership.toFixed(2)}% / ${targetPercent}% target.`);
+      const bar=document.getElementById('trackerProgress');
+      if(bar)bar.style.width=`${progress}%`;
+    }
+  }catch(error){
+    setTrackerText('trackerSupport','Use /lp');
+    setTrackerText('trackerDeposits','Bot live');
+    const bar=document.getElementById('trackerProgress');
+    if(bar)bar.style.width='35%';
   }
 })();
 </script>
