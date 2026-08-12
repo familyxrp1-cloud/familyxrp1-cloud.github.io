@@ -520,7 +520,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   </div>
   <div class="phases rv">
     <div class="phase active"><div class="phase-bg-n">01</div><div class="phase-lbl">Phase 01</div><div class="phase-title">Launch</div><ul class="phase-items"><li>Launch $FAMILY on XRPL</li><li>Website live</li><li>Family Vault bot live</li><li>Burn first escrow release</li></ul></div>
-    <div class="phase"><div class="phase-bg-n">02</div><div class="phase-lbl">Phase 02</div><div class="phase-title">Grow</div><ul class="phase-items"><li>Family World v1 live in Telegram</li><li>Wallet-gated profiles and points</li><li>LP support tracker bot</li><li>Daily games and arcade contests</li><li>Hourly activity posts when points are earned</li></ul></div>
+    <div class="phase"><div class="phase-bg-n">02</div><div class="phase-lbl">Phase 02</div><div class="phase-title">Grow</div><ul class="phase-items"><li>Family World v1 live in Telegram</li><li>Wallet-gated profiles and points</li><li>Buy burn tracker bot</li><li>Daily games and arcade contests</li><li>Hourly activity posts when points are earned</li></ul></div>
     <div class="phase"><div class="phase-bg-n">03</div><div class="phase-lbl">Phase 03</div><div class="phase-title">V2 World</div><ul class="phase-items"><li>Build the bigger metaverse layer</li><li>Improve gameplay and map depth</li><li>Expand rewards, missions and identity</li><li>Show other chains what community looks like</li></ul></div>
   </div>
   <div class="sledding-strip rv"></div>
@@ -532,12 +532,12 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       <div>
         <div class="label">Live Tracker</div>
         <h2>BOT TRACKED.<br>LIVE ON XRPL.</h2>
-        <p class="tracker-sub">The Family Vault bot tracks verified wallets, points, LP support, GM activity, referrals and Family World scores. The public site shows the live pool layer while private member points stay inside Telegram.</p>
+        <p class="tracker-sub">The Family Vault bot tracks verified wallets, points, buy burns, GM activity, referrals and Family World scores. The public site shows the live pool layer while private member points stay inside Telegram.</p>
       </div>
       <div class="tracker-live-note">
-        <b>LP support bot is active.</b>
-        Public XRPL pool data loads on this page. Full support deposits, 24h/7d support and the LP target readout open directly inside Telegram.
-        <a class="tracker-live-link" href="https://t.me/familyrewards_bot?start=lp" target="_blank" rel="noopener">Open LP Tracker</a>
+        <b>Buy burn bot is active.</b>
+        Public XRPL pool data loads on this page. Burn totals, 24h/7d burn activity and support-wallet tracking open directly inside Telegram.
+        <a class="tracker-live-link" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener">Open Buy Burn Tracker</a>
       </div>
     </div>
 
@@ -547,15 +547,15 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
         <strong id="trackerPool">Checking</strong>
         <span>Live XRPL AMM estimate</span>
       </div>
-      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=lp" target="_blank" rel="noopener" aria-label="Open LP support tracker in Telegram">
-        <small>LP support added</small>
+      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener" aria-label="Open buy burn tracker in Telegram">
+        <small>FAMILY burned</small>
         <strong id="trackerSupport">Checking</strong>
-        <span>Tap for live bot support details</span>
+        <span>Tap for live bot burn details</span>
       </a>
-      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=lp" target="_blank" rel="noopener" aria-label="Open support deposit count in Telegram">
-        <small>Support deposits</small>
+      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener" aria-label="Open burn transaction count in Telegram">
+        <small>Burn transactions</small>
         <strong id="trackerDeposits">Checking</strong>
-        <span>Tap for 24h, 7d and all-time support</span>
+        <span>Tap for 24h, 7d and all-time burns</span>
       </a>
       <div class="tracker-card">
         <small>FAMILY price</small>
@@ -565,21 +565,21 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     </div>
 
     <div class="tracker-status rv">
-      <span><b id="trackerTargetText">40% LP target tracked by the bot.</b><br>Public AMM figures update from XRPL. Holder profiles, World points and leaderboard positions are verified through Telegram.</span>
-      <div class="tracker-bar" aria-label="LP support target progress"><i id="trackerProgress"></i></div>
+      <span><b id="trackerTargetText">Buy burn tracker is live.</b><br>Burns are counted when support wallets send $FAMILY directly back to the issuer. Holder profiles, World points and leaderboard positions are verified through Telegram.</span>
+      <div class="tracker-bar" aria-label="Buy burn tracker active"><i id="trackerProgress"></i></div>
     </div>
 
     <div class="bot-grid rv">
       <div class="bot-card"><b>Family Vault Bot</b><p>Links wallets, verifies holders, tracks GM streaks, chat points, referrals and monthly totals.</p></div>
-      <div class="bot-card"><b>LP Tracker</b><p>Tracks LP support deposits, 24h and 7d support, all-time support and LP milestones.</p></div>
+      <div class="bot-card"><b>Buy Burn Tracker</b><p>Tracks support-wallet burns, 24h and 7d burn activity, and all-time FAMILY sent back to the issuer.</p></div>
       <div class="bot-card"><b>Family World</b><p>Fishing, missions and arcade scores add separate World points into the monthly race.</p></div>
     </div>
 
     <div class="tracker-actions rv">
-      <a href="https://t.me/familyrewards_bot?start=lp" target="_blank" rel="noopener" class="btn-ice">Open LP Tracker</a>
+      <a href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener" class="btn-ice">Open Buy Burn</a>
       <a href="https://t.me/familyrewards_bot?start=world" target="_blank" rel="noopener" class="btn-ghost">Open World</a>
       <a href="world.html" class="btn-ghost">View World</a>
-      <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" target="_blank" rel="noopener" class="btn-ghost">Buy / LP</a>
+      <a href="https://firstledger.net/token-v2/rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi/46414D494C590000000000000000000000000000" target="_blank" rel="noopener" class="btn-ghost">Buy $FAMILY</a>
     </div>
   </div>
 </section>
@@ -617,7 +617,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <div class="faq-item"><div class="faq-q">Why $FAMILY?</div><div class="faq-a">Built for the people who stayed. The XRP community proved its loyalty through years of uncertainty. $FAMILY reflects that. Community first, always.</div></div>
     <div class="faq-item"><div class="faq-q">What's the dev hold?</div><div class="faq-a">50% of supply locked in escrow. No rugs, no sudden dumps. Designed for long-term commitment from day one.</div></div>
     <div class="faq-item"><div class="faq-q">How does the burn work?</div><div class="faq-a">25% unlocks automatically 24 hours after launch on First Ledger and is burned forever. The remaining 75% stays locked for a minimum of one full year. That's the floor, not the ceiling.</div></div>
-    <div class="faq-item"><div class="faq-q">What does the bot track?</div><div class="faq-a">The Family Vault bot tracks verified wallets, holding points, GM streaks, referrals, chat activity, LP support and Family World points. Private profile data stays inside Telegram.</div></div>
+    <div class="faq-item"><div class="faq-q">What does the bot track?</div><div class="faq-a">The Family Vault bot tracks verified wallets, holding points, GM streaks, referrals, chat activity, buy burns and Family World points. Private profile data stays inside Telegram.</div></div>
     <div class="faq-item"><div class="faq-q">Is this just another meme coin?</div><div class="faq-a">$FAMILY is about community, not hype. No rocket emojis, no fake utility. Just people who believe in each other and the XRP ledger. Through every cycle.</div></div>
   </div>
 </section>
@@ -700,28 +700,21 @@ function compactNumber(value,digits=0){
 }
 function setTrackerText(id,value){const el=document.getElementById(id);if(el)el.textContent=value}
 function rippleTimeMs(seconds){return Number.isFinite(Number(seconds))?(Number(seconds)+946684800)*1000:0}
-function hasFamilyXrpAssets(tx){
-  const familyIssuer='rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
-  const familyCurrency='46414D494C590000000000000000000000000000';
-  const assets=[tx?.Asset,tx?.Asset2,tx?.asset,tx?.asset2];
-  return assets.some(a=>a?.currency==='XRP')&&assets.some(a=>a?.currency===familyCurrency&&a?.issuer===familyIssuer);
+function familyIssuedAmount(amount,currency,issuer){
+  if(!amount||typeof amount!=='object')return 0;
+  if(amount.currency!==currency||amount.issuer!==issuer)return 0;
+  return Number(amount.value||0);
 }
 (async function loadFamilyTracker(){
   const familyIssuer='rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
   const familyCurrency='46414D494C590000000000000000000000000000';
-  const supportAccount='rhP6dymQ3ABoaRHGLz6gZ6ziUwk4CoS8qP';
   const supportAccounts=[
     'rhP6dymQ3ABoaRHGLz6gZ6ziUwk4CoS8qP',
     'rPxWq2dcidWr3AfqXFzdSVBpe4GrATGpSB',
     'r4xpS7RMpEQZb92dqvpDwuyoCHjumrQfh'
   ];
-  const supportStart=Date.parse('2026-06-23T00:00:00Z');
-  const baselineXrp=887;
-  const baselineDeposits=51;
-  const targetPercent=40;
-  let lpCurrency='';
-  let lpIssuer='';
-  let lpSupply=0;
+  const burnStart=Date.parse('2026-08-12T00:00:00Z');
+  const supportSet=new Set(supportAccounts);
 
   try{
     const amm=await xrplRequest('amm_info',[{
@@ -733,9 +726,6 @@ function hasFamilyXrpAssets(tx){
     const familyReserve=Number(amm.amount2?.value||0);
     const poolValue=xrpReserve*2;
     const price=familyReserve>0?xrpReserve/familyReserve:0;
-    lpCurrency=amm.lp_token?.currency||'';
-    lpIssuer=amm.lp_token?.issuer||'';
-    lpSupply=Number(amm.lp_token?.value||0);
     setTrackerText('trackerPool',`${compactNumber(poolValue,0)} XRP`);
     setTrackerText('trackerPrice',price?`${price.toPrecision(4)} XRP`:'—');
   }catch(error){
@@ -744,53 +734,46 @@ function hasFamilyXrpAssets(tx){
   }
 
   try{
-    const result=await xrplRequest('account_tx',[{
-      account:supportAccount,
-      ledger_index_min:-1,
-      ledger_index_max:-1,
-      limit:200,
-      forward:false
-    }]);
-    let liveXrp=0;
-    let deposits=0;
-    for(const row of result.transactions||[]){
-      const tx=row.tx_json||row.tx||row.transaction;
-      const meta=row.meta||row.metaData;
-      if(!tx||!meta)continue;
-      if(meta.TransactionResult!=='tesSUCCESS')continue;
-      if(tx.TransactionType!=='AMMDeposit'||tx.Account!==supportAccount)continue;
-      if(!hasFamilyXrpAssets(tx)||typeof tx.Amount!=='string')continue;
-      const txTime=rippleTimeMs(tx.date);
-      if(txTime&&txTime<supportStart)continue;
-      liveXrp+=dropsToXrp(tx.Amount);
-      deposits+=1;
-    }
-    const totalXrp=baselineXrp+liveXrp;
-    const totalDeposits=baselineDeposits+deposits;
-    setTrackerText('trackerSupport',`${compactNumber(totalXrp,0)} XRP`);
-    setTrackerText('trackerDeposits',compactNumber(totalDeposits,0));
-    if(lpCurrency&&lpIssuer&&lpSupply>0){
-      const lineResults=await Promise.allSettled(supportAccounts.map(account=>xrplRequest('account_lines',[{
+    const results=await Promise.allSettled(supportAccounts.map(account=>xrplRequest('account_tx',[{
         account,
-        ledger_index:'validated',
-        limit:400
+        ledger_index_min:-1,
+        ledger_index_max:-1,
+        limit:200,
+        forward:false
       }])));
-      const combinedLp=lineResults.reduce((total,result)=>{
-        if(result.status!=='fulfilled')return total;
-        const line=(result.value.lines||[]).find(item=>item.account===lpIssuer&&item.currency===lpCurrency);
-        return total+Number(line?.balance||0);
-      },0);
-      const ownership=combinedLp>0?(combinedLp/lpSupply)*100:0;
-      const progress=Math.max(0,Math.min(100,(ownership/targetPercent)*100));
-      setTrackerText('trackerTargetText',`LP support ownership: ${ownership.toFixed(2)}% / ${targetPercent}% target.`);
-      const bar=document.getElementById('trackerProgress');
-      if(bar)bar.style.width=`${progress}%`;
+    const seen=new Set();
+    let burned=0;
+    let burns=0;
+    for(const result of results){
+      if(result.status!=='fulfilled')continue;
+      for(const row of result.value.transactions||[]){
+        const tx=row.tx_json||row.tx||row.transaction;
+        const meta=row.meta||row.metaData;
+        const hash=tx?.hash||row.hash;
+        if(!tx||!meta||!hash||seen.has(hash))continue;
+        seen.add(hash);
+        if(meta.TransactionResult!=='tesSUCCESS')continue;
+        if(tx.TransactionType!=='Payment')continue;
+        if(!supportSet.has(tx.Account)||tx.Destination!==familyIssuer)continue;
+        const txTime=rippleTimeMs(tx.date);
+        if(txTime&&txTime<burnStart)continue;
+        const delivered=meta.delivered_amount||meta.DeliveredAmount||tx.Amount;
+        const amount=familyIssuedAmount(delivered,familyCurrency,familyIssuer)||familyIssuedAmount(tx.Amount,familyCurrency,familyIssuer);
+        if(amount<=0)continue;
+        burned+=amount;
+        burns+=1;
+      }
     }
+    setTrackerText('trackerSupport',`${compactNumber(burned,0)} FAMILY`);
+    setTrackerText('trackerDeposits',compactNumber(burns,0));
+    setTrackerText('trackerTargetText',burns>0?`Buy burn tracker: ${compactNumber(burned,0)} FAMILY burned since tracking began.`:'Buy burn tracker is live and waiting for the first tracked burn.');
+    const bar=document.getElementById('trackerProgress');
+    if(bar)bar.style.width=burns>0?'100%':'28%';
   }catch(error){
     setTrackerText('trackerSupport','Open bot');
     setTrackerText('trackerDeposits','Live in bot');
     const bar=document.getElementById('trackerProgress');
-    if(bar)bar.style.width='35%';
+    if(bar)bar.style.width='28%';
   }
 })();
 </script>
