@@ -557,6 +557,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
         <h2>BUY & BURN.<br>MARKET TRACKED.</h2>
         <p class="tracker-sub">The Family Vault bot now tracks verified wallets, points, BUY & BURN activity, market cap from activation, GM activity, referrals and Family World scores.</p>
         <p class="tracker-sub">Support-wallet profits are used to buy $FAMILY and send it back to the issuer, reducing circulating supply directly on XRPL.</p>
+        <p class="tracker-sub">Market cap includes circulating supply plus the 375M locked escrow, so the public tracker uses the same higher supply base.</p>
       </div>
       <div class="burn-visual" aria-label="BUY & BURN visual tracker">
         <div class="burn-core">
@@ -608,17 +609,17 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
       <div class="tracker-card market">
         <small>Start market cap</small>
         <strong id="trackerStartMcap">Checking</strong>
-        <span>When BUY & BURN went live</span>
+        <span>Circulating + escrow at activation</span>
       </div>
       <div class="tracker-card market">
         <small>Current market cap</small>
         <strong id="trackerCurrentMcap">Checking</strong>
-        <span>Live XRPL AMM estimate</span>
+        <span>Includes locked escrow</span>
       </div>
       <div class="tracker-card market">
         <small>Change since start</small>
         <strong id="trackerMcapChange">Checking</strong>
-        <span>Market cap moves with price and supply</span>
+        <span>Uses total tracked supply</span>
       </div>
       <div class="tracker-card live">
         <small>AMM pool value</small>
@@ -628,7 +629,7 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     </div>
 
     <div class="tracker-status rv">
-      <span><b id="trackerTargetText">BUY & BURN market tracker is live.</b><br>Market cap movement is tracked from activation. Burns reduce circulating supply; price, volume and demand move market cap.</span>
+      <span><b id="trackerTargetText">BUY & BURN market tracker is live.</b><br>Market cap includes the locked escrow. Burns reduce circulating supply; price, volume and demand move market cap.</span>
       <div class="tracker-bar" aria-label="Buy burn tracker active"><i id="trackerProgress"></i></div>
     </div>
 
@@ -773,7 +774,7 @@ function familyIssuedAmount(amount,currency,issuer){
   if(amount.currency!==currency||amount.issuer!==issuer)return 0;
   return Number(amount.value||0);
 }
-async function accountTxSince(account,sinceMs,maxPages=6){
+async function accountTxSince(account,sinceMs,maxPages=20){
   const rows=[];
   let marker=null;
   let done=false;
@@ -807,13 +808,15 @@ async function accountTxSince(account,sinceMs,maxPages=6){
     'r4xpS7RMpEQZb92dqvpDwuyoCHjumrQfh'
   ];
   const burnStart=Date.parse('2026-08-12T13:16:41Z');
-  const burnStartIssuedSupply=499876915.5132603;
+  const burnStartCirculatingSupply=499876915.5132603;
+  const lockedEscrowSupply=375000000;
   const burnStartPriceXrp=0.000013480368517889528;
-  const burnStartMarketCapXrp=burnStartIssuedSupply*burnStartPriceXrp;
+  const burnStartTrackedSupply=burnStartCirculatingSupply+lockedEscrowSupply;
+  const burnStartMarketCapXrp=burnStartTrackedSupply*burnStartPriceXrp;
   const supportSet=new Set(supportAccounts);
   let price=0;
   let poolValue=0;
-  let issuedSupply=0;
+  let circulatingSupply=0;
 
   try{
     const amm=await xrplRequest('amm_info',[{
@@ -835,19 +838,26 @@ async function accountTxSince(account,sinceMs,maxPages=6){
       account:familyIssuer,
       ledger_index:'validated'
     }]);
-    issuedSupply=Number(balances.obligations?.[familyCurrency]||0);
+    circulatingSupply=Number(balances.obligations?.[familyCurrency]||0);
   }catch(error){
-    issuedSupply=0;
+    circulatingSupply=0;
   }
 
   try{
-    const results=await Promise.allSettled(supportAccounts.map(account=>accountTxSince(account,burnStart)));
+    const results=[];
+    for(const account of supportAccounts){
+      try{
+        results.push({status:'fulfilled',value:await accountTxSince(account,burnStart)});
+      }catch(error){
+        results.push({status:'rejected',reason:error});
+      }
+    }
     const seen=new Set();
     let burned=0;
     let burns=0;
     for(const result of results){
       if(result.status!=='fulfilled')continue;
-      for(const row of result.value.transactions||[]){
+      for(const row of result.value||[]){
         const tx=row.tx_json||row.tx||row.transaction;
         const meta=row.meta||row.metaData;
         const hash=tx?.hash||row.hash;
@@ -865,9 +875,10 @@ async function accountTxSince(account,sinceMs,maxPages=6){
         burns+=1;
       }
     }
-    if(!issuedSupply&&burned>0)issuedSupply=Math.max(0,burnStartIssuedSupply-burned);
-    const supplyCut=issuedSupply>0&&burned>0?(burned/(issuedSupply+burned))*100:0;
-    const currentMarketCap=issuedSupply>0&&price>0?issuedSupply*price:0;
+    if(!circulatingSupply&&burned>0)circulatingSupply=Math.max(0,burnStartCirculatingSupply-burned);
+    const trackedSupply=circulatingSupply>0?circulatingSupply+lockedEscrowSupply:0;
+    const supplyCut=circulatingSupply>0&&burned>0?(burned/(circulatingSupply+burned))*100:0;
+    const currentMarketCap=trackedSupply>0&&price>0?trackedSupply*price:0;
     const marketCapChange=currentMarketCap>0?((currentMarketCap-burnStartMarketCapXrp)/burnStartMarketCapXrp)*100:0;
     const burnValue=price>0?burned*price:0;
 
@@ -881,7 +892,7 @@ async function accountTxSince(account,sinceMs,maxPages=6){
     setTrackerText('trackerCurrentMcap',currentMarketCap?`${compactNumber(currentMarketCap,0)} XRP`:'Checking');
     setTrackerText('trackerMcapChange',currentMarketCap?signedPercent(marketCapChange,1):'Checking');
     setTrackerText('trackerMcapHero',currentMarketCap?signedPercent(marketCapChange,0):'Live');
-    setTrackerText('trackerTargetText',burns>0?`BUY & BURN has removed ${compactNumber(supplyCut,4)}% of circulating supply since activation. Market cap is tracked from ${compactNumber(burnStartMarketCapXrp,0)} XRP at launch of the burn tracker.`:'BUY & BURN tracker is live and waiting for the first tracked burn.');
+    setTrackerText('trackerTargetText',burns>0?`BUY & BURN has removed ${compactNumber(supplyCut,4)}% of circulating supply since activation. Market cap includes the 375M locked escrow and is tracked from ${compactNumber(burnStartMarketCapXrp,0)} XRP.`:'BUY & BURN tracker is live and waiting for the first tracked burn.');
     const bar=document.getElementById('trackerProgress');
     if(bar)bar.style.width=burns>0?`${Math.max(10,Math.min(100,supplyCut*18))}%`:'28%';
   }catch(error){
