@@ -367,19 +367,22 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
 .tracker-head{display:grid;grid-template-columns:minmax(0,0.88fr) minmax(320px,1.12fr);gap:40px;align-items:center;margin-bottom:30px;position:relative;z-index:1}
 .tracker-head h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5.5rem);line-height:0.88;color:var(--white);margin:10px 0 16px;letter-spacing:0.03em}
 .tracker-sub{font-size:1rem;color:var(--muted);max-width:520px;line-height:1.75}
-.burn-visual{min-height:330px;border:1px solid rgba(91,184,255,0.18);border-radius:22px;background:linear-gradient(145deg,rgba(13,27,46,0.86),rgba(4,9,15,0.56));position:relative;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,0.32)}
-.burn-visual::before{content:'';position:absolute;inset:24px;border-radius:50%;border:20px solid rgba(91,184,255,0.18);border-right-color:rgba(255,187,66,0.88);filter:drop-shadow(0 0 28px rgba(91,184,255,0.24))}
-.burn-visual::after{content:'';position:absolute;left:50%;top:50%;width:148px;height:148px;transform:translate(-50%,-42%);border-radius:26px;background:linear-gradient(180deg,rgba(91,184,255,0.18),rgba(255,155,45,0.16));border:1px solid rgba(91,184,255,0.24);box-shadow:0 0 80px rgba(91,184,255,0.26),0 32px 70px rgba(255,132,30,0.18)}
-.burn-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-38%);z-index:2;text-align:center}
-.burn-core b{display:block;font-family:'Bebas Neue',sans-serif;font-size:3.8rem;letter-spacing:0.04em;color:var(--white);text-shadow:0 0 22px rgba(91,184,255,0.42)}
-.burn-core span{display:block;margin-top:4px;color:var(--ice);font-size:0.72rem;font-weight:900;letter-spacing:0.16em;text-transform:uppercase}
-.burn-chip{position:absolute;z-index:3;background:rgba(4,9,15,0.72);border:1px solid rgba(91,184,255,0.28);border-radius:14px;padding:13px 15px;box-shadow:0 16px 46px rgba(0,0,0,0.24)}
-.burn-chip small{display:block;color:rgba(168,216,255,0.58);font-size:0.58rem;font-weight:900;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:5px}
-.burn-chip strong{font-family:'Bebas Neue',sans-serif;color:var(--ice);font-size:2rem;letter-spacing:0.04em}
-.burn-chip.left{left:20px;bottom:22px}
-.burn-chip.right{right:20px;top:22px}
-.burn-ledgers{position:absolute;right:22px;bottom:24px;display:flex;gap:8px;transform:rotate(-12deg)}
-.burn-ledgers i{display:block;width:34px;height:34px;border-radius:8px;background:linear-gradient(145deg,rgba(91,184,255,0.34),rgba(91,184,255,0.08));border:1px solid rgba(91,184,255,0.28);box-shadow:0 0 18px rgba(91,184,255,0.28)}
+.burn-visual{min-height:390px;border:1px solid rgba(91,184,255,0.22);border-radius:22px;background:linear-gradient(90deg,rgba(3,8,15,0.92) 0%,rgba(4,9,15,0.42) 42%,rgba(4,9,15,0.18) 100%),url('./assets/buy-burn-vault.jpg') 58% 50%/cover no-repeat;position:relative;overflow:hidden;box-shadow:0 28px 90px rgba(0,0,0,0.42),0 0 0 1px rgba(255,210,121,0.06) inset;isolation:isolate}
+.burn-visual::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 76% 54%,rgba(255,184,70,0.28),transparent 34%),radial-gradient(circle at 28% 36%,rgba(91,184,255,0.16),transparent 32%),linear-gradient(180deg,rgba(4,9,15,0.04),rgba(4,9,15,0.72));z-index:1;pointer-events:none}
+.burn-visual::after{content:'';position:absolute;inset:16px;border:1px solid rgba(168,216,255,0.14);border-radius:18px;z-index:2;pointer-events:none;box-shadow:0 0 52px rgba(91,184,255,0.14) inset}
+.burn-topline{position:absolute;left:24px;top:22px;z-index:3;display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(91,184,255,0.24);border-radius:999px;background:rgba(4,9,15,0.62);padding:9px 13px;backdrop-filter:blur(12px);box-shadow:0 12px 36px rgba(0,0,0,0.26)}
+.burn-topline span{font-size:0.62rem;font-weight:900;letter-spacing:0.16em;color:var(--ice)}
+.burn-topline i{width:8px;height:8px;border-radius:50%;background:#54db8a;box-shadow:0 0 18px rgba(84,219,138,0.92)}
+.burn-metric-board{position:absolute;left:24px;right:24px;bottom:24px;z-index:3;display:grid;grid-template-columns:minmax(0,1.18fr) minmax(170px,0.82fr);gap:12px;align-items:stretch}
+.burn-primary,.burn-mini{border:1px solid rgba(91,184,255,0.24);background:linear-gradient(180deg,rgba(6,15,27,0.78),rgba(3,8,15,0.68));border-radius:16px;box-shadow:0 18px 52px rgba(0,0,0,0.34);backdrop-filter:blur(14px)}
+.burn-primary{padding:18px 20px}
+.burn-primary small,.burn-mini small{display:block;color:rgba(168,216,255,0.68);font-size:0.58rem;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:7px}
+.burn-primary strong{display:block;font-family:'Bebas Neue',sans-serif;color:var(--white);font-size:clamp(3.1rem,6vw,4.8rem);letter-spacing:0.05em;line-height:0.9;text-shadow:0 0 24px rgba(91,184,255,0.42)}
+.burn-primary span{display:block;margin-top:8px;color:rgba(168,216,255,0.68);font-size:0.82rem;font-weight:700}
+.burn-side{display:grid;grid-template-rows:1fr 1fr;gap:12px}
+.burn-mini{padding:14px 16px}
+.burn-mini strong{display:block;font-family:'Bebas Neue',sans-serif;color:#ffd279;font-size:2.35rem;line-height:0.95;letter-spacing:0.05em;text-shadow:0 0 18px rgba(255,188,70,0.28)}
+.burn-mini.hot strong{color:var(--ice);text-shadow:0 0 18px rgba(91,184,255,0.36)}
 .tracker-live-note{background:rgba(4,9,15,0.48);border:1px solid var(--border);border-radius:16px;padding:20px;color:rgba(168,216,255,0.68);line-height:1.65;font-size:0.9rem;position:relative;z-index:1}
 .tracker-live-note b{display:block;color:var(--white);font-size:0.96rem;margin-bottom:5px}
 .tracker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px;position:relative;z-index:1}
@@ -410,15 +413,21 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   .tracker-head{grid-template-columns:1fr}
   .tracker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tracker-section{padding:72px 0}
-  .burn-visual{min-height:300px}
+  .burn-visual{min-height:380px}
 }
 @media(max-width:560px){
   .tracker-grid,.bot-grid{grid-template-columns:1fr}
   .tracker-status{align-items:flex-start;flex-direction:column}
   .tracker-bar{width:100%;flex-basis:auto}
-  .burn-visual{min-height:270px}
-  .burn-core b{font-size:3rem}
-  .burn-chip strong{font-size:1.55rem}
+  .burn-visual{min-height:430px;background-position:61% 50%}
+  .burn-visual::after{inset:10px}
+  .burn-topline{left:16px;top:16px}
+  .burn-metric-board{left:16px;right:16px;bottom:16px;grid-template-columns:1fr}
+  .burn-side{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .burn-primary{padding:16px}
+  .burn-primary strong{font-size:3.2rem}
+  .burn-mini{padding:12px}
+  .burn-mini strong{font-size:1.75rem}
 }
 .ca-wrap{display:flex;align-items:center;gap:10px;margin-top:22px;background:rgba(91,184,255,0.05);border:1px solid rgba(91,184,255,0.15);border-radius:8px;padding:10px 16px;flex-wrap:wrap}
 .ca-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
@@ -556,23 +565,31 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
         <div class="label">Live Tracker</div>
         <h2>BUY & BURN.<br>MARKET TRACKED.</h2>
         <p class="tracker-sub">The Family Vault bot now tracks verified wallets, points, BUY & BURN activity, market cap from activation, GM activity, referrals and Family World scores.</p>
-        <p class="tracker-sub">Support-wallet profits are used to buy $FAMILY and send it back to the issuer, reducing circulating supply directly on XRPL.</p>
-        <p class="tracker-sub">Market cap includes circulating supply plus the 375M locked escrow, so the public tracker uses the same higher supply base.</p>
+        <p class="tracker-sub">Support-wallet profits buy $FAMILY and send it back to the issuer, reducing circulating supply directly on XRPL.</p>
+        <p class="tracker-sub">Market cap is tracked on the full supply base, including the 375M locked escrow.</p>
       </div>
       <div class="burn-visual" aria-label="BUY & BURN visual tracker">
-        <div class="burn-core">
-          <b id="trackerSupplyCutHero">Checking</b>
-          <span>circulating supply removed</span>
+        <div class="burn-topline">
+          <span>BUY & BURN LIVE</span>
+          <i></i>
         </div>
-        <div class="burn-chip left">
-          <small>Family burned</small>
-          <strong id="trackerBurnedHero">Checking</strong>
+        <div class="burn-metric-board">
+          <div class="burn-primary">
+            <small>FAMILY burned</small>
+            <strong id="trackerBurnedHero">Checking</strong>
+            <span>Sent back to the issuer</span>
+          </div>
+          <div class="burn-side">
+            <div class="burn-mini">
+              <small>Supply removed</small>
+              <strong id="trackerSupplyCutHero">Checking</strong>
+            </div>
+            <div class="burn-mini hot">
+              <small>Market move</small>
+              <strong id="trackerMcapHero">Live</strong>
+            </div>
+          </div>
         </div>
-        <div class="burn-chip right">
-          <small>Market move</small>
-          <strong id="trackerMcapHero">Live</strong>
-        </div>
-        <div class="burn-ledgers"><i></i><i></i><i></i><i></i></div>
       </div>
     </div>
 
