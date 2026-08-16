@@ -360,42 +360,65 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
   .btn-ice,.btn-ghost{text-align:center}
 }
 /* ══ LIVE TRACKER ══ */
-.tracker-section{background:var(--deep);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:104px 0}
+.tracker-section{background:linear-gradient(180deg,#06111e 0%,#04090f 58%,#06111e 100%);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:104px 0;position:relative;overflow:hidden}
+.tracker-section::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(91,184,255,0.1),transparent 28%,rgba(84,219,138,0.05) 62%,transparent 86%);pointer-events:none}
+.tracker-section::after{content:'';position:absolute;inset:auto -10% 0 -10%;height:1px;background:linear-gradient(90deg,transparent,rgba(91,184,255,0.42),transparent)}
 .tracker-inner{max-width:1060px;margin:0 auto;padding:0 24px}
-.tracker-head{display:grid;grid-template-columns:minmax(0,0.85fr) minmax(320px,1.15fr);gap:40px;align-items:end;margin-bottom:36px}
+.tracker-head{display:grid;grid-template-columns:minmax(0,0.88fr) minmax(320px,1.12fr);gap:40px;align-items:center;margin-bottom:30px;position:relative;z-index:1}
 .tracker-head h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5.5rem);line-height:0.88;color:var(--white);margin:10px 0 16px;letter-spacing:0.03em}
 .tracker-sub{font-size:1rem;color:var(--muted);max-width:520px;line-height:1.75}
-.tracker-live-note{background:rgba(4,9,15,0.48);border:1px solid var(--border);border-radius:16px;padding:20px;color:rgba(168,216,255,0.68);line-height:1.65;font-size:0.9rem}
+.burn-visual{min-height:330px;border:1px solid rgba(91,184,255,0.18);border-radius:22px;background:linear-gradient(145deg,rgba(13,27,46,0.86),rgba(4,9,15,0.56));position:relative;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,0.32)}
+.burn-visual::before{content:'';position:absolute;inset:24px;border-radius:50%;border:20px solid rgba(91,184,255,0.18);border-right-color:rgba(255,187,66,0.88);filter:drop-shadow(0 0 28px rgba(91,184,255,0.24))}
+.burn-visual::after{content:'';position:absolute;left:50%;top:50%;width:148px;height:148px;transform:translate(-50%,-42%);border-radius:26px;background:linear-gradient(180deg,rgba(91,184,255,0.18),rgba(255,155,45,0.16));border:1px solid rgba(91,184,255,0.24);box-shadow:0 0 80px rgba(91,184,255,0.26),0 32px 70px rgba(255,132,30,0.18)}
+.burn-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-38%);z-index:2;text-align:center}
+.burn-core b{display:block;font-family:'Bebas Neue',sans-serif;font-size:3.8rem;letter-spacing:0.04em;color:var(--white);text-shadow:0 0 22px rgba(91,184,255,0.42)}
+.burn-core span{display:block;margin-top:4px;color:var(--ice);font-size:0.72rem;font-weight:900;letter-spacing:0.16em;text-transform:uppercase}
+.burn-chip{position:absolute;z-index:3;background:rgba(4,9,15,0.72);border:1px solid rgba(91,184,255,0.28);border-radius:14px;padding:13px 15px;box-shadow:0 16px 46px rgba(0,0,0,0.24)}
+.burn-chip small{display:block;color:rgba(168,216,255,0.58);font-size:0.58rem;font-weight:900;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:5px}
+.burn-chip strong{font-family:'Bebas Neue',sans-serif;color:var(--ice);font-size:2rem;letter-spacing:0.04em}
+.burn-chip.left{left:20px;bottom:22px}
+.burn-chip.right{right:20px;top:22px}
+.burn-ledgers{position:absolute;right:22px;bottom:24px;display:flex;gap:8px;transform:rotate(-12deg)}
+.burn-ledgers i{display:block;width:34px;height:34px;border-radius:8px;background:linear-gradient(145deg,rgba(91,184,255,0.34),rgba(91,184,255,0.08));border:1px solid rgba(91,184,255,0.28);box-shadow:0 0 18px rgba(91,184,255,0.28)}
+.tracker-live-note{background:rgba(4,9,15,0.48);border:1px solid var(--border);border-radius:16px;padding:20px;color:rgba(168,216,255,0.68);line-height:1.65;font-size:0.9rem;position:relative;z-index:1}
 .tracker-live-note b{display:block;color:var(--white);font-size:0.96rem;margin-bottom:5px}
-.tracker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.tracker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px;position:relative;z-index:1}
+.tracker-grid.market-grid{margin-top:12px}
 .tracker-card{background:linear-gradient(180deg,rgba(13,27,46,0.9),rgba(4,9,15,0.66));border:1px solid var(--border);border-radius:16px;padding:18px;min-height:132px;position:relative;overflow:hidden;text-decoration:none;color:inherit;display:block}
 .tracker-card::after{content:'';position:absolute;right:-32px;top:-32px;width:92px;height:92px;border-radius:50%;background:rgba(91,184,255,0.08)}
 .tracker-card small{display:block;font-size:0.62rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
 .tracker-card strong{display:block;font-family:'Bebas Neue',sans-serif;font-size:2.15rem;letter-spacing:0.04em;color:var(--white);line-height:1}
 .tracker-card span{display:block;margin-top:9px;font-size:0.78rem;color:rgba(168,216,255,0.58);line-height:1.45}
-.tracker-card.live strong{color:var(--ice)}
+.tracker-card.live strong,.tracker-card.hot strong{color:var(--ice)}
+.tracker-card.hot{border-color:rgba(91,184,255,0.34);box-shadow:0 16px 52px rgba(91,184,255,0.08)}
+.tracker-card.fire strong{color:#ffd279}
+.tracker-card.market strong{color:#54db8a}
 .tracker-card.tracker-link:hover{border-color:rgba(91,184,255,0.46);transform:translateY(-2px);box-shadow:0 18px 48px rgba(0,0,0,0.24)}
 .tracker-live-link{display:inline-flex;margin-top:12px;color:var(--ice);font-weight:800;text-decoration:none}
 .tracker-live-link:hover{text-decoration:underline}
-.tracker-status{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--border);border-radius:16px;padding:16px 18px;background:rgba(91,184,255,0.045);margin-bottom:26px}
+.tracker-status{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--border);border-radius:16px;padding:16px 18px;background:rgba(91,184,255,0.045);margin:6px 0 26px;position:relative;z-index:1}
 .tracker-status span{font-size:0.8rem;color:rgba(168,216,255,0.6);line-height:1.55}
 .tracker-status b{color:var(--ice)}
 .tracker-bar{height:10px;border-radius:999px;background:rgba(4,9,15,0.72);border:1px solid rgba(91,184,255,0.14);overflow:hidden;min-width:190px;flex:0 0 30%}
-.tracker-bar i{display:block;height:100%;width:0%;border-radius:inherit;background:linear-gradient(90deg,var(--ice),#54db8a);box-shadow:0 0 20px rgba(91,184,255,0.35);transition:width .6s ease}
-.bot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:28px}
+.tracker-bar i{display:block;height:100%;width:0%;border-radius:inherit;background:linear-gradient(90deg,var(--ice),#54db8a,#ffd279);box-shadow:0 0 20px rgba(91,184,255,0.35);transition:width .6s ease}
+.bot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:28px;position:relative;z-index:1}
 .bot-card{background:rgba(4,9,15,0.42);border:1px solid rgba(91,184,255,0.12);border-radius:14px;padding:18px}
 .bot-card b{display:block;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ice);margin-bottom:8px}
 .bot-card p{font-size:0.86rem;line-height:1.6;color:rgba(168,216,255,0.64)}
-.tracker-actions{display:flex;gap:12px;flex-wrap:wrap}
+.tracker-actions{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
 @media(max-width:900px){
   .tracker-head{grid-template-columns:1fr}
   .tracker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tracker-section{padding:72px 0}
+  .burn-visual{min-height:300px}
 }
 @media(max-width:560px){
   .tracker-grid,.bot-grid{grid-template-columns:1fr}
   .tracker-status{align-items:flex-start;flex-direction:column}
   .tracker-bar{width:100%;flex-basis:auto}
+  .burn-visual{min-height:270px}
+  .burn-core b{font-size:3rem}
+  .burn-chip strong{font-size:1.55rem}
 }
 .ca-wrap{display:flex;align-items:center;gap:10px;margin-top:22px;background:rgba(91,184,255,0.05);border:1px solid rgba(91,184,255,0.15);border-radius:8px;padding:10px 16px;flex-wrap:wrap}
 .ca-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
@@ -531,47 +554,87 @@ footer{position:relative;z-index:2;background:var(--ink);border-top:1px solid va
     <div class="tracker-head rv">
       <div>
         <div class="label">Live Tracker</div>
-        <h2>BOT TRACKED.<br>LIVE ON XRPL.</h2>
-        <p class="tracker-sub">The Family Vault bot tracks verified wallets, points, buy burns, GM activity, referrals and Family World scores. The public site shows the live pool layer while private member points stay inside Telegram.</p>
+        <h2>BUY & BURN.<br>MARKET TRACKED.</h2>
+        <p class="tracker-sub">The Family Vault bot now tracks verified wallets, points, BUY & BURN activity, market cap from activation, GM activity, referrals and Family World scores.</p>
+        <p class="tracker-sub">Support-wallet profits are used to buy $FAMILY and send it back to the issuer, reducing circulating supply directly on XRPL.</p>
       </div>
-      <div class="tracker-live-note">
-        <b>Buy burn bot is active.</b>
-        Public XRPL pool data loads on this page. Burn totals, 24h/7d burn activity and support-wallet tracking open directly inside Telegram.
-        <a class="tracker-live-link" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener">Open Buy Burn Tracker</a>
+      <div class="burn-visual" aria-label="BUY & BURN visual tracker">
+        <div class="burn-core">
+          <b id="trackerSupplyCutHero">Checking</b>
+          <span>circulating supply removed</span>
+        </div>
+        <div class="burn-chip left">
+          <small>Family burned</small>
+          <strong id="trackerBurnedHero">Checking</strong>
+        </div>
+        <div class="burn-chip right">
+          <small>Market move</small>
+          <strong id="trackerMcapHero">Live</strong>
+        </div>
+        <div class="burn-ledgers"><i></i><i></i><i></i><i></i></div>
       </div>
     </div>
 
+    <div class="tracker-live-note rv">
+      <b>BUY & BURN bot is active.</b>
+      Every tracked burn is verified on XRPL. The tracker shows total FAMILY burned, estimated XRP value, burn count, circulating supply reduced and market cap movement since BUY & BURN went live.
+      <a class="tracker-live-link" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener">Open BUY & BURN Tracker</a>
+    </div>
+
     <div class="tracker-grid rv">
+      <a class="tracker-card tracker-link hot" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener" aria-label="Open buy burn tracker in Telegram">
+        <small>FAMILY burned</small>
+        <strong id="trackerSupport">Checking</strong>
+        <span>Total sent back to the issuer</span>
+      </a>
+      <div class="tracker-card fire">
+        <small>Supply reduced</small>
+        <strong id="trackerSupplyCut">Checking</strong>
+        <span>Circulating supply removed</span>
+      </div>
+      <div class="tracker-card live">
+        <small>Burn value</small>
+        <strong id="trackerBurnValue">Checking</strong>
+        <span>Estimated live AMM value</span>
+      </div>
+      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener" aria-label="Open burn transaction count in Telegram">
+        <small>Burn transactions</small>
+        <strong id="trackerDeposits">Checking</strong>
+        <span>Tracked on XRPL</span>
+      </a>
+    </div>
+
+    <div class="tracker-grid market-grid rv">
+      <div class="tracker-card market">
+        <small>Start market cap</small>
+        <strong id="trackerStartMcap">Checking</strong>
+        <span>When BUY & BURN went live</span>
+      </div>
+      <div class="tracker-card market">
+        <small>Current market cap</small>
+        <strong id="trackerCurrentMcap">Checking</strong>
+        <span>Live XRPL AMM estimate</span>
+      </div>
+      <div class="tracker-card market">
+        <small>Change since start</small>
+        <strong id="trackerMcapChange">Checking</strong>
+        <span>Market cap moves with price and supply</span>
+      </div>
       <div class="tracker-card live">
         <small>AMM pool value</small>
         <strong id="trackerPool">Checking</strong>
         <span>Live XRPL AMM estimate</span>
       </div>
-      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener" aria-label="Open buy burn tracker in Telegram">
-        <small>FAMILY burned</small>
-        <strong id="trackerSupport">Checking</strong>
-        <span>Tap for live bot burn details</span>
-      </a>
-      <a class="tracker-card tracker-link" href="https://t.me/familyrewards_bot?start=burn" target="_blank" rel="noopener" aria-label="Open burn transaction count in Telegram">
-        <small>Burn transactions</small>
-        <strong id="trackerDeposits">Checking</strong>
-        <span>Tap for 24h, 7d and all-time burns</span>
-      </a>
-      <div class="tracker-card">
-        <small>FAMILY price</small>
-        <strong id="trackerPrice">Checking</strong>
-        <span>XRPL AMM implied XRP price</span>
-      </div>
     </div>
 
     <div class="tracker-status rv">
-      <span><b id="trackerTargetText">Buy burn tracker is live.</b><br>Burns are counted when support wallets send $FAMILY directly back to the issuer. Holder profiles, World points and leaderboard positions are verified through Telegram.</span>
+      <span><b id="trackerTargetText">BUY & BURN market tracker is live.</b><br>Market cap movement is tracked from activation. Burns reduce circulating supply; price, volume and demand move market cap.</span>
       <div class="tracker-bar" aria-label="Buy burn tracker active"><i id="trackerProgress"></i></div>
     </div>
 
     <div class="bot-grid rv">
       <div class="bot-card"><b>Family Vault Bot</b><p>Links wallets, verifies holders, tracks GM streaks, chat points, referrals and monthly totals.</p></div>
-      <div class="bot-card"><b>Buy Burn Tracker</b><p>Tracks support-wallet burns, 24h and 7d burn activity, and all-time FAMILY sent back to the issuer.</p></div>
+      <div class="bot-card"><b>BUY & BURN Tracker</b><p>Tracks support-wallet burns, estimated burn value, supply reduction and burn transactions on XRPL.</p></div>
       <div class="bot-card"><b>Family World</b><p>Fishing, missions and arcade scores add separate World points into the monthly race.</p></div>
     </div>
 
@@ -698,12 +761,42 @@ function compactNumber(value,digits=0){
   if(abs>=1000)return `${(n/1000).toFixed(1)}K`;
   return n.toLocaleString(undefined,{maximumFractionDigits:digits,minimumFractionDigits:digits});
 }
+function signedPercent(value,digits=1){
+  const n=Number(value||0);
+  if(!Number.isFinite(n))return '—';
+  return `${n>=0?'+':''}${n.toLocaleString(undefined,{maximumFractionDigits:digits,minimumFractionDigits:digits})}%`;
+}
 function setTrackerText(id,value){const el=document.getElementById(id);if(el)el.textContent=value}
 function rippleTimeMs(seconds){return Number.isFinite(Number(seconds))?(Number(seconds)+946684800)*1000:0}
 function familyIssuedAmount(amount,currency,issuer){
   if(!amount||typeof amount!=='object')return 0;
   if(amount.currency!==currency||amount.issuer!==issuer)return 0;
   return Number(amount.value||0);
+}
+async function accountTxSince(account,sinceMs,maxPages=6){
+  const rows=[];
+  let marker=null;
+  let done=false;
+  for(let page=0;page<maxPages&&!done;page+=1){
+    const request={
+      account,
+      ledger_index_min:-1,
+      ledger_index_max:-1,
+      limit:200,
+      forward:false
+    };
+    if(marker)request.marker=marker;
+    const result=await xrplRequest('account_tx',[request]);
+    marker=result.marker||null;
+    for(const row of result.transactions||[]){
+      const tx=row.tx_json||row.tx||row.transaction;
+      const txTime=rippleTimeMs(tx?.date);
+      if(txTime&&txTime<sinceMs){done=true;continue}
+      rows.push(row);
+    }
+    if(!marker)break;
+  }
+  return rows;
 }
 (async function loadFamilyTracker(){
   const familyIssuer='rJttfuZqs91hXGS5hvB42reVQvL3CgtgXi';
@@ -713,8 +806,14 @@ function familyIssuedAmount(amount,currency,issuer){
     'rPxWq2dcidWr3AfqXFzdSVBpe4GrATGpSB',
     'r4xpS7RMpEQZb92dqvpDwuyoCHjumrQfh'
   ];
-  const burnStart=Date.parse('2026-08-12T00:00:00Z');
+  const burnStart=Date.parse('2026-08-12T13:16:41Z');
+  const burnStartIssuedSupply=499876915.5132603;
+  const burnStartPriceXrp=0.000013480368517889528;
+  const burnStartMarketCapXrp=burnStartIssuedSupply*burnStartPriceXrp;
   const supportSet=new Set(supportAccounts);
+  let price=0;
+  let poolValue=0;
+  let issuedSupply=0;
 
   try{
     const amm=await xrplRequest('amm_info',[{
@@ -724,23 +823,25 @@ function familyIssuedAmount(amount,currency,issuer){
     }]).then(r=>r.amm);
     const xrpReserve=dropsToXrp(amm.amount);
     const familyReserve=Number(amm.amount2?.value||0);
-    const poolValue=xrpReserve*2;
-    const price=familyReserve>0?xrpReserve/familyReserve:0;
+    poolValue=xrpReserve*2;
+    price=familyReserve>0?xrpReserve/familyReserve:0;
     setTrackerText('trackerPool',`${compactNumber(poolValue,0)} XRP`);
-    setTrackerText('trackerPrice',price?`${price.toPrecision(4)} XRP`:'—');
   }catch(error){
     setTrackerText('trackerPool','Open bot');
-    setTrackerText('trackerPrice','Live in bot');
   }
 
   try{
-    const results=await Promise.allSettled(supportAccounts.map(account=>xrplRequest('account_tx',[{
-        account,
-        ledger_index_min:-1,
-        ledger_index_max:-1,
-        limit:200,
-        forward:false
-      }])));
+    const balances=await xrplRequest('gateway_balances',[{
+      account:familyIssuer,
+      ledger_index:'validated'
+    }]);
+    issuedSupply=Number(balances.obligations?.[familyCurrency]||0);
+  }catch(error){
+    issuedSupply=0;
+  }
+
+  try{
+    const results=await Promise.allSettled(supportAccounts.map(account=>accountTxSince(account,burnStart)));
     const seen=new Set();
     let burned=0;
     let burns=0;
@@ -764,14 +865,31 @@ function familyIssuedAmount(amount,currency,issuer){
         burns+=1;
       }
     }
+    if(!issuedSupply&&burned>0)issuedSupply=Math.max(0,burnStartIssuedSupply-burned);
+    const supplyCut=issuedSupply>0&&burned>0?(burned/(issuedSupply+burned))*100:0;
+    const currentMarketCap=issuedSupply>0&&price>0?issuedSupply*price:0;
+    const marketCapChange=currentMarketCap>0?((currentMarketCap-burnStartMarketCapXrp)/burnStartMarketCapXrp)*100:0;
+    const burnValue=price>0?burned*price:0;
+
     setTrackerText('trackerSupport',`${compactNumber(burned,0)} FAMILY`);
+    setTrackerText('trackerBurnedHero',`${compactNumber(burned,1)}`);
     setTrackerText('trackerDeposits',compactNumber(burns,0));
-    setTrackerText('trackerTargetText',burns>0?`Buy burn tracker: ${compactNumber(burned,0)} FAMILY burned since tracking began.`:'Buy burn tracker is live and waiting for the first tracked burn.');
+    setTrackerText('trackerSupplyCut',supplyCut?`${compactNumber(supplyCut,4)}%`:'Checking');
+    setTrackerText('trackerSupplyCutHero',supplyCut?`${compactNumber(supplyCut,2)}%`:'Live');
+    setTrackerText('trackerBurnValue',burnValue?`${compactNumber(burnValue,1)} XRP`:'Live in bot');
+    setTrackerText('trackerStartMcap',`${compactNumber(burnStartMarketCapXrp,0)} XRP`);
+    setTrackerText('trackerCurrentMcap',currentMarketCap?`${compactNumber(currentMarketCap,0)} XRP`:'Checking');
+    setTrackerText('trackerMcapChange',currentMarketCap?signedPercent(marketCapChange,1):'Checking');
+    setTrackerText('trackerMcapHero',currentMarketCap?signedPercent(marketCapChange,0):'Live');
+    setTrackerText('trackerTargetText',burns>0?`BUY & BURN has removed ${compactNumber(supplyCut,4)}% of circulating supply since activation. Market cap is tracked from ${compactNumber(burnStartMarketCapXrp,0)} XRP at launch of the burn tracker.`:'BUY & BURN tracker is live and waiting for the first tracked burn.');
     const bar=document.getElementById('trackerProgress');
-    if(bar)bar.style.width=burns>0?'100%':'28%';
+    if(bar)bar.style.width=burns>0?`${Math.max(10,Math.min(100,supplyCut*18))}%`:'28%';
   }catch(error){
     setTrackerText('trackerSupport','Open bot');
     setTrackerText('trackerDeposits','Live in bot');
+    setTrackerText('trackerSupplyCut','Live in bot');
+    setTrackerText('trackerBurnValue','Live in bot');
+    setTrackerText('trackerStartMcap',`${compactNumber(burnStartMarketCapXrp,0)} XRP`);
     const bar=document.getElementById('trackerProgress');
     if(bar)bar.style.width='28%';
   }
