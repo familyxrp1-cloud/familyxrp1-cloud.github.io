@@ -877,7 +877,7 @@ async function accountTxSince(account,sinceMs,maxPages=20){
     'r4xpS7RMpEQZb92dqvpDwuyoCHjumrQfh'
   ];
   const burnStart=Date.parse('2026-08-12T13:16:41Z');
-  const buyBurnApiUrl='https://engines-toronto-personally-either.trycloudflare.com/api/family/buy-burn';
+  const buyBurnApiUrl='https://cheap-mrna-accepted-desperate.trycloudflare.com/api/family/buy-burn';
   const burnStartCirculatingSupply=499876915.5132603;
   const lockedEscrowSupply=375000000;
   const burnStartPriceXrp=0.000013480368517889528;
@@ -956,6 +956,7 @@ async function accountTxSince(account,sinceMs,maxPages=20){
         burns+=1;
       }
     }
+    if(burns===0||burned<=0)throw new Error('XRPL fallback returned no burn history');
     if(!circulatingSupply&&burned>0)circulatingSupply=Math.max(0,burnStartCirculatingSupply-burned);
     const trackedSupply=circulatingSupply>0?circulatingSupply+lockedEscrowSupply:0;
     const supplyCut=circulatingSupply>0&&burned>0?(burned/(circulatingSupply+burned))*100:0;
